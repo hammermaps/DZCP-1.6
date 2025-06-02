@@ -279,7 +279,7 @@ WHERE id = '" . (int)($_GET['id']) . "'");
         if (!empty($tmpname)) {
             $img = @getimagesize($tmpname);
             if ($img[0]) {
-                foreach ($picformat AS $end_del) {
+                foreach ($picformat as $end_del) {
                     if (file_exists(basePath . '/inc/images/clanwars/' . $cwid . '_logo.' . $end_del)) {
                         unlink(basePath . '/inc/images/clanwars/' . $cwid . '_logo.' . $end_del);
                         break;
@@ -300,7 +300,7 @@ WHERE id = '" . (int)($_GET['id']) . "'");
                 if (!empty($tmpname)) {
                     $img = @getimagesize($tmpname);
                     if ($img[0]) {
-                        foreach ($picformat AS $end_del) {
+                        foreach ($picformat as $end_del) {
                             if (file_exists(basePath . '/inc/images/clanwars/' . $cwid . '_' . $zaehler . '.' . $end_del)) {
                                 unlink(basePath . '/inc/images/clanwars/' . $cwid . '_' . $zaehler . '.' . $end_del);
                                 break;

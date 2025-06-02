@@ -12,6 +12,7 @@ $ajaxJob = true;
 include_once(basePath . '/vendor/autoload.php');
 
 use GUMP\GUMP;
+
 $gump = GUMP::get_instance();
 
 include_once(basePath . "/inc/debugger.php");

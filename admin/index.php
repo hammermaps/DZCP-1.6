@@ -54,7 +54,7 @@ else {
     //Site Permissions
     $files = get_files(basePath . '/admin/menu/', false, true, array('xml'));
     if (count($files)) {
-        foreach ($files AS $file_xml) {
+        foreach ($files as $file_xml) {
             if (file_exists(basePath . '/admin/menu/' . str_replace('.xml', '.php', $file_xml))) {
                 $permission = false;
                 $xml = simplexml_load_file(basePath . '/admin/menu/' . $file_xml);
@@ -65,7 +65,7 @@ else {
                 if ($oa && !$ora && $chkMe == 4) $permission = true;
                 if ($ora && $chkMe == 4 && rootAdmin()) $permission = true;
 
-                foreach ($picformat AS $end) {
+                foreach ($picformat as $end) {
                     if (file_exists(basePath . '/admin/menu/' . str_replace('.xml', '', $file_xml) . '.' . $end))
                         break;
                 }
@@ -79,9 +79,9 @@ else {
         }
     }
 
-    foreach ($amenu AS $m => $k) {
+    foreach ($amenu as $m => $k) {
         natcasesort($k);
-        foreach ($k AS $l) $$m .= $l;
+        foreach ($k as $l) $$m .= $l;
     }
 
     $radmin1 = '';
@@ -111,7 +111,7 @@ else {
         $dzcp_version = show_dzcp_version(isset($_GET['version_reload']));
 
         $dzcp_news = ['news' => ''];
-        if(admin_view_dzcp_news && api_enabled)
+        if (admin_view_dzcp_news && api_enabled)
             $dzcp_news = $api->getNews(false);
 
         $index = show($dir . "/admin", array("head" => _config_head,
@@ -122,8 +122,8 @@ else {
             "content" => _content,
             "newsticker" => admin_view_dzcp_news && api_enabled && !empty($dzcp_news['results']['news'])
                 ? ('<div style="padding:3px"><b>DZCP News:</b><br />' .
-                '<div id="dzcpticker">' . utf8_encode($dzcp_news['results']['news']) .
-                '</div></div>') : '',
+                    '<div id="dzcpticker">' . utf8_encode($dzcp_news['results']['news']) .
+                    '</div></div>') : '',
             "rootadmin" => _rootadmin,
             "rootmenu" => $rootmenu,
             "settingsmenu" => $settingsmenu,

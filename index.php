@@ -20,7 +20,9 @@ if (file_exists(basePath . "/inc/mysql.php"))
     require_once(basePath . "/inc/mysql.php");
 
 include(basePath . '/vendor/autoload.php');
+
 use GUMP\GUMP;
+
 $gump = GUMP::get_instance();
 
 if (empty($sql_user) && empty($sql_pass) && empty($sql_db)) {

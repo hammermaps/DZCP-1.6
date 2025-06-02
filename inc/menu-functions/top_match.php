@@ -22,7 +22,7 @@ function top_match()
         if ($get = _fetch($qry)) {
             $squad = '_defaultlogo.jpg';
             $gegner = '_defaultlogo.jpg';
-            foreach ($picformat AS $end) {
+            foreach ($picformat as $end) {
                 if (file_exists(basePath . '/inc/images/clanwars/' . $get['id'] . '_logo.' . $end))
                     $gegner = $get['id'] . '_logo.' . $end;
 

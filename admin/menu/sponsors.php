@@ -252,21 +252,21 @@ if ($do == "new") {
         $xnone = "none";
     }
 
-    foreach ($picformat AS $end) {
+    foreach ($picformat as $end) {
         if (file_exists(basePath . '/banner/sponsors/site_' . $get['id'] . '.' . $end)) {
             $sitepic = '<img src="../banner/sponsors/site_' . $get['id'] . '.' . $end . '" alt="" width="50%" />';
             break;
         }
     }
 
-    foreach ($picformat AS $end) {
+    foreach ($picformat as $end) {
         if (file_exists(basePath . '/banner/sponsors/banner_' . $get['id'] . '.' . $end)) {
             $bannerpic = '<img src="../banner/sponsors/banner_' . $get['id'] . '.' . $end . '" alt="" width="50%" />';
             break;
         }
     }
 
-    foreach ($picformat AS $end) {
+    foreach ($picformat as $end) {
         if (file_exists(basePath . '/banner/sponsors/box_' . $get['id'] . '.' . $end)) {
             $boxpic = '<img src="../banner/sponsors/box_' . $get['id'] . '.' . $end . '" alt="" width="50%" />';
             break;
@@ -361,21 +361,21 @@ if ($do == "new") {
             $xnone = "none";
         }
 
-        foreach ($picformat AS $end) {
+        foreach ($picformat as $end) {
             if (file_exists(basePath . '/banner/sponsors/site_' . $get['id'] . '.' . $end)) {
                 $sitepic = '<img src="../banner/sponsors/site_' . $get['id'] . '.' . $end . '" alt="" width="50%" />';
                 break;
             }
         }
 
-        foreach ($picformat AS $end) {
+        foreach ($picformat as $end) {
             if (file_exists(basePath . '/banner/sponsors/banner_' . $get['id'] . '.' . $end)) {
                 $bannerpic = '<img src="../banner/sponsors/banner_' . $get['id'] . '.' . $end . '" alt="" width="50%" />';
                 break;
             }
         }
 
-        foreach ($picformat AS $end) {
+        foreach ($picformat as $end) {
             if (file_exists(basePath . '/banner/sponsors/box_' . $get['id'] . '.' . $end)) {
                 $boxpic = '<img src="../banner/sponsors/box_' . $get['id'] . '.' . $end . '" alt="" width="50%" />';
                 break;

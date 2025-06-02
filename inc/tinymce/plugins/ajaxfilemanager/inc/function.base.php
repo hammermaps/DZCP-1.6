@@ -106,7 +106,7 @@ function isValidExt($filePath, $validExts, $invalidExts = array())
 
 /**
  *  transform file relative path to absolute path
- * @param  string $value the path to the file
+ * @param string $value the path to the file
  * @return string
  */
 function relToAbs($value)

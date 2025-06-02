@@ -27,7 +27,7 @@ switch ($action):
                 $imgArr = array();
                 $files = get_files("images/", false, true, $picformat, false, array(), 'minimize');
 
-                foreach ($files AS $file) {
+                foreach ($files as $file) {
                     if ((int)($file) == $get['id'])
                         array_push($imgArr, $file);
                 }

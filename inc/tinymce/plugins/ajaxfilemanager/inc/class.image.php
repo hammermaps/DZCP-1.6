@@ -86,7 +86,7 @@ class Image
     /**
      * append to errors array and shown the each error when the debug turned on
      *
-     * @param  string $string
+     * @param string $string
      * @return void
      * @access private
      * @copyright this function originally come from Andy's php
@@ -115,7 +115,7 @@ class Image
     /**
      * Load an image from the file system.
      *
-     * @param  string $filename
+     * @param string $filename
      * @return bool
      * @access public
      * @copyright this function originally come from Andy's php
@@ -173,7 +173,7 @@ class Image
     /**
      * Load an image from a string (eg. from a database table)
      *
-     * @param  string $string
+     * @param string $string
      * @return bool
      * @access public
      * @copyright this function originally come from Andy's php
@@ -192,9 +192,9 @@ class Image
     /**
      * Save the modified image
      *
-     * @param  string $filename
-     * @param  int $quality
-     * @param  string $forcetype
+     * @param string $filename
+     * @param int $quality
+     * @param string $forcetype
      * @return bool
      * @access public
      * @copyright this function originally come from Andy's php
@@ -240,8 +240,8 @@ class Image
     /**
      * Shows the masked image without any saving
      *
-     * @param  string $type
-     * @param  int $quality
+     * @param string $type
+     * @param int $quality
      * @return bool
      * @access public
      * @copyright this function originally come from Andy's php
@@ -283,10 +283,10 @@ class Image
     /**
      * Used for cropping image
      *
-     * @param  int $dst_x
-     * @param  int $dst_y
-     * @param  int $dst_w
-     * @param  int $dst_h
+     * @param int $dst_x
+     * @param int $dst_y
+     * @param int $dst_w
+     * @param int $dst_h
      * @return bool
      * @access public
      * @copyright this function originally come from Andy's php
@@ -430,7 +430,7 @@ class Image
     /**
      * Get the extension of a file name
      *
-     * @param  string $file
+     * @param string $file
      * @return string
      * @copyright this function originally come from Andy's php
      */
@@ -446,10 +446,10 @@ class Image
     /**
      * Validate whether image reading/writing routines are valid.
      *
-     * @param  string $filename
-     * @param  string $extension
-     * @param  string $function
-     * @param  bool $write
+     * @param string $filename
+     * @param string $extension
+     * @param string $function
+     * @param bool $write
      * @return bool
      * @access private
      * @copyright this function originally come from Andy's php
@@ -550,7 +550,7 @@ class Image
     /**
      * get the GD version information
      *
-     * @param  bool $versionOnly
+     * @param bool $versionOnly
      * @return array
      * @access private
      * @copyright this function originally come from Andy's php
@@ -628,7 +628,7 @@ class Image
     /**
      * Destroy the resources used by the images.
      *
-     * @param  bool $original
+     * @param bool $original
      * @return void
      * @access public
      * @copyright this function originally come from Andy's php

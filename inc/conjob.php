@@ -18,6 +18,7 @@ $ajaxJob = true;
 include(basePath . '/vendor/autoload.php');
 
 use GUMP\GUMP;
+
 $gump = GUMP::get_instance();
 
 include(basePath . "/inc/debugger.php");
@@ -26,32 +27,31 @@ include(basePath . "/inc/bbcode.php");
 
 use BrightNucleus\CountryCodes\Country;
 
-if((settings('last_conjob',false)+90) <= time()) {
+if ((settings('last_conjob', false) + 90) <= time()) {
     @ignore_user_abort(true);
     @set_time_limit(90);
-    db("UPDATE `" . $db['settings'] . "` SET `last_conjob` = ".time()." WHERE `id` = 1;"); //Update
+    db("UPDATE `" . $db['settings'] . "` SET `last_conjob` = " . time() . " WHERE `id` = 1;"); //Update
 
     //Update longitudes & latitude for membermap for PHP
-    if(api_enabled) {
+    if (api_enabled) {
         //Update
-        $mme_qry = db('SELECT `id`, `city`, `country` FROM `'.$db['users'].'` WHERE `gmaps_koord` IS NULL OR `gmaps_koord` = "" ORDER BY id;');
-        while($mme_get = _fetch($mme_qry)) {
+        $mme_qry = db('SELECT `id`, `city`, `country` FROM `' . $db['users'] . '` WHERE `gmaps_koord` IS NULL OR `gmaps_koord` = "" ORDER BY id;');
+        while ($mme_get = _fetch($mme_qry)) {
             $geo = null;
-            if(!empty($mme_get['city']) && !empty($mme_get['country'])) {
-                $geo = $api->getGeoLocation(strtolower(re($mme_get['city'])).','.strtolower(getCountryName($mme_get['country'])));
-            }
-            else if(!empty($mme_get['city'])) {
+            if (!empty($mme_get['city']) && !empty($mme_get['country'])) {
+                $geo = $api->getGeoLocation(strtolower(re($mme_get['city'])) . ',' . strtolower(getCountryName($mme_get['country'])));
+            } else if (!empty($mme_get['city'])) {
                 $geo = $api->getGeoLocation(strtolower(re($mme_get['city'])));
-            }
-            else if(!empty($mme_get['country'])) {
+            } else if (!empty($mme_get['country'])) {
                 $geo = $api->getGeoLocation(strtolower(getCountryName($mme_get['country'])));
             }
 
-            if(!is_null($geo) && !$geo['error'] && array_key_exists('lat',$geo['results']) && array_key_exists('lng',$geo['results']) &&
+            if (!is_null($geo) && !$geo['error'] && array_key_exists('lat', $geo['results']) && array_key_exists('lng', $geo['results']) &&
                 !empty($geo['results']['lat']) && $geo['results']['lat'] != 0 && !empty($geo['results']['lng']) && $geo['results']['lng'] != 0) {
-                db("UPDATE `" . $db['users'] . "` SET `gmaps_koord` = '".$geo['results']['lat'].",".$geo['results']['lng']."' WHERE `id` = " . $mme_get['id'] . ";");
+                db("UPDATE `" . $db['users'] . "` SET `gmaps_koord` = '" . $geo['results']['lat'] . "," . $geo['results']['lng'] . "' WHERE `id` = " . $mme_get['id'] . ";");
             }
-        } unset($mme_qry,$mme_get,$geo);
+        }
+        unset($mme_qry, $mme_get, $geo);
     }
 
     //-> Automatische Datenbank Optimierung

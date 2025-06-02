@@ -231,7 +231,7 @@ switch ($do) {
 
             if (!empty($tmp)) {
                 $img = getimagesize($tmp);
-                foreach ($picformat AS $end1) {
+                foreach ($picformat as $end1) {
                     if (file_exists(basePath . '/inc/images/squads/' . (int)($_GET['id']) . '.' . $end1)) {
                         @unlink(basePath . '/inc/images/squads/' . (int)($_GET['id']) . '.' . $end1);
                         break;
@@ -250,7 +250,7 @@ switch ($do) {
 
             if (!empty($tmp)) {
                 $img = getimagesize($tmp);
-                foreach ($picformat AS $end1) {
+                foreach ($picformat as $end1) {
                     if (file_exists(basePath . '/inc/images/squads/' . (int)($_GET['id']) . '_logo.' . $end1)) {
                         @unlink(basePath . '/inc/images/squads/' . (int)($_GET['id']) . '_logo.' . $end1);
                         break;
@@ -354,14 +354,14 @@ switch ($do) {
 
         $image = '';
         $logoimage = '';
-        foreach ($picformat AS $end) {
+        foreach ($picformat as $end) {
             if (file_exists(basePath . '/inc/images/squads/' . (int)($_GET['id']) . '.' . $end)) {
                 $image = '<img src="../inc/images/squads/' . (int)($_GET['id']) . '.' . $end . '" width="200" alt="" onmouseover="DZCP.showInfo(\'<tr><td><img src=../inc/images/squads/' . (int)($_GET['id']) . '.' . $end . ' alt= /></tr></td>\')" onmouseout="DZCP.hideInfo()" /><br />';
                 break;
             }
         }
 
-        foreach ($picformat AS $end) {
+        foreach ($picformat as $end) {
             if (file_exists(basePath . '/inc/images/squads/' . (int)($_GET['id']) . '_logo.' . $end)) {
                 $logoimage = '<img src="../inc/images/squads/' . (int)($_GET['id']) . '_logo.' . $end . '" height="60" alt="" onmouseover="DZCP.showInfo(\'<tr><td><img src=../inc/images/squads/' . (int)($_GET['id']) . '_logo.' . $end . ' alt= /></tr></td>\')" onmouseout="DZCP.hideInfo()" /><br />';
                 break;

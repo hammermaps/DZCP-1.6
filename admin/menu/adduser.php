@@ -115,24 +115,24 @@ if ($do == "add") {
         $insert_id = mysqli_insert_id($mysql);
         setIpcheck("createuser(" . $userid . "_" . $insert_id . ")");
 
-        if(isset($_POST['land']) && isset($_POST['city'])) {
-            if(empty($_POST['land'])) {
+        if (isset($_POST['land']) && isset($_POST['city'])) {
+            if (empty($_POST['land'])) {
                 $geo = $api->getGeoLocation(strtolower($_POST['city']));
-            } else if(empty($_POST['land'])) {
+            } else if (empty($_POST['land'])) {
                 $geo = $api->getGeoLocation(strtolower(getCountryName($_POST['land'])));
             } else {
-                $geo = $api->getGeoLocation(strtolower($_POST['city']).','.strtolower(getCountryName($_POST['land'])));
+                $geo = $api->getGeoLocation(strtolower($_POST['city']) . ',' . strtolower(getCountryName($_POST['land'])));
             }
 
-            if(!$geo['error'] && array_key_exists('lat',$geo['results']) && array_key_exists('lng',$geo['results']) &&
+            if (!$geo['error'] && array_key_exists('lat', $geo['results']) && array_key_exists('lng', $geo['results']) &&
                 !empty($geo['results']['lat']) && $geo['results']['lat'] != 0 && !empty($geo['results']['lng']) && $geo['results']['lng'] != 0) {
-                db("UPDATE `" . $db['users'] . "` SET `gmaps_koord` = '".$geo['results']['lat'].",".$geo['results']['lng']."' WHERE `id` = " . $insert_id . ";");
+                db("UPDATE `" . $db['users'] . "` SET `gmaps_koord` = '" . $geo['results']['lat'] . "," . $geo['results']['lng'] . "' WHERE `id` = " . $insert_id . ";");
             }
         }
 
         // permissions
         if (!empty($_POST['perm'])) {
-            foreach ($_POST['perm'] AS $v => $k) $p .= "`" . substr($v, 2) . "` = '" . (int)($k) . "',";
+            foreach ($_POST['perm'] as $v => $k) $p .= "`" . substr($v, 2) . "` = '" . (int)($k) . "',";
             if (!empty($p)) $p = ', ' . substr($p, 0, strlen($p) - 1);
 
             db("INSERT INTO " . $db['permissions'] . " SET `user` = " . (int)($insert_id) . $p);
@@ -141,7 +141,7 @@ if ($do == "add") {
 
         // internal boardpermissions
         if (!empty($_POST['board'])) {
-            foreach ($_POST['board'] AS $v)
+            foreach ($_POST['board'] as $v)
                 db("INSERT INTO " . $db['f_access'] . " SET `user` = " . (int)($insert_id) . ", `forum` = '" . $v . "'");
         }
         ////////////////////

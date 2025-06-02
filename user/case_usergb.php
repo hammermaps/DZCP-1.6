@@ -61,7 +61,7 @@ if (defined('_UserMenu')) {
                     "ip" => _iplog_info,
                     "eintraghead" => _eintrag));
             } else {
-                $qryperm = db("SELECT `perm_gb` FROM `" . $db['users'] . "` WHERE `id` = " . $_GET['id'].";", false, true);
+                $qryperm = db("SELECT `perm_gb` FROM `" . $db['users'] . "` WHERE `id` = " . $_GET['id'] . ";", false, true);
                 if ($qryperm['perm_gb']) {
                     $qry = db("INSERT INTO " . $db['usergb'] . "
                                          SET `user`       = '" . ((int)$_GET['id']) . "',

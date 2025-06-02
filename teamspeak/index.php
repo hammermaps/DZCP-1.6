@@ -26,7 +26,7 @@ if (fsockopen_support()) {
         $tstree = $tsstatus->render(true);
 
         $users = 0;
-        foreach ($tsstatus->_userDatas AS $user) {
+        foreach ($tsstatus->_userDatas as $user) {
             if ($user["client_type"] == 0) {
                 $users++;
                 $icon = "16x16_player_off.png";

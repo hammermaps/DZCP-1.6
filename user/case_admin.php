@@ -51,8 +51,8 @@ if (defined('_UserMenu')) {
                             $msg = show(_admin_user_get_identy, array("nick" => autor($identy_userid)));
                             $_SESSION['identy_id'] = $userid; //Save Last ID
 
-                            db("UPDATE " . $db['users'] . " SET `online` = 0, `sessid` = '', ".
-                                "`time` = ".$_SESSION['lastvisit']." WHERE `id` = " . $userid . ";"); //Logout
+                            db("UPDATE " . $db['users'] . " SET `online` = 0, `sessid` = '', " .
+                                "`time` = " . $_SESSION['lastvisit'] . " WHERE `id` = " . $userid . ";"); //Logout
                             session_regenerate_id();
 
                             $_SESSION['id'] = $_GET['id'];
@@ -87,7 +87,7 @@ if (defined('_UserMenu')) {
                             // internal boardpermissions
                             db("DELETE FROM " . $db['f_access'] . " WHERE `user` = '" . $edit_userid . "'");
                             if (!empty($_POST['board'])) {
-                                foreach ($_POST['board'] AS $v) {
+                                foreach ($_POST['board'] as $v) {
                                     db("INSERT INTO `" . $db['f_access'] . "` SET `user` = " . $edit_userid . ", `forum` = '" . $v . "';");
                                 }
                             }
@@ -240,10 +240,10 @@ if (defined('_UserMenu')) {
 
                             //IP-Check Loop
                             foreach ($ips as $ip) {
-                                if(is_array($ip))
+                                if (is_array($ip))
                                     continue;
 
-                                if(!empty($ip)) {
+                                if (!empty($ip)) {
                                     if (!validateIpV4Range((string)$ip, ['[192].[168].[0-255].[0-255]', '[127].[0].[0-255].[0-255]',
                                         '[10].[0-255].[0-255].[0-255]', '[172].[16-31].[0-255].[0-255]'])) {
                                         db("DELETE FROM `" . $db['acomments'] . "` WHERE `ip` = '" . $ip . "';");
@@ -256,7 +256,8 @@ if (defined('_UserMenu')) {
                                         db("DELETE FROM `" . $db['usergb'] . "` WHERE `ip` = '" . $ip . "';");
                                     }
                                 }
-                            } unset($ips);
+                            }
+                            unset($ips);
 
                             foreach ($picformat as $tmpendung) {
                                 if (file_exists(basePath . "/inc/images/uploads/userpics/" . (int)($getdel['id']) . "." . $tmpendung))

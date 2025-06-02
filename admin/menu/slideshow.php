@@ -74,7 +74,7 @@ if ($do == 'new') {
     if (empty($_FILES['bild']['tmp_name']) || empty($_POST['bez']) || empty($_POST['url']) || $_POST['url'] == "http://") {
         if (!$_FILES['bild']['tmp_name']) $error = _slider_admin_error_nopic;
         elseif (empty($_POST['bez'])) $error = _slider_admin_error_empty_bezeichnung;
-        elseif (empty($_POST['url']) OR $_POST['url'] == "http://") $error = _slider_admin_error_empty_url;
+        elseif (empty($_POST['url']) or $_POST['url'] == "http://") $error = _slider_admin_error_empty_url;
 
         $error = show("errors/errortable", array("error" => $error));
 
@@ -194,7 +194,7 @@ if ($do == 'new') {
 } elseif ($do == 'editdo') {
     if (empty($_POST['bez']) || empty($_POST['url']) || $_POST['url'] == "http://") {
         if (empty($_POST['bez'])) $error = _slider_admin_error_empty_bezeichnung;
-        elseif (empty($_POST['url']) OR $_POST['url'] == "http://") $error = _slider_admin_error_empty_url;
+        elseif (empty($_POST['url']) or $_POST['url'] == "http://") $error = _slider_admin_error_empty_url;
 
         $error = show("errors/errortable", array("error" => $error));
 

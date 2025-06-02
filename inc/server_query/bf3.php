@@ -119,7 +119,7 @@ function server_query_bf3($ip, $port, $q_port, $request)
         $player_total = cut_pascal($buffer, 4, 0, 1);
 
         for ($i = 0; $i < $player_total; $i++) {
-            foreach ($field_list AS $field) {
+            foreach ($field_list as $field) {
                 $value = cut_pascal($buffer, 4, 0, 1);
 
                 switch ($field) {

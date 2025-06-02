@@ -14,7 +14,7 @@ function random_gallery()
         $get = db("SELECT `id`,`kat` FROM " . $db['gallery'] . " ORDER BY RAND()", false, true);
 
         $imgArr = array();
-        foreach ($files AS $file) {
+        foreach ($files as $file) {
             if ((int)($file) == $get['id'])
                 array_push($imgArr, $file);
         }

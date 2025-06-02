@@ -75,7 +75,7 @@ switch (strtolower($action)):
 
         $squad = re($get['name']);
         $style = '';
-        foreach ($picformat AS $end) {
+        foreach ($picformat as $end) {
             if (file_exists(basePath . '/inc/images/squads/' . (int)($get['id']) . '.' . $end)) {
                 $style = 'padding:0;';
                 $squad = '<img src="../inc/images/squads/' . (int)($get['id']) . '.' . $end . '" alt="' . re($get['name']) . '" />';
@@ -98,7 +98,7 @@ switch (strtolower($action)):
             $squad = show(_gameicon, array("icon" => $get['icon'])) . ' ' . re($get['name']);
             $style = '';
 
-            foreach ($picformat AS $end) {
+            foreach ($picformat as $end) {
                 if (file_exists(basePath . '/inc/images/squads/' . (int)($get['id']) . '.' . $end)) {
                     $style = 'text-align:center;padding:0';
                     $squad = '<img src="../inc/images/squads/' . (int)($get['id']) . '.' . $end . '" alt="' . re($get['name']) . '" />';

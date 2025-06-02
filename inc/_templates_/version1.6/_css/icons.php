@@ -11,7 +11,7 @@ include(basePath . "/inc/config.php");
 use Phpfastcache\CacheManager;
 
 // Cache
-$cache = CacheManager::getInstance($config_cache['storage'], $config_cache['config'],'default');
+$cache = CacheManager::getInstance($config_cache['storage'], $config_cache['config'], 'default');
 
 $CachedString = $cache->getItem('css_icons');
 if (is_null($CachedString->get())) {

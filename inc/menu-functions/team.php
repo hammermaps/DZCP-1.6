@@ -16,7 +16,7 @@ function team($tID = '')
         $where = "WHERE `navi` = 1 ORDER BY RAND();";
 
     $qry = db("SELECT `id`,`name` FROM `" . $db['squads'] . "` " . $where . ";");
-    if(_rows($qry)) {
+    if (_rows($qry)) {
         $get = _fetch($qry);
 
         //Members

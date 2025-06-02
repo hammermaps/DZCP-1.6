@@ -44,7 +44,8 @@ if (defined('_UserMenu')) {
             } elseif ($check_email) {
                 $index = error(_error_email_exists, 1);
             } else {
-                $newpwd = ''; $newpwd = '';
+                $newpwd = '';
+                $newpwd = '';
                 if (isset($_POST['pwd']) && isset($_POST['cpwd']) &&
                     !empty($_POST['pwd']) && !empty($_POST['cpwd'])) {
                     if ($_POST['pwd'] == $_POST['cpwd']) {
@@ -97,19 +98,19 @@ if (defined('_UserMenu')) {
                   `show`         = " . ((int)($_POST['visibility_profile'])) . " 
                    WHERE `id` = " . $userid . ";");
 
-                if(isset($_POST['land']) && isset($_POST['city'])) {
+                if (isset($_POST['land']) && isset($_POST['city'])) {
                     if ($get['country'] != up($_POST['land']) || $get['city'] != up($_POST['city'])) {
-                        if(empty($_POST['land'])) {
+                        if (empty($_POST['land'])) {
                             $geo = $api->getGeoLocation(strtolower($_POST['city']));
-                        } else if(empty($_POST['land'])) {
+                        } else if (empty($_POST['land'])) {
                             $geo = $api->getGeoLocation(strtolower(getCountryName($_POST['land'])));
                         } else {
-                            $geo = $api->getGeoLocation(strtolower($_POST['city']).','.strtolower(getCountryName($_POST['land'])));
+                            $geo = $api->getGeoLocation(strtolower($_POST['city']) . ',' . strtolower(getCountryName($_POST['land'])));
                         }
 
-                        if(!$geo['error'] && array_key_exists('lat',$geo['results']) && array_key_exists('lng',$geo['results']) &&
-                        !empty($geo['results']['lat']) && $geo['results']['lat'] != 0 && !empty($geo['results']['lng']) && $geo['results']['lng'] != 0) {
-                            db("UPDATE `" . $db['users'] . "` SET `gmaps_koord` = '".$geo['results']['lat'].",".$geo['results']['lng']."' WHERE `id` = " . $userid . ";");
+                        if (!$geo['error'] && array_key_exists('lat', $geo['results']) && array_key_exists('lng', $geo['results']) &&
+                            !empty($geo['results']['lat']) && $geo['results']['lat'] != 0 && !empty($geo['results']['lng']) && $geo['results']['lng'] != 0) {
+                            db("UPDATE `" . $db['users'] . "` SET `gmaps_koord` = '" . $geo['results']['lat'] . "," . $geo['results']['lng'] . "' WHERE `id` = " . $userid . ";");
                         }
                     }
                 }
@@ -252,10 +253,10 @@ if (defined('_UserMenu')) {
 
             //IP-Check Loop
             foreach ($ips as $ip) {
-                if(is_array($ip))
+                if (is_array($ip))
                     continue;
 
-                if(!empty($ip)) {
+                if (!empty($ip)) {
                     if (!validateIpV4Range((string)$ip, ['[192].[168].[0-255].[0-255]', '[127].[0].[0-255].[0-255]',
                         '[10].[0-255].[0-255].[0-255]', '[172].[16-31].[0-255].[0-255]'])) {
                         db("DELETE FROM `" . $db['acomments'] . "` WHERE `ip` = '" . $ip . "';");
@@ -268,7 +269,8 @@ if (defined('_UserMenu')) {
                         db("DELETE FROM `" . $db['usergb'] . "` WHERE `ip` = '" . $ip . "';");
                     }
                 }
-            } unset($ips);
+            }
+            unset($ips);
 
             foreach ($picformat as $tmpendung) {
                 if (file_exists(basePath . "/inc/images/uploads/userpics/" . (int)($getdel['id']) . "." . $tmpendung))
@@ -418,7 +420,10 @@ if (defined('_UserMenu')) {
                         "value" => re($getcontent[$getcustom['feldname']])));
                 }
 
-                $pnl = ''; $pnm = ''; $deleteava = ''; $deletepic = '';
+                $pnl = '';
+                $pnm = '';
+                $deleteava = '';
+                $deletepic = '';
                 if ($get['nletter'] == 1)
                     $pnl = 'checked="checked"';
 

@@ -203,7 +203,7 @@ if (defined('_Forum')) {
 
                     $dowhat = show(_forum_dowhat_add_post, array("id" => $_GET['id'], "kid" => $_GET['kid']));
 
-                    $qry_posts = db("SELECT * FROM `".$db['f_posts']."` WHERE `kid` = ".(int)($_GET['kid'])." AND `sid` = ".(int)($_GET['id'])." ORDER BY `date` DESC;");
+                    $qry_posts = db("SELECT * FROM `" . $db['f_posts'] . "` WHERE `kid` = " . (int)($_GET['kid']) . " AND `sid` = " . (int)($_GET['id']) . " ORDER BY `date` DESC;");
                     if (_rows($qry_posts)) {
                         $get_posts = _fetch($qry_posts);
                         $gett = db("SELECT `topic` FROM `" . $db['f_threads'] . "` WHERE `id` = " . (int)($get_posts['sid']) . ";", false, true);
@@ -522,7 +522,8 @@ if (defined('_Forum')) {
                             if (!empty($getu['hp']))
                                 $hp = show(_hpicon_forum, array("hp" => links(re($getu['hp']))));
                         } else {
-                            $pn = ""; $hp = "";
+                            $pn = "";
+                            $hp = "";
                             $email = show(_emailicon_forum, array("email" => eMailAddr(re($gett['t_email']))));
                             if (!empty($gett['t_hp']))
                                 $hp = show(_hpicon_forum, array("hp" => links(re($gett['t_hp']))));
@@ -690,7 +691,7 @@ if (defined('_Forum')) {
         }
     } elseif ($do == "delete") {
         $get = db("SELECT `reg`,`sid`,`kid` FROM `" . $db['f_posts'] . "` WHERE `id` = " . (int)($_GET['id']) . ";", false, true);
-        if ($get['reg'] == $userid OR permission("forum")) {
+        if ($get['reg'] == $userid or permission("forum")) {
             db("DELETE FROM `" . $db['f_posts'] . "` WHERE `id` = " . (int)($_GET['id']) . ";");
 
             $fposts = userstats("forumposts", $get['reg']) - 1;

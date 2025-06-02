@@ -37,7 +37,7 @@ if (!file_exists(basePath . '/' . $_GET['img'])) {
     imagesavealpha($neuesBild, true);
     imagecopyresampled($neuesBild, $altesBild, 0, 0, 0, 0, $neueBreite, $neueHoehe, $breite, $hoehe);
     ob_start();
-        imagepng($neuesBild);
+    imagepng($neuesBild);
     $bild = ob_get_contents();
     ob_end_clean();
 
@@ -53,11 +53,11 @@ $hoehe = $size[1];
 
 $neueBreite = empty($_GET['width']) ? 100 : (int)($_GET['width']);
 $neueHoehe = (int)($hoehe * $neueBreite / $breite);
-$cachehash = str_replace(['/','\\'],'_',$file_exp[0]) . '_minimize_' . $neueBreite . 'x' . $neueHoehe;
+$cachehash = str_replace(['/', '\\'], '_', $file_exp[0]) . '_minimize_' . $neueBreite . 'x' . $neueHoehe;
 $picture_build = false;
 
 // Cache
-$cache = CacheManager::getInstance($config_cache['storage'], $config_cache['config'],'default');
+$cache = CacheManager::getInstance($config_cache['storage'], $config_cache['config'], 'default');
 
 switch ($size[2]) {
     case 1: ## GIF ##
@@ -74,10 +74,10 @@ switch ($size[2]) {
             imagecopyresampled($neuesBild, $altesBild, 0, 0, 0, 0, $neueBreite, $neueHoehe, $breite, $hoehe);
             ob_start();
             imagegif($neuesBild);
-                $bild = ob_get_contents();
+            $bild = ob_get_contents();
             ob_end_clean();
 
-            if(thumbgen_cache) {
+            if (thumbgen_cache) {
                 $CachedString->set(bin2hex($bild))->expiresAfter(thumbgen_cache_time);
             }
 
@@ -98,10 +98,10 @@ switch ($size[2]) {
             imagecopyresampled($neuesBild, $altesBild, 0, 0, 0, 0, $neueBreite, $neueHoehe, $breite, $hoehe);
             ob_start();
             imagejpeg($neuesBild, null, 100);
-                $bild = ob_get_contents();
+            $bild = ob_get_contents();
             ob_end_clean();
 
-            if(thumbgen_cache) {
+            if (thumbgen_cache) {
                 $CachedString->set(bin2hex($bild))->expiresAfter(thumbgen_cache_time);
             }
 
@@ -124,10 +124,10 @@ switch ($size[2]) {
             imagecopyresampled($neuesBild, $altesBild, 0, 0, 0, 0, $neueBreite, $neueHoehe, $breite, $hoehe);
             ob_start();
             imagepng($neuesBild);
-                $bild = ob_get_contents();
+            $bild = ob_get_contents();
             ob_end_clean();
 
-            if(thumbgen_cache) {
+            if (thumbgen_cache) {
                 $CachedString->set(bin2hex($bild))->expiresAfter(thumbgen_cache_time);
             }
 
@@ -139,7 +139,7 @@ switch ($size[2]) {
         break;
 }
 
-if(thumbgen_cache && $picture_build) {
+if (thumbgen_cache && $picture_build) {
     $cache->save($CachedString);
 }
 

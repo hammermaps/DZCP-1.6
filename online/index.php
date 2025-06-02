@@ -30,7 +30,9 @@ if (_rows($qry)) {
         if (!preg_match("#autor_#is", $get['whereami']))
             $whereami = re($get['whereami']);
         else
-            $whereami = preg_replace_callback("#autor_(.*?)$#", function ($id) { return autor($id); }, $get['whereami']);
+            $whereami = preg_replace_callback("#autor_(.*?)$#", function ($id) {
+                return autor($id);
+            }, $get['whereami']);
 
         $online_ip = '';
         if ($chkMe == 4) {
@@ -55,14 +57,16 @@ $qry = db("SELECT * FROM " . $db['c_who'] . "
 
 if (_rows($qry)) {
     while ($get = _fetch($qry)) {
-        if(!is_validate_ip($get['ip'])) {
+        if (!is_validate_ip($get['ip'])) {
             continue;
         }
 
         if (!preg_match("#autor_#is", $get['whereami']))
             $whereami = re($get['whereami']);
         else
-            $whereami = preg_replace_callback("#autor_(.*?)$#", function ($id) { return autor($id); }, $get['whereami']);
+            $whereami = preg_replace_callback("#autor_(.*?)$#", function ($id) {
+                return autor($id);
+            }, $get['whereami']);
 
         if ($chkMe == 4) {
             $online_ip = $get['ip'];

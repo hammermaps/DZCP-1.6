@@ -84,7 +84,7 @@ if ($do == "edit") {
         // permissions
         db("DELETE FROM " . $db['permissions'] . " WHERE `pos` = '" . (int)($_GET['id']) . "'");
         if (!empty($_POST['perm'])) {
-            foreach ($_POST['perm'] AS $v => $k) $p .= "`" . substr($v, 2) . "` = '" . (int)($k) . "',";
+            foreach ($_POST['perm'] as $v => $k) $p .= "`" . substr($v, 2) . "` = '" . (int)($k) . "',";
             if (!empty($p)) $p = ', ' . substr($p, 0, strlen($p) - 1);
 
             db("INSERT INTO " . $db['permissions'] . " SET `pos` = '" . (int)($_GET['id']) . "'" . $p);
@@ -94,7 +94,7 @@ if ($do == "edit") {
         // internal boardpermissions
         db("DELETE FROM " . $db['f_access'] . " WHERE `pos` = '" . (int)($_GET['id']) . "'");
         if (!empty($_POST['board'])) {
-            foreach ($_POST['board'] AS $v)
+            foreach ($_POST['board'] as $v)
                 db("INSERT INTO " . $db['f_access'] . " SET `pos` = '" . (int)($_GET['id']) . "', `forum` = '" . $v . "'");
         }
         ////////////////////
@@ -143,7 +143,7 @@ if ($do == "edit") {
                          `position`  = '" . up($_POST['kat']) . "'");
         $posID = mysqli_insert_id($mysql);
         // permissions
-        foreach ($_POST['perm'] AS $v => $k) $p .= "`" . substr($v, 2) . "` = '" . (int)($k) . "',";
+        foreach ($_POST['perm'] as $v => $k) $p .= "`" . substr($v, 2) . "` = '" . (int)($k) . "',";
         if (!empty($p)) $p = ', ' . substr($p, 0, strlen($p) - 1);
 
         db("INSERT INTO " . $db['permissions'] . " SET `pos` = '" . $posID . "'" . $p);
@@ -151,7 +151,7 @@ if ($do == "edit") {
 
         // internal boardpermissions
         if (!empty($_POST['board'])) {
-            foreach ($_POST['board'] AS $v)
+            foreach ($_POST['board'] as $v)
                 db("INSERT INTO " . $db['f_access'] . " SET `pos` = '" . $posID . "', `forum` = '" . $v . "'");
         }
         ////////////////////

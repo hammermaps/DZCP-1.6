@@ -269,14 +269,14 @@ if (defined('_Clanwars')) {
 
         $logo_squad = '_defaultlogo.jpg';
         $logo_gegner = '_defaultlogo.jpg';
-        foreach ($picformat AS $end) {
+        foreach ($picformat as $end) {
             if (file_exists(basePath . '/inc/images/clanwars/' . $get['id'] . '_logo.' . $end)) {
                 $logo_gegner = $get['id'] . '_logo.' . $end;
                 break;
             }
         }
 
-        foreach ($picformat AS $end) {
+        foreach ($picformat as $end) {
             if (file_exists(basePath . '/inc/images/squads/' . $get['squad_id'] . '_logo.' . $end)) {
                 $logo_squad = $get['squad_id'] . '_logo.' . $end;
                 break;

@@ -6,7 +6,7 @@
 
 if (defined('_UserMenu')) {
     $where = _site_user_logout;
-    if(isset($_GET['reinit'])) {
+    if (isset($_GET['reinit'])) {
         header("Location: ../news/");
         $_SESSION['DSGVO'] = true;
         $_SESSION['do_show_dsgvo'] = true;
@@ -25,16 +25,16 @@ if (defined('_UserMenu')) {
                 $_SESSION['identy_ip'] = '';
                 $_SESSION['identy_id'] = '';
                 $_SESSION['ip'] = visitorIp();
-                $_SESSION['lastvisit'] = userstats("lastvisit",$_SESSION['id']);
+                $_SESSION['lastvisit'] = userstats("lastvisit", $_SESSION['id']);
 
-                db("UPDATE " . $db['users'] . " SET `online` = 1, `sessid` = '" . session_id() . "', `time` = ".time()." WHERE `id` = " .$_SESSION['id'].";");
+                db("UPDATE " . $db['users'] . " SET `online` = 1, `sessid` = '" . session_id() . "', `time` = " . time() . " WHERE `id` = " . $_SESSION['id'] . ";");
                 header("Location: ../user/?action=userlobby");
                 exit();
             }
         }
 
         if ($chkMe && $userid) {
-            db("UPDATE `" . $db['users'] . "` SET `online` = 0, `pkey` = '', `sessid` = '', `time` = ".time()." WHERE `id` = ".$userid.";");
+            db("UPDATE `" . $db['users'] . "` SET `online` = 0, `pkey` = '', `sessid` = '', `time` = " . time() . " WHERE `id` = " . $userid . ";");
             setIpcheck("logout(" . $userid . ")");
             cookie::clear();
             session_unset();

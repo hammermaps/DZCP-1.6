@@ -6,25 +6,28 @@
 
 if (_adminMenu != 'true') exit;
 
-$where = $where.': '._site_addoncheck;
+$where = $where . ': ' . _site_addoncheck;
 
 //load all xml files for addons
-$addons_installed = array(); $addons_not_installed = array();
-$addons_xml = get_files(basePath . "/inc/_versions_"); $addons_local = array();
+$addons_installed = array();
+$addons_not_installed = array();
+$addons_xml = get_files(basePath . "/inc/_versions_");
+$addons_local = array();
 foreach ($addons_xml as $addon_xml) {
-    $array = json_decode(json_encode(simplexml_load_file(basePath . '/inc/_versions_/' . $addon_xml)),true);
-    if(!$array['Version'] || !$array['AID'] ||   empty($array['AID'])) {
+    $array = json_decode(json_encode(simplexml_load_file(basePath . '/inc/_versions_/' . $addon_xml)), true);
+    if (!$array['Version'] || !$array['AID'] || empty($array['AID'])) {
         $addons_not_installed[] = $array;
         continue;
     }
 
     $addons_installed[] = $array;
-} unset($array,$addon_xml);
+}
+unset($array, $addon_xml);
 
-if(api_enabled) {
+if (api_enabled) {
     $api_data = $api->getAddonVersions($addons_installed, true, 600);
     $addons_installed['error'] = true;
-    if(!empty($api_data) && !$api_data['error']) {
+    if (!empty($api_data) && !$api_data['error']) {
         $addons_installed = $api_data['results'];
         $addons_installed['error'] = false;
         $addons_installed['error_msg'] = $api_data['status'];
@@ -35,13 +38,13 @@ if(api_enabled) {
     $addons_installed['error_msg'] = 'inc/config.php => "api_enabled" is false';
 }
 
-$addons = array_merge($addons_installed,$addons_not_installed);
+$addons = array_merge($addons_installed, $addons_not_installed);
 $addons['error'] = $addons_installed['error'];
 $addons['error_msg'] = $addons_installed['error_msg'];
-unset($addons_installed,$addons_not_installed);
+unset($addons_installed, $addons_not_installed);
 
 $show_not_installed = $show_installed = '';
-if(count($addons_xml)) {
+if (count($addons_xml)) {
     foreach ($addons as $addon) {
         if (!is_array($addon) || !array_key_exists('AID', $addon))
             continue;
@@ -100,13 +103,14 @@ if(count($addons_xml)) {
 
         $color++;
     }
-} unset($addons_xml);
+}
+unset($addons_xml);
 
-if(empty($show_not_installed))
-    $show_not_installed = '<tr><td class="contentMainSecond" colspan="4" style="text-align: center;"><span class="fontBold">'._no_entry.'</span></td></tr>';
+if (empty($show_not_installed))
+    $show_not_installed = '<tr><td class="contentMainSecond" colspan="4" style="text-align: center;"><span class="fontBold">' . _no_entry . '</span></td></tr>';
 
-if(empty($show_installed))
-    $show_installed = '<tr><td class="contentMainSecond" colspan="4" style="text-align: center;"><span class="fontBold">'._no_entry.'</span></td></tr>';
+if (empty($show_installed))
+    $show_installed = '<tr><td class="contentMainSecond" colspan="4" style="text-align: center;"><span class="fontBold">' . _no_entry . '</span></td></tr>';
 
 $show = show($dir . '/addon_check', [
     'show_installed' => $show_installed,
@@ -119,6 +123,6 @@ $show = show($dir . '/addon_check', [
     'show_cmf_table_1' => !empty($show_installed) && !empty($show_not_installed) ? '' : '-->'
 ]);
 
-if($addons['error']) {
-    DebugConsole::insert_warning('index::admin::addoncheck',$addons['error_msg']);
+if ($addons['error']) {
+    DebugConsole::insert_warning('index::admin::addoncheck', $addons['error_msg']);
 }

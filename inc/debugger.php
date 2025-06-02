@@ -230,7 +230,7 @@ class DebugConsole
                 break;
         }
 
-        if ($loglevel_int > 0 AND $loglevel_int <= $input_maxlevel) {
+        if ($loglevel_int > 0 and $loglevel_int <= $input_maxlevel) {
             $string = date("H:i:s", time(TRUE)) . " " . $_SERVER["REMOTE_ADDR"] . " [" . $loglevel_str . "]: " . $input_content . EOL;
 
             if (!$fileheader = fopen($file, "a")) {

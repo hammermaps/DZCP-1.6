@@ -81,7 +81,9 @@ if (defined('_Forum')) {
                     "edit" => $edit,
                     "delete" => $delete));
 
-                $hp = ""; $pn = ""; $email = "";
+                $hp = "";
+                $pn = "";
+                $email = "";
                 if ($getp['reg']) {
                     $getu = db("SELECT `nick`,`hp`,`email` FROM `" . $db['users'] . "` WHERE `id` = " . $getp['reg'] . ";", false, true);
 
@@ -246,7 +248,8 @@ if (defined('_Forum')) {
                 "edit" => $editt,
                 "delete" => $deletet));
 
-            $hp = ""; $pn = "";
+            $hp = "";
+            $pn = "";
             if ($get['t_reg'] != 0) {
                 $getu = db("SELECT `nick`,`hp`,`email` FROM `" . $db['users'] . "` WHERE `id` = " . $get['t_reg'] . ";", false, true);
                 $email = show(_emailicon_forum, array("email" => eMailAddr(re($getu['email']))));
@@ -300,39 +303,39 @@ if (defined('_Forum')) {
             $email = ($chkMe >= 1 ? $email : '');
             $fastreply = "";
 
-            if($chkMe){
-                if(!$get['closed']) {
-                    $fastreply=show($dir."/forum_fastreply",array(
-                        "fasttext"=>'',
-                        "id"=>$get['id'],
-                        "kid"=>((int)$getw['kid']),
-                        "action"=>'?action=showthread&id='.$_GET['id'].'&do=fastreply',
-                        "what"=>_button_value_add));
+            if ($chkMe) {
+                if (!$get['closed']) {
+                    $fastreply = show($dir . "/forum_fastreply", array(
+                        "fasttext" => '',
+                        "id" => $get['id'],
+                        "kid" => ((int)$getw['kid']),
+                        "action" => '?action=showthread&id=' . $_GET['id'] . '&do=fastreply',
+                        "what" => _button_value_add));
                 }
             }
 
-            if($do == "fastreply") {
-                db("INSERT INTO `".$db['f_posts']."` SET `kid` = ".((int)$getw['kid']).
-                    ",`sid` = ".((int)$_GET['id']).
-                    ",`date` = ".time().
-                    ",`nick` = '".up($_POST['nick']).
-                    "',`email` = '".up($_POST['email']).
-                    "',`hp` = '".links(strval($_POST['hp'])).
-                    "',`reg` = '".up($userid).
-                    "',`text` = '".up($_POST['eintrag'],true).
-                    "',`ip` = '".up($userip)."';");
+            if ($do == "fastreply") {
+                db("INSERT INTO `" . $db['f_posts'] . "` SET `kid` = " . ((int)$getw['kid']) .
+                    ",`sid` = " . ((int)$_GET['id']) .
+                    ",`date` = " . time() .
+                    ",`nick` = '" . up($_POST['nick']) .
+                    "',`email` = '" . up($_POST['email']) .
+                    "',`hp` = '" . links(strval($_POST['hp'])) .
+                    "',`reg` = '" . up($userid) .
+                    "',`text` = '" . up($_POST['eintrag'], true) .
+                    "',`ip` = '" . up($userip) . "';");
 
-                db("UPDATE ".$db['f_threads']." SET `lp`=".time().", `first` = 0 WHERE `id` = ".(int)$_GET['id'].";");
-                setIpcheck("fid(".((int)$getw['kid']).")");
-                db("UPDATE `".$db['userstats']."` SET `forumposts`= (forumposts+1) WHERE `user` = ".$userid.";");
+                db("UPDATE " . $db['f_threads'] . " SET `lp`=" . time() . ", `first` = 0 WHERE `id` = " . (int)$_GET['id'] . ";");
+                setIpcheck("fid(" . ((int)$getw['kid']) . ")");
+                db("UPDATE `" . $db['userstats'] . "` SET `forumposts`= (forumposts+1) WHERE `user` = " . $userid . ";");
 
-                $entrys= cnt($db['f_posts'],"WHERE `sid`=".(int)$_GET['id']);
-                if($entrys == "0")
+                $entrys = cnt($db['f_posts'], "WHERE `sid`=" . (int)$_GET['id']);
+                if ($entrys == "0")
                     $pagenr = "1";
                 else
-                    $pagenr = ceil($entrys/config('m_fposts'));
+                    $pagenr = ceil($entrys / config('m_fposts'));
 
-                $lpost=show(_forum_add_lastpost,array("id"=>$entrys+1, "tid"=>$_GET['id'], "page"=>$pagenr));
+                $lpost = show(_forum_add_lastpost, array("id" => $entrys + 1, "tid" => $_GET['id'], "page" => $pagenr));
                 $index = info(_forum_newpost_successful, $lpost);
             } else {
                 $index = show($dir . "/forum_posts", array(

@@ -64,7 +64,7 @@ if ($do == 'preview') {
         $sendTO = isset($_POST['to']) ? strtolower($_POST['to']) : '';
         if ($sendTO == "reg") {
             $message = show(bbcode_email(re(settings('eml_nletter'))),
-                array("text" => bbcode_nletter(re($_POST['eintrag'],true))));
+                array("text" => bbcode_nletter(re($_POST['eintrag'], true))));
             $subject = re(settings('eml_nletter_subj'));
 
             $qry = db("SELECT `email` FROM `" . $db['users'] . "` WHERE `nletter` = 1 AND `dsgvo_lock` = 0;");

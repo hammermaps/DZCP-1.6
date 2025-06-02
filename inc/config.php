@@ -74,7 +74,9 @@ define('phpmailer_smtp_secure', 'tls');//Enable TLS encryption, `ssl` also accep
 /*
  * Cache Configuration
  */
+
 use Phpfastcache\Config\Config;
+
 $config_cache = array(
     //auto ,apc, apcu, cassandra, cookie, couchbase, couchdb, files, leveldb, memcache, memcached, memstatic, mongodb, predis
     //redis, riak, sqlite, ssdb, wincache, xcache, zenddisk, zendshm
@@ -146,7 +148,8 @@ if (!isset($installation)) $installation = false;
 if (!isset($updater)) $updater = false;
 if (!isset($global_index)) $global_index = false;
 
-function show($tpl = "", $array = array(), $array_lang_constant = array(), $array_block = array()) {
+function show($tpl = "", $array = array(), $array_lang_constant = array(), $array_block = array())
+{
     global $tmpdir, $chkMe, $cache, $config_cache;
     if (!empty($tpl) && $tpl != null) {
         $template = basePath . "/inc/_templates_/" . $tmpdir . "/" . $tpl;
@@ -154,7 +157,7 @@ function show($tpl = "", $array = array(), $array_lang_constant = array(), $arra
 
         $CachedString = $cache->getItem(md5('tpl_' . $tmpdir . $template));
         if (is_null($CachedString->get())) {
-            if(strlen($template . ".html") <= 128) {
+            if (strlen($template . ".html") <= 128) {
                 if (file_exists($template . ".html")) {
                     $tpl = file_get_contents($template . ".html");
                     if (!view_error_reporting && $config_cache['tpl'] && dbc_index::MemSetIndex()) {
@@ -323,9 +326,9 @@ function db($query = '', $rows = false, $fetch = false)
         if (!$qry = $mysql->query($query)) {
             DebugConsole::sql_error_handler($query);
             $language_text = [];
-            include_once(basePath.'/inc/lang/languages/english.php');
+            include_once(basePath . '/inc/lang/languages/english.php');
             $get = _fetch($mysql->query("SELECT `clanname` FROM `" . $db['settings'] . "`;"));
-            die('<img src="../inc/images/dberror.png" align="absmiddle"/>&nbsp;&nbsp;<b>Upps...</b><br /><br />Entschuldige bitte! Das h&auml;tte nicht passieren d&uuml;rfen.<p>'.
+            die('<img src="../inc/images/dberror.png" align="absmiddle"/>&nbsp;&nbsp;<b>Upps...</b><br /><br />Entschuldige bitte! Das h&auml;tte nicht passieren d&uuml;rfen.<p>' .
                 'Wir k&uuml;mmern uns so schnell wie m&ouml;glich darum.<br><br>' . utf8_decode($get['clanname']) . '<br><br>' . $language_text['_back']);
         }
     }

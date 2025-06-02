@@ -221,9 +221,9 @@ if (defined('_UserMenu')) {
                 && $_POST['users'] != "-" || $_POST['users'] == $userid || $_POST['buddys'] == $userid) {
                 if (empty($_POST['titel'])) $error = _empty_titel;
                 elseif (empty($_POST['eintrag'])) $error = _empty_eintrag;
-                elseif ($_POST['buddys'] == "-" AND $_POST['users'] == "-") $error = _empty_to;
-                elseif ($_POST['buddys'] != "-" AND $_POST['users'] != "-") $error = _msg_to_just_1;
-                elseif ($_POST['buddys'] OR $_POST['users'] == $userid) $error = _msg_not_to_me;
+                elseif ($_POST['buddys'] == "-" and $_POST['users'] == "-") $error = _empty_to;
+                elseif ($_POST['buddys'] != "-" and $_POST['users'] != "-") $error = _msg_to_just_1;
+                elseif ($_POST['buddys'] or $_POST['users'] == $userid) $error = _msg_not_to_me;
 
                 $error = show("errors/errortable", array("error" => $error));
 
