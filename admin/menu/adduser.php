@@ -92,7 +92,7 @@ if ($do == "add") {
         else
             $mkpwd = $_POST['pwd'];
 
-        $pwd = hash('sha256', $mkpwd);
+        $pwd = password_hash($mkpwd, PASSWORD_DEFAULT);
         $bday = ($_POST['t'] && $_POST['m'] && $_POST['j'] ? cal($_POST['t']) . "." . cal($_POST['m']) . "." . $_POST['j'] : 0);
         $qry = db("INSERT INTO `" . $db['users'] . "`
                              SET `user`     = '" . up($_POST['user']) . "',
