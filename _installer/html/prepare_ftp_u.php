@@ -13,15 +13,15 @@
         <input type="hidden" name="check" value="<?php echo $formcheck; ?>">
         <tr>
             <td><b>FTP-Host:</b></td>
-            <td><input type="text" name="host" value="<?php if (isset($_POST['host'])) echo $_POST['host']; ?>"></td>
+            <td><input type="text" name="host" value="<?php if (isset($_POST['host'])) echo htmlspecialchars($_POST['host'], ENT_QUOTES, 'UTF-8'); ?>"></td>
             <td><b>FTP-Pfad:</b></td>
-            <td><input type="text" name="pfad" value="<?php if (isset($_POST['pfad'])) echo $_POST['pfad']; ?>"></td>
+            <td><input type="text" name="pfad" value="<?php if (isset($_POST['pfad'])) echo htmlspecialchars($_POST['pfad'], ENT_QUOTES, 'UTF-8'); ?>"></td>
         </tr>
         <tr>
             <td><b>FTP-Benutzername:</b></td>
-            <td><input type="text" name="user" value="<?php if (isset($_POST['user'])) echo $_POST['user']; ?>"></td>
+            <td><input type="text" name="user" value="<?php if (isset($_POST['user'])) echo htmlspecialchars($_POST['user'], ENT_QUOTES, 'UTF-8'); ?>"></td>
             <td><b>FTP-Passwort:</b></td>
-            <td><input type="password" name="pwd" value="<?php if (isset($_POST['pwd'])) echo $_POST['pwd']; ?>"></td>
+            <td><input type="password" name="pwd" value="<?php if (isset($_POST['pwd'])) echo htmlspecialchars($_POST['pwd'], ENT_QUOTES, 'UTF-8'); ?>"></td>
         </tr>
         <tr>
             <td height="10"></td>

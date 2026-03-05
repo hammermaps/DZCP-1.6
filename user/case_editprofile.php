@@ -49,10 +49,12 @@ if (defined('_UserMenu')) {
                 if (isset($_POST['pwd']) && isset($_POST['cpwd']) &&
                     !empty($_POST['pwd']) && !empty($_POST['cpwd'])) {
                     if ($_POST['pwd'] == $_POST['cpwd']) {
-                        $newpwd = "pwd = '" . hash('sha256', $_POST['pwd']) . "',";
+                        $hashed_pwd = password_hash($_POST['pwd'], PASSWORD_DEFAULT);
+                        $newpwd = "pwd = '" . $hashed_pwd . "',";
                         $index = info(_info_edit_profile_done, "?action=user&amp;id=" . $userid . "");
-                        $_SESSION['pwd'] = hash('sha256', $_POST['pwd']);
+                        $_SESSION['pwd'] = $hashed_pwd;
 
+                        // Mark password as updated (no longer MD5)
                         if (db("SELECT * FROM `" . $db['users'] . "` WHERE `id` = " . $userid . " AND `pwd_md5` = 1;", true)) {
                             db("UPDATE `" . $db['users'] . "` SET `pwd_md5` = 0 WHERE `id` = " . $userid . ";");
                         }

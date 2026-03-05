@@ -1913,18 +1913,49 @@ function mkpwd(int $length = 8, bool $add_dashes = false, string $available_sets
 function checkpwd(string $user, string $pwd)
 {
     global $db;
-    $sql = db("SELECT * FROM `" . $db['users'] . "` WHERE `user` = '" . up($user) .
-        "' AND (`pwd` = '" . hash('sha256', $pwd) . "' OR (`pwd` = '" . md5($pwd) . "' AND `pwd_md5` = 1)) AND `level` != 0;");
+
+    // First, get the user record
+    $sql = db_stmt("SELECT * FROM `" . $db['users'] . "` WHERE `user` = ? AND `level` != 0",
+        array('s', up($user)));
+
     if (_rows($sql)) {
         $get = _fetch($sql);
-        if ($get['pwd_md5']) {
-            //Update Password to SHA256
-            db("UPDATE `" . $db['users'] . "` SET `pwd` = '" . hash('sha256', $pwd) . "', `pwd_md5` = 0 WHERE `id` = " . $get['id'] . ";");
-            $get['pwd'] = hash('sha256', $pwd);
+        $password_valid = false;
+
+        // Check if password needs migration (old MD5 or SHA256)
+        if ($get['pwd_md5'] == 1) {
+            // Legacy MD5 password
+            if ($get['pwd'] === md5($pwd)) {
+                $password_valid = true;
+                $needs_rehash = true;
+            }
+        } elseif (substr($get['pwd'], 0, 3) !== '$2y') {
+            // SHA256 hash (64 characters, not starting with $2y)
+            if ($get['pwd'] === hash('sha256', $pwd)) {
+                $password_valid = true;
+                $needs_rehash = true;
+            }
+        } else {
+            // Modern password_hash() format
+            if (password_verify($pwd, $get['pwd'])) {
+                $password_valid = true;
+                // Check if rehash is needed (e.g., cost factor changed)
+                $needs_rehash = password_needs_rehash($get['pwd'], PASSWORD_DEFAULT);
+            }
+        }
+
+        // If password is valid and needs rehashing, update to password_hash()
+        if ($password_valid && isset($needs_rehash) && $needs_rehash) {
+            $new_hash = password_hash($pwd, PASSWORD_DEFAULT);
+            db_stmt("UPDATE `" . $db['users'] . "` SET `pwd` = ?, `pwd_md5` = 0 WHERE `id` = ?",
+                array('si', $new_hash, $get['id']));
+            $get['pwd'] = $new_hash;
             $get['pwd_md5'] = 0;
         }
 
-        return $get;
+        if ($password_valid) {
+            return $get;
+        }
     }
 
     return false;

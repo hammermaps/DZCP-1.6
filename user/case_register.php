@@ -96,11 +96,11 @@ if (defined('_UserMenu')) {
             } else {
                 if (empty($_POST['pwd'])) {
                     $mkpwd = mkpwd();
-                    $pwd = hash('sha256', $mkpwd);
+                    $pwd = password_hash($mkpwd, PASSWORD_DEFAULT);
                     $msg = _info_reg_valid;
                 } else {
                     $mkpwd = $_POST['pwd'];
-                    $pwd = hash('sha256', $mkpwd);
+                    $pwd = password_hash($mkpwd, PASSWORD_DEFAULT);
                     $msg = _info_reg_valid_pwd;
                 }
 
