@@ -20,8 +20,12 @@ $dir = "teamspeak";
 
 ## SECTIONS ##
 if (fsockopen_support()) {
-    $CachedString = $cache->getItem('page_teamspeak_' . $_SESSION['language']);
-    if (is_null($CachedString->get()) || isset($_GET['cID'])) {
+    try {
+        $CachedString = $cache->getItem('page_teamspeak_' . $_SESSION['language']);
+    } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
+        $CachedString = null;
+    }
+    if (is_null($CachedString) || is_null($CachedString->get()) || isset($_GET['cID'])) {
         $tsstatus = new TSStatus(settings('ts_ip'), settings('ts_port'), settings('ts_sport'), settings('ts_customicon'), settings('ts_showchannel'));
         $tstree = $tsstatus->render(true);
 
@@ -78,10 +82,12 @@ if (fsockopen_support()) {
             "idletime" => _ts_idletime,
             "channelstats" => $channelstats,
             "userstats" => $userstats));
-        $CachedString->set($index)->expiresAfter(config('cache_teamspeak'));
-        $cache->save($CachedString);
+        if (!is_null($CachedString)) {
+            $CachedString->set($index)->expiresAfter(config('cache_teamspeak'));
+            $cache->save($CachedString);
+        }
     } else {
-        $CachedString->get();
+        $index = $CachedString->get();
     }
 } else {
     $index = error(_fopen, 1);

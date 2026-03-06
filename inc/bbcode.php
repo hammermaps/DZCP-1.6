@@ -596,8 +596,6 @@ function parse_csv($csv_string, $delimiter = ",", $skip_empty_lines = true, $tri
 /**
  * @param string $land
  * @return false|mixed|string|string[]
- * @throws \Psr\Cache\InvalidArgumentException
- * @throws \phpFastCache\Exceptions\phpFastCacheInvalidArgumentException
  */
 function getCountryName(string $land)
 {
@@ -607,16 +605,19 @@ function getCountryName(string $land)
         return '';
 
     $csv = [];
-    $CachedString = $cache->getItem('CountryNames');
-    if (is_null($CachedString->get())) {
-        $stream = get_external_contents('https://static.dzcp.de/csv/iso3166.csv');
-        if (!empty($stream)) {
-            $csv = parse_csv($stream);
-            $CachedString->set(serialize($csv))->expiresAfter(604800);
-            $cache->save($CachedString);
+    try {
+        $CachedString = $cache->getItem('CountryNames');
+        if (is_null($CachedString->get())) {
+            $stream = get_external_contents('https://static.dzcp.de/csv/iso3166.csv');
+            if (!empty($stream)) {
+                $csv = parse_csv($stream);
+                $CachedString->set(serialize($csv))->expiresAfter(604800);
+                $cache->save($CachedString);
+            }
+        } else {
+            $csv = unserialize($CachedString->get());
         }
-    } else {
-        $csv = unserialize($CachedString->get());
+    } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
     }
 
     foreach ($csv as $row) {
@@ -2357,30 +2358,34 @@ function userstats(string $what, int $tid = 0)
  * @param string $subject
  * @param string $content
  * @return bool
- * @throws \PHPMailer\PHPMailer\Exception
  */
 function sendMail(string $mailto, string $subject, string $content)
 {
-    $mail = new PHPMailer(false);
-    if (phpmailer_use_smtp) {
-        $mail->isSMTP();
-        $mail->Host = phpmailer_smtp_host;
-        $mail->SMTPAuth = phpmailer_use_auth;
-        $mail->Username = phpmailer_smtp_user;
-        $mail->Password = phpmailer_smtp_password;
-        $mail->SMTPSecure = phpmailer_smtp_secure;
-        $mail->Port = phpmailer_smtp_port;
+    try {
+        $mail = new PHPMailer(true);
+        if (phpmailer_use_smtp) {
+            $mail->isSMTP();
+            $mail->Host = phpmailer_smtp_host;
+            $mail->SMTPAuth = phpmailer_use_auth;
+            $mail->Username = phpmailer_smtp_user;
+            $mail->Password = phpmailer_smtp_password;
+            $mail->SMTPSecure = phpmailer_smtp_secure;
+            $mail->Port = phpmailer_smtp_port;
+        }
+
+        $mail->setFrom(($mailfrom = re(settings('mailfrom'))), $mailfrom);
+        $mail->AddAddress(preg_replace('/(\\n+|\\r+|%0A|%0D)/i', '', $mailto));
+        $mail->isHTML(true);
+        $mail->Subject = re($subject);
+        $mail->Body = $content;
+        $mail->AltBody = bbcode_nletter_plain($content);
+
+        $mail->setLanguage(language_short_tag(), basePath . '/vendor/phpmailer/phpmailer/language');
+        return $mail->send();
+    } catch (\PHPMailer\PHPMailer\Exception $e) {
+        DebugConsole::insert_error('sendMail()', $e->getMessage());
+        return false;
     }
-
-    $mail->setFrom(($mailfrom = re(settings('mailfrom'))), $mailfrom);
-    $mail->AddAddress(preg_replace('/(\\n+|\\r+|%0A|%0D)/i', '', $mailto));
-    $mail->isHTML(true);
-    $mail->Subject = re($subject);
-    $mail->Body = $content;
-    $mail->AltBody = bbcode_nletter_plain($content);
-
-    $mail->setLanguage(language_short_tag(), basePath . '/vendor/phpmailer/phpmailer/language');
-    return $mail->send();
 }
 
 function language_short_tag()

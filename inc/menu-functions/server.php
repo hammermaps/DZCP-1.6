@@ -5,7 +5,6 @@
  * Menu: Gameserver
  * @param int $serverID
  * @return string
- * @throws \phpFastCache\Exceptions\phpFastCacheInvalidArgumentException
  */
 function server($serverID = 0)
 {
@@ -37,12 +36,18 @@ function server($serverID = 0)
             include(basePath . '/inc/server_query/' . strtolower($get['status']) . '.php');
         }
 
-        $CachedString = $cache->getItem('nav_server_' . $serverID);
-        if (is_null($CachedString->get())) {
+        try {
+            $CachedString = $cache->getItem('nav_server_' . $serverID);
+        } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
+            $CachedString = null;
+        }
+        if (is_null($CachedString) || is_null($CachedString->get())) {
             $server = gs_normalise(@call_user_func('server_query_' . $get['status'], $get['ip'], $get['port'], $get['qport'], 'info'));
             $player_list = call_user_func('server_query_' . $get['status'], $get['ip'], $get['port'], $get['qport'], 'players');
-            $CachedString->set(serialize(array('server' => $server, 'players' => $player_list)))->expiresAfter(config('cache_server'));
-            $cache->save($CachedString);
+            if (!is_null($CachedString)) {
+                $CachedString->set(serialize(array('server' => $server, 'players' => $player_list)))->expiresAfter(config('cache_server'));
+                $cache->save($CachedString);
+            }
             unset($server_cache);
         } else {
             $server_cache = unserialize($CachedString->get());

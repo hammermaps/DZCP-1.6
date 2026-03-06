@@ -25,8 +25,12 @@ switch ($action):
             while ($get = _fetch($qry)) {
                 $player_list = '';
                 if ($get['status'] != "nope" && file_exists(basePath . '/inc/server_query/' . $get['status'] . '.php')) {
-                    $CachedString = $cache->getItem('gameserver_' . (int)($get['id']) . '_' . $_SESSION['language']);
-                    if (is_null($CachedString->get()) || isset($_GET['cID'])) {
+                    try {
+                        $CachedString = $cache->getItem('gameserver_' . (int)($get['id']) . '_' . $_SESSION['language']);
+                    } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
+                        $CachedString = null;
+                    }
+                    if (is_null($CachedString) || is_null($CachedString->get()) || isset($_GET['cID'])) {
                         if (!function_exists('server_query_' . $get['status'])) {
                             include(basePath . '/inc/server_query/' . strtolower($get['status']) . '.php');
                         }
@@ -224,8 +228,10 @@ switch ($action):
                             "name" => h($server['hostname']),
                             "mappath" => $mappath,
                             "image_map" => $image_map));
-                        $CachedString->set($index)->expiresAfter(config('cache_server'));
-                        $cache->save($CachedString);
+                        if (!is_null($CachedString)) {
+                            $CachedString->set($index)->expiresAfter(config('cache_server'));
+                            $cache->save($CachedString);
+                        }
                     } else {
                         $index .= $CachedString->get();
                     }

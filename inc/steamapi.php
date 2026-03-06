@@ -124,14 +124,17 @@ class SteamAPI
      * @param string $method
      * @param string $version
      * @return boolean
-     * @throws \Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException
      */
     private static final function get_api(string $interface = 'ISteamUser', string $method = 'GetPlayerSummaries', string $version = 'v0002')
     {
         global $cache;
         if (empty(self::$api_key) || empty(self::$user_data['steamID'])) return false;
         $cache_tag = md5('steam_api_' . $interface . '_' . $method . '_' . self::$profile_url);
-        $CachedString = $cache->getItem($cache_tag);
+        try {
+            $CachedString = $cache->getItem($cache_tag);
+        } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
+            return false;
+        }
         if (is_null($CachedString->get())) {
             self::$send_data_api['format'] = 'xml';
             self::$send_data_api['key'] = self::$api_key;
@@ -181,14 +184,17 @@ class SteamAPI
      * @param string $zone
      * @param string $xml
      * @return boolean
-     * @throws \Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException
      */
     private static final function get_steamcommunity(string $zone = '', string $xml = 'profile')
     {
         global $cache;
         $zone_url = !empty($zone) ? '/' . $zone . '/' : '';
         $zone_tag = !empty($zone) ? $zone . '_' : 'profile';
-        $CachedString = $cache->getItem(md5('steam_' . self::$profile_url));
+        try {
+            $CachedString = $cache->getItem(md5('steam_' . self::$profile_url));
+        } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
+            return false;
+        }
         if (is_null($CachedString->get()) || !steam_infos_cache) {
             $xml_stream = steam_only_proxy ? false : get_external_contents(re(self::$api_com . '/id/' . self::$profile_url . $zone_url . '/?xml=1', true));
             if (empty($xml_stream) || !$xml_stream) {

@@ -13,8 +13,12 @@ use Phpfastcache\CacheManager;
 // Cache
 $cache = CacheManager::getInstance($config_cache['storage'], $config_cache['config'], 'default');
 
-$CachedString = $cache->getItem('css_icons');
-if (is_null($CachedString->get())) {
+try {
+    $CachedString = $cache->getItem('css_icons');
+} catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
+    $CachedString = null;
+}
+if (is_null($CachedString) || is_null($CachedString->get())) {
     function getIcons($dir)
     {
         $dp = @opendir($dir);
@@ -45,9 +49,11 @@ if (is_null($CachedString->get())) {
         }
     }
 
-    $CachedString->set($icons)->expiresAfter(30);
-    $cache->save($CachedString);
-    echo $CachedString->get();
+    if (!is_null($CachedString)) {
+        $CachedString->set($icons)->expiresAfter(30);
+        $cache->save($CachedString);
+    }
+    echo $icons;
 } else {
     echo $CachedString->get();
 }
