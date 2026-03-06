@@ -124,6 +124,7 @@
                 <li><a href="#v16fixes"> 5.2 DZCP v1.6.0.4 Bugfixes, Updates, Neuerungen</a></li>
             </ul>
         </li>
+        <li><a href="#v1612fixes">6. DZCP v1.6.1.2 Bugfixes, Updates, Neuerungen (06.03.2026)</a></li>
     </ul>
 </section>
 <section>
@@ -451,6 +452,27 @@
     249.885 Zeilen gelöscht und<br>
     675.507 Zeilen gesammt verändert in<br>
     über 800 Commits.<br>
+</section>
+<section>
+    <h3><a name="v1612fixes">6. DZCP v1.6.1.2 Bugfixes, Updates, Neuerungen (06.03.2026)</a></h3>
+    <a href="https://github.com/hammermaps/DZCP-1.6/" target="_blank">Projekt on GitHub</a>
+    <h4>Sicherheit</h4>
+    <ul>
+        <li>CSRF-Schutz hinzugef&uuml;gt: neue Funktionen csrf_token(), csrf_field() und csrf_check() in inc/bbcode.php; alle POST-Anfragen werden automatisch gepr&uuml;ft</li>
+        <li>SQL-Injection-Schutz verbessert: _real_escape_string() konsequent f&uuml;r alle Benutzereingaben in SQL-Abfragen eingesetzt</li>
+        <li>SQL-Injection-Schutz verbessert: db_stmt() mit parametrisierten Abfragen f&uuml;r kritische Datenbankoperationen (z.B. Login, Galerie, Registrierung)</li>
+        <li>$userid wird in allen SQL-Abfragen als (int) gecastet</li>
+        <li>$userip wird mit _real_escape_string() in SQL-Abfragen gesichert</li>
+        <li>Tabellenname-Validierung mit Whitelist in admin/menu/links.php hinzugef&uuml;gt</li>
+        <li>XSS-Schutz: htmlspecialchars() mit ENT_QUOTES und UTF-8 f&uuml;r alle Benutzerausgaben in HTML verwendet</li>
+        <li>Passwort-Hashing auf password_hash() (PASSWORD_DEFAULT) aktualisiert; MD5 und SHA256 wurden ersetzt</li>
+    </ul>
+    <h4>Updates, Neuerungen</h4>
+    <ul>
+        <li>JavaScript modernisiert: const/let statt var, Arrow Functions und addEventListener statt on*-Eigenschaften (inc/_templates_/version1.6/_js/dzcp.js)</li>
+        <li>Session &amp; Cookie-Verschl&uuml;sselung wieder aktiviert (wurde seit 1.6.0.2 deaktiviert)</li>
+        <li>Versionsnummer auf 1.6.1.2 aktualisiert (06.03.2026)</li>
+    </ul>
 </section>
 <footer><a href="https://www.dzcp.de/" target="_blank">Powered by DZCP - deV!L`z Clanportal</a></footer>
 </body>
