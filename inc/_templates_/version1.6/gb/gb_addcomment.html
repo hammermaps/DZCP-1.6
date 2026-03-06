@@ -4,6 +4,7 @@
         <td>
             <form id="gbForm" name="gbForm" method="post" action="?action=admin&amp;do=postcomment&amp;id=[id]"
                   onsubmit="return(DZCP.submitButton())">
+                <input type="hidden" name="csrf_token" value="[csrf_token]" />
                 <table class="mainContent" cellspacing="1">
                     <tr>
                         <td class="contentHead" align="center" colspan="2"><span class="fontBold">[head_gb]</span></td>

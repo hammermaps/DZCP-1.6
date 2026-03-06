@@ -5,6 +5,7 @@
     <td>
         <form id="adduser" name="adduser" enctype="multipart/form-data"
               action="?admin=datenschutz&amp;do=edit&amp;id=[id]" method="post">
+                <input type="hidden" name="csrf_token" value="[csrf_token]" />
             <table class="hperc" cellspacing="1">
                 <tr>
                     <td class="contentMainTop" width="25%"><span class="fontBold">[lang_organisation]:</span></td>

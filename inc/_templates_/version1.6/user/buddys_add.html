@@ -1,4 +1,5 @@
 <form name="buddys" action="?action=buddys&amp;do=addbuddy" method="post" onsubmit="return(DZCP.submitButton())">
+                <input type="hidden" name="csrf_token" value="[csrf_token]" />
     <select name="users" class="dropdown">
         <option value="-" class="dropdownKat">- User -</option>
         [users]

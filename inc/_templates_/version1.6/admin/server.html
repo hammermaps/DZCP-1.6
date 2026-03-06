@@ -32,6 +32,7 @@
         <td>
             <form action="?admin=server&amp;do=ts" method="post" name="teamspeak"
                   onsubmit="return(DZCP.submitButton('tssubmit'))">
+                <input type="hidden" name="csrf_token" value="[csrf_token]" />
                 <table class="hperc" cellspacing="1">
                     <tr>
                         <td class="contentHead" colspan="2" align="center"><span class="fontBold">[ts_head]</span></td>

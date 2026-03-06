@@ -2251,4 +2251,4 @@ $language_text['_upload_partners_head'] = 'Partnerbuttons';
 $language_text['_upload_partners_info'] = 'Only jpg, gif or png files. Recommended dimensions: 88px * 31px';
 $language_text['_select_field_ranking_add'] = '<option value="[value]" [sel]>[what]</option>';
 $language_text['_user_list_ck'] = 'List in clan cash?';
-$language_text['_fightus_squad'] = 'Wanted team';
+$language_text['_fightus_squad'] = 'Wanted team';$language_text['_csrf_invalid'] = 'Invalid or missing security token. Please go back and try again.';

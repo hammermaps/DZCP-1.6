@@ -4,6 +4,7 @@
 <tr>
     <td class="contentMainTop" colspan="7" align="center">
         <form name="kalender" action="" method="post" onsubmit="return(DZCP.submitButton())">
+                <input type="hidden" name="csrf_token" value="[csrf_token]" />
             <select name="monat" class="dropdown">[monate]</select>
             <select name="jahr" class="dropdown">[jahr]</select>
             <input id="contentSubmit" type="submit" value="[what]" class="submit"/>
