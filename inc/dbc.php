@@ -26,10 +26,12 @@ final class dbc_index
                 $data_cache = null;
                 try {
                     $data_cache = $cache->getItem('dbc_' . $index_key);
-                } catch (\Phpfastcache\Exceptions\phpFastCacheInvalidArgumentException $e) {
+                } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
                 }
-                $data_cache->set(serialize($data))->expiresAfter(1.5);
-                $cache->save($data_cache);
+                if (!is_null($data_cache)) {
+                    $data_cache->set(serialize($data))->expiresAfter(1.5);
+                    $cache->save($data_cache);
+                }
             }
         }
 
@@ -83,10 +85,10 @@ final class dbc_index
             $data = null;
             try {
                 $data = $cache->getItem('dbc_' . $index_key);
-            } catch (\Phpfastcache\Exceptions\phpFastCacheInvalidArgumentException $e) {
+            } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
             }
 
-            if (!is_null($data->get())) {
+            if (!is_null($data) && !is_null($data->get())) {
                 if (show_dbc_debug)
                     DebugConsole::insert_loaded('dbc_index::issetIndex()', 'Load index: "' . $index_key . '" from cache');
 

@@ -46,7 +46,11 @@ function steamIMG($steamID = '')
     if (!$steam = SteamAPI::getUserInfos($steamID)) return '-'; //UserInfos
     if (!$steam || empty($steam) || !is_array($steam) || count($steam) <= 1) return '-';
 
-    $CachedString = $cache->getItem('steam_avatar_' . $steamID);
+    try {
+        $CachedString = $cache->getItem('steam_avatar_' . $steamID);
+    } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
+        return '-';
+    }
     if (is_null($CachedString->get())) {
         if (($img_stream = get_external_contents($steam['user']['avatarIcon_url'], false, true)) && !empty($img_stream)) {
             $steam['user']['avatarIcon_url'] = 'data:image/png;base64,' . base64_encode($img_stream);
