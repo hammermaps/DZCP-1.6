@@ -2263,3 +2263,7 @@ $language_text['_upload_partners_info'] = 'Nur jpg, gif oder png Dateien. Empfoh
 $language_text['_select_field_ranking_add'] = '<option value="[value]" [sel]>[what]</option>';
 $language_text['_user_list_ck'] = 'In der Clankasse auflisten?';
 $language_text['_fightus_squad'] = 'gew&uuml;nschtes Team';$language_text['_csrf_invalid'] = 'Ungültiges oder fehlendes Sicherheits-Token. Bitte gehen Sie zurück und versuchen Sie es erneut.';
+$language_text['_config_changelog'] = 'Changelog';
+$language_text['_perm_changelog'] = 'Changelog einsehen';
+$language_text['_changelog_not_found'] = 'Die Datei changelog.md wurde nicht gefunden.';
+$language_text['_changelog_read_error'] = 'Die Datei changelog.md konnte nicht gelesen werden.';

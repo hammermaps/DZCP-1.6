@@ -2328,3 +2328,7 @@ $language_text['_select_field_ranking_add'] = '<option value="[value]" [sel]>[wh
 $language_text['_user_list_ck'] = 'Lista Clan Cash?';
 $language_text['_fightus_squad'] = 'Cerca Teams';
 $language_text['_csrf_invalid'] = 'Token di sicurezza non valido o mancante. Si prega di tornare indietro e riprovare.';
+$language_text['_config_changelog'] = 'Changelog';
+$language_text['_perm_changelog'] = 'Visualizza Changelog';
+$language_text['_changelog_not_found'] = 'Il file changelog.md non &egrave; stato trovato.';
+$language_text['_changelog_read_error'] = 'Il file changelog.md non pu&ograve; essere letto.';

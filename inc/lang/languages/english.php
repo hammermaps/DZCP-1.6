@@ -2252,3 +2252,7 @@ $language_text['_upload_partners_info'] = 'Only jpg, gif or png files. Recommend
 $language_text['_select_field_ranking_add'] = '<option value="[value]" [sel]>[what]</option>';
 $language_text['_user_list_ck'] = 'List in clan cash?';
 $language_text['_fightus_squad'] = 'Wanted team';$language_text['_csrf_invalid'] = 'Invalid or missing security token. Please go back and try again.';
+$language_text['_config_changelog'] = 'Changelog';
+$language_text['_perm_changelog'] = 'View Changelog';
+$language_text['_changelog_not_found'] = 'The file changelog.md was not found.';
+$language_text['_changelog_read_error'] = 'The file changelog.md could not be read.';

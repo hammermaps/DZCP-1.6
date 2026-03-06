@@ -2257,3 +2257,7 @@ $language_text['_upload_partners_info'] = 'Только jpg, gif и png Файл
 $language_text['_select_field_ranking_add'] = '<option value="[value]" [sel]>[what]</option>';
 $language_text['_user_list_ck'] = 'Указать в меню: Капилку клана?';
 $language_text['_fightus_squad'] = 'Желаемую команду';$language_text['_csrf_invalid'] = 'Недействительный или отсутствующий токен безопасности. Пожалуйста, вернитесь назад и попробуйте снова.';
+$language_text['_config_changelog'] = 'Changelog';
+$language_text['_perm_changelog'] = 'Просмотр Changelog';
+$language_text['_changelog_not_found'] = 'Файл changelog.md не найден.';
+$language_text['_changelog_read_error'] = 'Файл changelog.md не удалось прочитать.';
