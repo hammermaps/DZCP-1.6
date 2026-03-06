@@ -15,11 +15,11 @@ function partners()
         while ($get = _fetch($qry)) {
             if ($get['textlink']) {
                 $partners .= show("menu/partners_textlink", array("link" => $get['link'],
-                    "name" => re($get['banner'])));
+                    "name" => h($get['banner'])));
             } else {
-                $partners .= show("menu/partners", array("link" => re($get['link']),
+                $partners .= show("menu/partners", array("link" => h($get['link']),
                     "title" => htmlspecialchars(str_replace('http://', '', re($get['link']))),
-                    "banner" => re($get['banner'])));
+                    "banner" => h($get['banner'])));
             }
 
             $table = strstr($partners, '<tr>') ? true : false;
