@@ -38,7 +38,7 @@ if (defined('_News')) {
 
             $klapp = "";
             if ($get['klapptext'])
-                $klapp = show(_news_klapplink, array("klapplink" => re($get['klapplink']),
+                $klapp = show(_news_klapplink, array("klapplink" => h($get['klapplink']),
                     "which" => "expand",
                     "id" => $get['id']));
 
@@ -47,21 +47,21 @@ if (defined('_News')) {
             $links1 = "";
             if (!empty($get['url1'])) {
                 $rel = _related_links;
-                $links1 = show(_news_link, array("link" => re($get['link1']),
+                $links1 = show(_news_link, array("link" => h($get['link1']),
                     "url" => $get['url1']));
             }
 
             $links2 = "";
             if (!empty($get['url2'])) {
                 $rel = _related_links;
-                $links2 = show(_news_link, array("link" => re($get['link2']),
+                $links2 = show(_news_link, array("link" => h($get['link2']),
                     "url" => $get['url2']));
             }
 
             $links3 = "";
             if (!empty($get['url3'])) {
                 $rel = _related_links;
-                $links3 = show(_news_link, array("link" => re($get['link3']),
+                $links3 = show(_news_link, array("link" => h($get['link3']),
                     "url" => $get['url3']));
             }
 
@@ -81,7 +81,7 @@ if (defined('_News')) {
                 }
             }
 
-            $show_sticky .= show($dir . "/news_show", array("titel" => re($get['titel']),
+            $show_sticky .= show($dir . "/news_show", array("titel" => h($get['titel']),
                 "kat" => $newsimage,
                 "id" => $get['id'],
                 "comments" => $comments,
@@ -123,7 +123,7 @@ if (defined('_News')) {
 
             $klapp = "";
             if ($get['klapptext'])
-                $klapp = show(_news_klapplink, array("klapplink" => re($get['klapplink']),
+                $klapp = show(_news_klapplink, array("klapplink" => h($get['klapplink']),
                     "which" => "expand",
                     "id" => $get['id']));
 
@@ -132,21 +132,21 @@ if (defined('_News')) {
             $links1 = "";
             if (!empty($get['url1'])) {
                 $rel = _related_links;
-                $links1 = show(_news_link, array("link" => re($get['link1']),
+                $links1 = show(_news_link, array("link" => h($get['link1']),
                     "url" => $get['url1']));
             }
 
             $links2 = "";
             if (!empty($get['url2'])) {
                 $rel = _related_links;
-                $links2 = show(_news_link, array("link" => re($get['link2']),
+                $links2 = show(_news_link, array("link" => h($get['link2']),
                     "url" => $get['url2']));
             }
 
             $links3 = "";
             if (!empty($get['url3'])) {
                 $rel = _related_links;
-                $links3 = show(_news_link, array("link" => re($get['link3']),
+                $links3 = show(_news_link, array("link" => h($get['link3']),
                     "url" => $get['url3']));
             }
 
@@ -177,7 +177,7 @@ if (defined('_News')) {
                     "del" => convSpace(_confirm_del_news)));
             }
 
-            $show .= show($dir . "/news_show", array("titel" => re($get['titel']),
+            $show .= show($dir . "/news_show", array("titel" => h($get['titel']),
                 "kat" => $newsimage,
                 "id" => $get['id'],
                 "comments" => $comments,

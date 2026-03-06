@@ -65,7 +65,7 @@ switch ($action):
 
                 if (!$get['reg']) {
                     $gbtitel = show(_gb_titel_noreg, array("postid" => $i,
-                        "nick" => re($get['nick']),
+                        "nick" => h($get['nick']),
                         "edit" => $edit,
                         "delete" => $delete,
                         "comment" => $comment,
@@ -244,9 +244,9 @@ switch ($action):
                     $form = show("page/editor_notregged", array("nickhead" => _nick,
                         "emailhead" => _email,
                         "hphead" => _hp,
-                        "postemail" => re($get['email']),
-                        "posthp" => re($get['hp']),
-                        "postnick" => re($get['nick'])));
+                        "postemail" => h($get['email']),
+                        "posthp" => h($get['hp']),
+                        "postnick" => h($get['nick']));
                 }
 
                 $index = show($dir . "/add", array("titel" => _eintragen_titel,
@@ -314,7 +314,7 @@ switch ($action):
 
                 if ($get['reg'] == "0") {
                     $gbtitel = show(_gb_titel_noreg, array("postid" => "?",
-                        "nick" => re($get['nick']),
+                        "nick" => h($get['nick']),
                         "edit" => "",
                         "delete" => "",
                         "comment" => "",
@@ -402,7 +402,7 @@ switch ($action):
 
         if ($regCheck) {
             $gbtitel = show(_gb_titel_noreg, array("postid" => $get_id,
-                "nick" => re($get_nick),
+                "nick" => htmlspecialchars($get_nick, ENT_QUOTES, 'UTF-8'),
                 "edit" => "",
                 "delete" => "",
                 "comment" => "",
