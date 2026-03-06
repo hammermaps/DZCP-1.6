@@ -43,7 +43,7 @@ if ($do == 'new') {
         $show = show($dir . "/form_vote", array("head" => _votes_admin_head,
             "value" => _button_value_add,
             "what" => "&amp;do=add",
-            "question1" => re($_POST['question']),
+            "question1" => htmlspecialchars($_POST['question'], ENT_QUOTES, 'UTF-8'),
             "a1" => $_POST['a1'],
             "closed" => "",
             "br1" => "<!--",
@@ -158,7 +158,7 @@ if ($do == 'new') {
         "value" => _button_value_edit,
         "br1" => "",
         "br2" => "",
-        "question1" => re($get['titel']),
+        "question1" => h($get['titel']),
         "a1" => voteanswer("a1", $_GET['id']),
         "a2" => voteanswer("a2", $_GET['id']),
         "a3" => voteanswer("a3", $_GET['id']),
@@ -266,7 +266,7 @@ if ($do == 'new') {
         $color++;
 
         $show .= show($dir . "/votes_show", array("date" => date("d.m.Y", $get['datum']),
-            "vote" => re($get['titel']),
+            "vote" => h($get['titel']),
             "class" => $class,
             "edit" => $edit,
             "icon" => $icon,

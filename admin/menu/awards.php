@@ -48,9 +48,9 @@ if ($do == "new") {
         else $sel = "";
 
         $squads .= show(_awards_admin_edit_select_field_squads, array("id" => $gets['id'],
-            "name" => re($gets['name']),
-            "game" => re($gets['game']),
-            "icon" => re($gets['icon']),
+            "name" => h($gets['name']),
+            "game" => h($gets['game']),
+            "icon" => h($gets['icon']),
             "sel" => $sel));
     }
 
@@ -69,10 +69,10 @@ if ($do == "new") {
         "what" => _button_value_edit,
         "squads" => $squads,
         "dropdown_date" => $dropdown_date,
-        "award_event" => re($get['event']),
+        "award_event" => h($get['event']),
         "award_url" => $get['url'],
-        "award_place" => re($get['place']),
-        "award_prize" => re($get['prize'])));
+        "award_place" => h($get['place']),
+        "award_prize" => h($get['prize'])));
 } elseif ($do == "add") {
     if (empty($_POST['event']) || empty($_POST['url'])) {
         if (empty($_POST['event'])) {
@@ -151,7 +151,7 @@ if ($do == "new") {
         $color++;
 
         $show_ .= show($dir . "/awards_show", array("datum" => date("d.m.Y", $get['date']),
-            "award" => re($get['event']),
+            "award" => h($get['event']),
             "id" => $get['squad'],
             "class" => $class,
             "edit" => $edit,

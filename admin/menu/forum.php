@@ -16,8 +16,8 @@ if ($_GET['show'] == "subkats") {
                       ORDER BY s2.pos");
     while ($getk = _fetch($qryk)) {
         if (!empty($getk['kattopic'])) {
-            $subkat = show(_config_forum_subkats, array("topic" => re($getk['kattopic']),
-                "subtopic" => re($getk['subtopic']),
+            $subkat = show(_config_forum_subkats, array("topic" => h($getk['kattopic']),
+                "subtopic" => h($getk['subtopic']),
                 "id" => $getk['id']));
 
             $edit = show("page/button_edit_single", array("id" => $getk['id'],
@@ -36,7 +36,7 @@ if ($_GET['show'] == "subkats") {
                 "edit" => $edit));
         }
 
-        $skathead = show(_config_forum_subkathead, array("kat" => re($getk['name'])));
+        $skathead = show(_config_forum_subkathead, array("kat" => h($getk['name'])));
         $add = show(_config_forum_subkats_add, array("id" => $_GET['id']));
 
         $show = show($dir . "/forum_show_subkats", array("head" => _config_forum_head,
@@ -51,7 +51,7 @@ if ($_GET['show'] == "subkats") {
     $qry = db("SELECT * FROM " . $db['f_kats'] . "
                      ORDER BY kid");
     while ($get = _fetch($qry)) {
-        $kat = show(_config_forum_kats_titel, array("kat" => re($get['name']),
+        $kat = show(_config_forum_kats_titel, array("kat" => h($get['name']),
             "id" => $get['id']));
 
         $edit = show("page/button_edit_single", array("id" => $get['id'],
@@ -89,7 +89,7 @@ if ($_GET['show'] == "subkats") {
                      ORDER BY kid");
         while ($get = _fetch($qry)) {
             $positions .= show(_select_field, array("value" => $get['kid'] + 1,
-                "what" => _nach . ' ' . re($get['name']),
+                "what" => _nach . ' ' . h($get['name']),
                 "sel" => ""));
         }
 
@@ -147,7 +147,7 @@ if ($_GET['show'] == "subkats") {
             while ($getpos = _fetch($pos)) {
                 if ($get['name'] != $getpos['name']) {
                     $positions .= show(_select_field, array("value" => $getpos['kid'] + 1,
-                        "what" => _nach . ' ' . re($getpos['name'])));
+                        "what" => _nach . ' ' . h($getpos['name'])));
                 }
             }
 
@@ -164,7 +164,7 @@ if ($_GET['show'] == "subkats") {
                 "public" => _config_forum_public,
                 "intern" => _config_forum_intern,
                 "value" => _button_value_edit,
-                "kat" => re($get['name'])));
+                "kat" => h($get['name'])));
         }
     } elseif ($do == "editkat") {
         if (empty($_POST['kat'])) {
@@ -196,7 +196,7 @@ if ($_GET['show'] == "subkats") {
             " ORDER BY pos");
         while ($get = _fetch($qry)) {
             $positions .= show(_select_field, array("value" => $get['pos'] + 1,
-                "what" => _nach . ' ' . re($get['kattopic']),
+                "what" => _nach . ' ' . h($get['kattopic']),
                 "sel" => ""));
         }
         $show = show($dir . "/skatform", array("head" => _config_forum_add_skat,
@@ -239,16 +239,16 @@ if ($_GET['show'] == "subkats") {
             while ($getpos = _fetch($pos)) {
                 if ($get['kattopic'] != $getpos['kattopic']) {
                     $positions .= show(_select_field, array("value" => $getpos['pos'] + 1,
-                        "what" => _nach . ' ' . re($getpos['kattopic'])));
+                        "what" => _nach . ' ' . h($getpos['kattopic'])));
                 }
             }
 
             $show = show($dir . "/skatform", array("head" => _config_forum_edit_skat,
                 "fkat" => _config_forum_skatname,
                 "fstopic" => _config_forum_stopic,
-                "skat" => re($get['kattopic']),
+                "skat" => h($get['kattopic']),
                 "what" => "editskat",
-                "stopic" => re($get['subtopic']),
+                "stopic" => h($get['subtopic']),
                 "id" => $_GET['id'],
                 "sid" => $get['sid'],
                 "nothing" => _nothing,

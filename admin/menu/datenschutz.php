@@ -52,17 +52,17 @@ switch ($do) {
             $get = db("SELECT * FROM `" . $db['dsgvo_pers'] . "` WHERE `id` = " . (int)$_GET['id'] . ";", false, true);
             $head = ($get['id'] == 1 ? _datenschutz_rolle_1 : _datenschutz_rolle_2);
             $show = show($dir . "/datenschutz_edit_users", array('head' => $head,
-                'organisation' => re($get['organisation']),
-                'titel' => re($get['titel']),
-                'first_name' => re($get['first_name']),
-                'last_name' => re($get['last_name']),
-                'address' => re($get['address']),
+                'organisation' => h($get['organisation']),
+                'titel' => h($get['titel']),
+                'first_name' => h($get['first_name']),
+                'last_name' => h($get['last_name']),
+                'address' => h($get['address']),
                 'zip_code' => (int)($get['zip_code']),
-                'place' => re($get['place']),
-                'country' => re($get['country']),
-                'e-mail' => re($get['e-mail']),
-                'phone' => re($get['phone']),
-                'website' => re($get['website']),
+                'place' => h($get['place']),
+                'country' => h($get['country']),
+                'e-mail' => h($get['e-mail']),
+                'phone' => h($get['phone']),
+                'website' => h($get['website']),
                 'id' => $get['id'],
                 'value' => _button_value_save));
         }
@@ -77,7 +77,7 @@ switch ($do) {
             $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
             $color++;
             $show .= show($dir . "/datenschutz_show", array('rolle' => $rolle, 'class' => $class,
-                'first_name' => re($get['first_name']), 'last_name' => re($get['last_name']), 'edit' => $edit));
+                'first_name' => h($get['first_name']), 'last_name' => h($get['last_name']), 'edit' => $edit));
         }
 
         $selects_1 = '';

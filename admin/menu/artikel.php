@@ -15,7 +15,7 @@ switch ($do) {
         while ($getk = _fetch($qryk)) {
             $kat .= show(_select_field, array("value" => $getk['id'],
                 "sel" => "",
-                "what" => re($getk['kategorie'])));
+                "what" => h($getk['kategorie'])));
         }
 
         $show = show($dir . "/artikel_form", array("head" => _artikel_add,
@@ -68,11 +68,11 @@ switch ($do) {
                 "preview" => _preview,
                 "do" => "insert",
                 "ntitel" => _titel,
-                "titel" => re($_POST['titel']),
+                "titel" => htmlspecialchars($_POST['titel'], ENT_QUOTES, 'UTF-8'),
                 "artikeltext" => re_bbcode(re($_POST['artikel'], true)),
-                "link1" => re($_POST['link1']),
-                "link2" => re($_POST['link2']),
-                "link3" => re($_POST['link3']),
+                "link1" => htmlspecialchars($_POST['link1'], ENT_QUOTES, 'UTF-8'),
+                "link2" => htmlspecialchars($_POST['link2'], ENT_QUOTES, 'UTF-8'),
+                "link3" => htmlspecialchars($_POST['link3'], ENT_QUOTES, 'UTF-8'),
                 "url1" => links(re($_POST['url1'], true)),
                 "url2" => links(re($_POST['url2'], true)),
                 "url3" => links(re($_POST['url3'], true)),
@@ -116,7 +116,7 @@ switch ($do) {
             $sel = ($get['kat'] == $getk['id'] ? 'selected="selected"' : '');
             $kat .= show(_select_field, array("value" => $getk['id'],
                 "sel" => $sel,
-                "what" => re($getk['kategorie'])));
+                "what" => h($getk['kategorie'])));
         }
 
         $artikelimage = "";
@@ -137,11 +137,11 @@ switch ($do) {
             "kat" => $kat,
             "do" => $do,
             "ntitel" => _titel,
-            "titel" => re($get['titel']),
+            "titel" => h($get['titel']),
             "artikeltext" => re_bbcode(re($get['text'])),
-            "link1" => re($get['link1']),
-            "link2" => re($get['link2']),
-            "link3" => re($get['link3']),
+            "link1" => h($get['link1']),
+            "link2" => h($get['link2']),
+            "link3" => h($get['link3']),
             "url1" => $get['url1'],
             "url2" => $get['url2'],
             "url3" => $get['url3'],
@@ -256,7 +256,7 @@ switch ($do) {
                 "title" => _button_title_del,
                 "del" => convSpace(_confirm_del_artikel)));
 
-            $titel = show(_artikel_show_link, array("titel" => cut(re($get['titel']), config('l_newsadmin')), "id" => $get['id']));
+            $titel = show(_artikel_show_link, array("titel" => cut(h($get['titel']), config('l_newsadmin')), "id" => $get['id']));
 
             $public = ($get['public'] ? '<a href="?admin=artikel&amp;do=public&amp;id=' . $get['id'] . '&amp;what=unset"><img src="../inc/images/public.gif" alt="" title="' . _non_public . '" /></a>'
                 : '<a href="?admin=artikel&amp;do=public&amp;id=' . $get['id'] . '&amp;what=set"><img src="../inc/images/nonpublic.gif" alt="" title="' . _public . '" /></a>');

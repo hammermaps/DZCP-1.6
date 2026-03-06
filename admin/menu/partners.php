@@ -42,7 +42,7 @@ if ($do == "add") {
 
     $files = get_files('../banner/partners/', false, true);
     for ($i = 0; $i < count($files); $i++) {
-        if (re($get['banner']) == $files[$i]) $sel = 'selected="selected"';
+        if (h($get['banner']) == $files[$i]) $sel = 'selected="selected"';
         else $sel = "";
 
         $banners .= show(_partners_select_icons, array("icon" => $files[$i],
@@ -53,8 +53,8 @@ if ($do == "add") {
         "nothing" => "",
         "banner" => _partners_button,
         "link" => _link,
-        "e_link" => re($get['link']),
-        "e_textlink" => (empty($get['textlink']) ? '' : re($get['banner'])),
+        "e_link" => h($get['link']),
+        "e_textlink" => (empty($get['textlink']) ? '' : h($get['banner'])),
         "or" => _or,
         "textlink" => _partnerbuttons_textlink,
         "banners" => $banners,
@@ -88,13 +88,13 @@ if ($do == "add") {
             "title" => _button_title_del,
             "del" => convSpace(_confirm_del_entry)));
 
-        $rlink = str_replace('http://', '', re($get['link']));
-        $button = '<img src="../banner/partners/' . re($get['banner']) . '" alt="' . $rlink . '" title="' . $rlink . '" />';
+        $rlink = str_replace('http://', '', h($get['link']));
+        $button = '<img src="../banner/partners/' . h($get['banner']) . '" alt="' . $rlink . '" title="' . $rlink . '" />';
         $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
         $color++;
         $show_ .= show($dir . "/partners_show", array("class" => $class,
-            "button" => (empty($get['textlink']) ? $button : '<div style="text-align:center;">' . _partnerbuttons_textlink . ': <b>' . re($get['banner']) . '</b></div>'),
-            "link" => re($get['link']),
+            "button" => (empty($get['textlink']) ? $button : '<div style="text-align:center;">' . _partnerbuttons_textlink . ': <b>' . h($get['banner']) . '</b></div>'),
+            "link" => h($get['link']),
             "id" => $get['id'],
             "edit" => $edit,
             "delete" => $delete));

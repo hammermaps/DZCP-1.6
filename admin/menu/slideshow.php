@@ -41,7 +41,7 @@ if ($do == 'new') {
     $qry = db("SELECT * FROM " . $db['slideshow'] . " ORDER BY `pos` ASC;");
     $positions = '';
     while ($get = _fetch($qry)) {
-        $positions .= show(_select_field, array("value" => (int)$get['pos'] + 1, "what" => _nach . ': ' . re($get['bez']), "sel" => ""));
+        $positions .= show(_select_field, array("value" => (int)$get['pos'] + 1, "what" => _nach . ': ' . h($get['bez']), "sel" => ""));
     }
 
     $show = show($dir . "/slideshow_form", array(
@@ -98,7 +98,7 @@ if ($do == 'new') {
             "nein" => _no,
             "bezeichnung" => _slider_bezeichnung,
             "desc" => _slider_desc,
-            "tdesc" => re($_POST['desc']),
+            "tdesc" => htmlspecialchars($_POST['desc'], ENT_QUOTES, 'UTF-8'),
             "t_zeichen" => _zeichen,
             "noch" => _noch,
             "url" => _slider_url,
@@ -109,7 +109,7 @@ if ($do == 'new') {
             "v_bezeichnung" => re($_POST['bez'], true),
             "v_pos_none" => "",
             "v_position" => $positions,
-            "v_url" => re($_POST['url']),
+            "v_url" => htmlspecialchars($_POST['url'], ENT_QUOTES, 'UTF-8'),
             "selected" => $selected,
             "selected_txt" => $selected_txt,
             "v_pic" => ""));
@@ -157,7 +157,7 @@ if ($do == 'new') {
     $qrypos = db("SELECT * FROM " . $db['slideshow'] . " WHERE `id` != '" . (int)($_GET['id']) . "' ORDER BY `pos` ASC");
     $positions = '';
     while ($getpos = _fetch($qrypos)) {
-        $positions .= show(_select_field, array("value" => $getpos['pos'] + 1, "what" => _nach . ': ' . re($getpos['bez']), "sel" => ""));
+        $positions .= show(_select_field, array("value" => $getpos['pos'] + 1, "what" => _nach . ': ' . h($getpos['bez']), "sel" => ""));
     }
 
     $get = db("SELECT * FROM " . $db['slideshow'] . " WHERE `id` = '" . (int)($_GET['id']) . "'", false, true);
@@ -167,7 +167,7 @@ if ($do == 'new') {
     if ($get['showbez'])
         $selected_txt = 'selected="selected"';
 
-    $show = show($dir . "/slideshow_form", array("id" => re($get['id']),
+    $show = show($dir . "/slideshow_form", array("id" => h($get['id']),
         "error" => "",
         "do" => "editdo",
         "head" => _slider_admin_edit,
@@ -176,7 +176,7 @@ if ($do == 'new') {
         "nein" => _no,
         "bezeichnung" => _slider_bezeichnung,
         "desc" => _slider_desc,
-        "tdesc" => re($get['desc']),
+        "tdesc" => h($get['desc']),
         "t_zeichen" => _zeichen,
         "noch" => _noch,
         "url" => _slider_url,
@@ -184,10 +184,10 @@ if ($do == 'new') {
         "pic" => _slider_pic,
         "position" => _slider_position,
         "first" => _slider_position_first,
-        "v_bezeichnung" => re($get['bez']),
+        "v_bezeichnung" => h($get['bez']),
         "v_pos_none" => _slider_position_lazy,
         "v_position" => $positions,
-        "v_url" => re($get['url']),
+        "v_url" => h($get['url']),
         "selected" => $selected,
         "selected_txt" => $selected_txt,
         "v_pic" => img_size('inc/images/slideshow/' . $get['id'] . '.jpg') . "<br />"));
@@ -204,7 +204,7 @@ if ($do == 'new') {
         if ($get['showbez'])
             $selected_txt = 'selected="selected"';
 
-        $show = show($dir . "/slideshow_form", array("id" => re($_POST['id']),
+        $show = show($dir . "/slideshow_form", array("id" => htmlspecialchars($_POST['id'], ENT_QUOTES, 'UTF-8'),
             "error" => $error,
             "do" => "editdo",
             "head" => _slider_admin_edit,
@@ -224,7 +224,7 @@ if ($do == 'new') {
             "v_bezeichnung" => re($_POST['bez'], true),
             "v_pos_none" => _slider_position_lazy,
             "v_position" => $positions,
-            "v_url" => re($_POST['url']),
+            "v_url" => htmlspecialchars($_POST['url'], ENT_QUOTES, 'UTF-8'),
             "selected" => $selected,
             "selected_txt" => $selected_txt,
             "v_pic" => img_size('inc/images/slideshow/' . $_POST['id'] . '.jpg') . "<br />"));

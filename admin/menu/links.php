@@ -83,9 +83,9 @@ if ($do == "new") {
             "tchecked" => $tchecked,
             "bnone" => $bnone,
             "llink" => $get['url'],
-        "lbeschreibung" => re($get['beschreibung']),
+        "lbeschreibung" => h($get['beschreibung']),
         "btext" => _links_text,
-        "ltext" => re($get['text']),
+        "ltext" => h($get['text']),
         "what" => _button_value_edit,
         "do" => "editlink&amp;id=" . $_GET['id'] . ""));
     }
@@ -125,7 +125,7 @@ if ($do == "new") {
         $color++;
 
         $show .= show($dir . "/links_show", array(
-            "link" => cut(re($get['url']), 40, true, false),
+            "link" => cut(h($get['url']), 40, true, false),
             "class" => $class,
             "type" => "links",
             "edit" => $edit,

@@ -10,13 +10,13 @@ $where = $where . ': ' . _config_clankasse_head;
 $qry = db("SELECT k_inhaber,k_nr,k_blz,k_bank,iban,bic,k_waehrung,k_vwz FROM " . $db['settings'] . "");
 $get = _fetch($qry);
 
-$waehrung = re($get['k_waehrung']);
+$waehrung = h($get['k_waehrung']);
 $waehrung_list = _select_field_waehrung;
 $waehrung_list = str_replace("<option value=\"" . $waehrung . "\">",
     "<option value=\"" . $waehrung . "\" selected=\"selected\">", $waehrung_list);
 
 $konto_show = show($dir . "/form_konto", array("kinhaber" => _clankasse_inhaber,
-    "inhaber" => re($get['k_inhaber']),
+    "inhaber" => h($get['k_inhaber']),
     "kkontonr" => _clankasse_nr,
     "kontonr" => $get['k_nr'],
     "kblz" => _clankasse_blz,
@@ -25,10 +25,10 @@ $konto_show = show($dir . "/form_konto", array("kinhaber" => _clankasse_inhaber,
     "waehrung" => $waehrung_list,
     "blz" => $get['k_blz'],
     "kbank" => _clankasse_bank,
-    "bank" => re($get['k_bank']),
-    "vwz" => re($get['k_vwz']),
-    "iban" => re($get['iban']),
-    "bic" => re($get['bic'])));
+    "bank" => h($get['k_bank']),
+    "vwz" => h($get['k_vwz']),
+    "iban" => h($get['iban']),
+    "bic" => h($get['bic'])));
 
 $konto = show($dir . "/form", array("head" => _config_konto_head,
     "what" => "konto",
@@ -48,7 +48,7 @@ while ($getk = _fetch($qryk)) {
         "title" => _button_title_del,
         "del" => convSpace(_confirm_del_entry)));
 
-    $show_ .= show($dir . "/clankasse_show", array("name" => re($getk['kat']),
+    $show_ .= show($dir . "/clankasse_show", array("name" => h($getk['kat']),
         "class" => $class,
         "edit" => $edit,
         "delete" => $delete));
@@ -96,7 +96,7 @@ if ($do == "update") {
 
     $show = show($dir . "/form_clankasse", array("newhead" => _clankasse_edit_head,
         "do" => "editkat&amp;id=" . $_GET['id'] . "",
-        "kat" => re($get['kat']),
+        "kat" => h($get['kat']),
         "top" => _config_c_clankasse,
         "what" => _button_value_edit,
         "dlkat" => _admin_download_kat));
