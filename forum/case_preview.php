@@ -71,9 +71,9 @@ if (defined('_Forum')) {
                   WHERE id = '" . $getw['sid'] . "'");
         $kat = _fetch($qrykat);
 
-        $wheres = show(_forum_post_where_preview, array("wherepost" => re($_POST['topic']),
-            "wherekat" => re($getw['kattopic']),
-            "mainkat" => re($kat['name']),
+        $wheres = show(_forum_post_where_preview, array("wherepost" => htmlspecialchars($_POST['topic'], ENT_QUOTES, 'UTF-8'),
+            "wherekat" => h($getw['kattopic']),
+            "mainkat" => h($kat['name']),
             "tid" => $_GET['id'],
             "kid" => $getw['kid']));
 
@@ -88,7 +88,7 @@ if (defined('_Forum')) {
             "admin" => "",
             "class" => 'class="commentsRight"',
             "nick" => cleanautor($pUId, '', re($_POST['nick'], true), re($_POST['email'], true)),
-            "threadhead" => re($_POST['topic']),
+            "threadhead" => htmlspecialchars($_POST['topic'], ENT_QUOTES, 'UTF-8'),
             "titel" => $titel,
             "postnr" => "1",
             "pn" => $pn,

@@ -338,16 +338,16 @@ if (defined('_UserMenu')) {
                 $qrycustom = db("SELECT * FROM `" . $db['profile'] . "` WHERE `kid` = 2 AND `shown` = 1 ORDER BY `id` ASC;");
                 while ($getcustom = _fetch($qrycustom)) {
                     $getcontent = db("SELECT `" . $getcustom['feldname'] . "` FROM `" . $db['users'] . "` WHERE `id` = " . $userid . ";", false, true);
-                    $custom_clan .= show(_profil_edit_custom, array("name" => pfields_name(re($getcustom['name'])) . ":",
-                        "feldname" => re($getcustom['feldname']),
-                        "value" => re($getcontent[$getcustom['feldname']])));
+                    $custom_clan .= show(_profil_edit_custom, array("name" => pfields_name(h($getcustom['name'])) . ":",
+                        "feldname" => h($getcustom['feldname']),
+                        "value" => h($getcontent[$getcustom['feldname']])));
                 }
 
                 $clan = show($dir . "/edit_clan", array("clan" => _profil_clan,
                     "pstatus" => _profil_status,
                     "pexclans" => _profil_exclans,
                     "status" => $status,
-                    "exclans" => re($get['ex']),
+                    "exclans" => h($get['ex']),
                     "custom_clan" => $custom_clan));
             }
 
@@ -390,36 +390,36 @@ if (defined('_UserMenu')) {
                 $qrycustom = db("SELECT `name`,`feldname` FROM `" . $db['profile'] . "` WHERE `kid` = 1 AND `shown` = 1 ORDER BY `id` ASC;");
                 while ($getcustom = _fetch($qrycustom)) {
                     $getcontent = db("SELECT `" . $getcustom['feldname'] . "` FROM `" . $db['users'] . "` WHERE `id` = " . $userid . " LIMIT 1;", false, true);
-                    $custom_about .= show(_profil_edit_custom, array("name" => pfields_name(re($getcustom['name'])) . ":",
-                        "feldname" => re($getcustom['feldname']),
-                        "value" => re($getcontent[$getcustom['feldname']])));
+                    $custom_about .= show(_profil_edit_custom, array("name" => pfields_name(h($getcustom['name'])) . ":",
+                        "feldname" => h($getcustom['feldname']),
+                        "value" => h($getcontent[$getcustom['feldname']])));
                 }
 
                 $custom_contact = '';
                 $qrycustom = db("SELECT `name`,`feldname` FROM `" . $db['profile'] . "` WHERE `kid` = 3 AND `shown` = 1 ORDER BY `id` ASC;");
                 while ($getcustom = _fetch($qrycustom)) {
                     $getcontent = db("SELECT `" . $getcustom['feldname'] . "` FROM `" . $db['users'] . "` WHERE `id` = " . $userid . " LIMIT 1;", false, true);
-                    $custom_contact .= show(_profil_edit_custom, array("name" => pfields_name(re($getcustom['name'])) . ":",
-                        "feldname" => re($getcustom['feldname']),
-                        "value" => re($getcontent[$getcustom['feldname']])));
+                    $custom_contact .= show(_profil_edit_custom, array("name" => pfields_name(h($getcustom['name'])) . ":",
+                        "feldname" => h($getcustom['feldname']),
+                        "value" => h($getcontent[$getcustom['feldname']])));
                 }
 
                 $custom_favos = '';
                 $qrycustom = db("SELECT `name`,`feldname` FROM `" . $db['profile'] . "` WHERE `kid` = 4 AND `shown` = 1 ORDER BY `id` ASC;");
                 while ($getcustom = _fetch($qrycustom)) {
                     $getcontent = db("SELECT `" . $getcustom['feldname'] . "` FROM `" . $db['users'] . "` WHERE `id` = " . $userid . " LIMIT 1;", false, true);
-                    $custom_favos .= show(_profil_edit_custom, array("name" => pfields_name(re($getcustom['name'])) . ":",
-                        "feldname" => re($getcustom['feldname']),
-                        "value" => re($getcontent[$getcustom['feldname']])));
+                    $custom_favos .= show(_profil_edit_custom, array("name" => pfields_name(h($getcustom['name'])) . ":",
+                        "feldname" => h($getcustom['feldname']),
+                        "value" => h($getcontent[$getcustom['feldname']])));
                 }
 
                 $custom_hardware = '';
                 $qrycustom = db("SELECT `name`,`feldname` FROM `" . $db['profile'] . "` WHERE `kid` = 5 AND `shown` = 1 ORDER BY `id` ASC;");
                 while ($getcustom = _fetch($qrycustom)) {
                     $getcontent = db("SELECT `" . $getcustom['feldname'] . "` FROM `" . $db['users'] . "` WHERE `id` = " . $userid . " LIMIT 1;", false, true);
-                    $custom_hardware .= show(_profil_edit_custom, array("name" => pfields_name(re($getcustom['name'])) . ":",
-                        "feldname" => re($getcustom['feldname']),
-                        "value" => re($getcontent[$getcustom['feldname']])));
+                    $custom_hardware .= show(_profil_edit_custom, array("name" => pfields_name(h($getcustom['name'])) . ":",
+                        "feldname" => h($getcustom['feldname']),
+                        "value" => h($getcontent[$getcustom['feldname']])));
                 }
 
                 $pnl = '';
@@ -484,10 +484,10 @@ if (defined('_UserMenu')) {
                     "originidl" => _originid,
                     "battlenetidl" => _battlenetid,
                     "pcity" => _profil_city,
-                    "city" => re($get['city']),
+                    "city" => h($get['city']),
                     "psteamid" => _steamid,
-                    "v_steamid" => re($get['steamid']),
-                    "skypename" => re($get['skypename']),
+                    "v_steamid" => h($get['steamid']),
+                    "skypename" => h($get['skypename']),
                     "nletter" => _profil_nletter,
                     "pnmail" => _profil_pnmail,
                     "pnl" => $pnl,
@@ -496,22 +496,22 @@ if (defined('_UserMenu')) {
                     "dropdown_age" => $dropdown_age,
                     "ava" => $avatar,
                     "hp" => links(re($get['hp'])),
-                    "nick" => re($get['nick']),
-                    "name" => re($get['user']),
-                    "rlname" => re($get['rlname']),
+                    "nick" => h($get['nick']),
+                    "name" => h($get['user']),
+                    "rlname" => h($get['rlname']),
                     "bdayday" => $bdayday,
                     "bdaymonth" => $bdaymonth,
                     "bdayyear" => $bdayyear,
                     "sex" => $sex,
-                    "email" => re($get['email']),
+                    "email" => h($get['email']),
                     "visibility_gb" => $perm_gb,
                     "visibility_gallery" => $perm_gallery,
                     "visibility_profile" => $perm_profile,
                     "sig" => re_bbcode(re($get['signatur'])),
-                    "xboxid" => re($get['xboxid']),
-                    "psnid" => re($get['psnid']),
-                    "originid" => re($get['originid']),
-                    "battlenetid" => re($get['battlenetid']),
+                    "xboxid" => h($get['xboxid']),
+                    "psnid" => h($get['psnid']),
+                    "originid" => h($get['originid']),
+                    "battlenetid" => h($get['battlenetid']),
                     "clan" => $clan,
                     "pic" => $pic,
                     "editpic" => _profil_edit_pic,

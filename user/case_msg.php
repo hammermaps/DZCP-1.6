@@ -38,7 +38,7 @@ if (defined('_UserMenu')) {
                 }
 
                 $index = show($dir . "/msg_show", array("answermsg" => $answermsg,
-                    "titel" => re($get['titel']),
+                    "titel" => h($get['titel']),
                     "nachricht" => bbcode(re($get['nachricht'])),
                     "answer" => $answer,
                     "sendnews" => $sendnews,
@@ -66,7 +66,7 @@ if (defined('_UserMenu')) {
                 $answer = _back;
 
                 $index = show($dir . "/msg_show", array("answermsg" => $answermsg,
-                    "titel" => re($get['titel']),
+                    "titel" => h($get['titel']),
                     "nachricht" => bbcode(re($get['nachricht'])),
                     "answer" => $answer,
                     "sendnews" => "",
@@ -78,8 +78,8 @@ if (defined('_UserMenu')) {
             $get = _fetch($qry);
 
             if ($get['von'] == $userid || $get['an'] == $userid) {
-                if (preg_match("#RE:#is", re($get['titel']))) $titel = re($get['titel']);
-                else $titel = "RE: " . re($get['titel']);
+                if (preg_match("#RE:#is", re($get['titel']))) $titel = h($get['titel']);
+                else $titel = "RE: " . h($get['titel']);
 
                 $index = show($dir . "/answer", array("von" => $userid,
                     "an" => $get['von'],
@@ -98,7 +98,7 @@ if (defined('_UserMenu')) {
             elseif ($_GET['id'] == $userid) $index = error(_error_msg_self, 1);
             else {
 
-                $titel = show(_msg_from_nick, array("nick" => re(data("nick"))));
+                $titel = show(_msg_from_nick, array("nick" => h(data("nick"))));
 
                 $index = show($dir . "/answer", array("von" => $userid,
                     "an" => $_GET['id'],
@@ -253,7 +253,7 @@ if (defined('_UserMenu')) {
                 $index = show($dir . "/new", array("von" => $userid,
                     "an" => _to,
                     "or" => _or,
-                    "posttitel" => re($_POST['titel']),
+                    "posttitel" => htmlspecialchars($_POST['titel'], ENT_QUOTES, 'UTF-8'),
                     "posteintrag" => re_bbcode(re($_POST['eintrag'], true)),
                     "postto" => $_POST['buddys'] . "" . $_POST['users'],
                     "buddys" => $buddys,
@@ -294,7 +294,7 @@ if (defined('_UserMenu')) {
                     if ($get['von'] == 0) $absender = _msg_bot;
                     else $absender = autor($get['von']);
 
-                    $titel = show(_msg_in_title, array("titel" => re($get['titel'])));
+                    $titel = show(_msg_in_title, array("titel" => h($get['titel'])));
 
                     $delete = _delete;
                     $date = date("d.m.Y H:i", $get['datum']) . _uhr;
@@ -329,7 +329,7 @@ if (defined('_UserMenu')) {
                                ORDER BY datum DESC");
             $postausgang = '';
             while ($get = _fetch($qry)) {
-                $titel = show(_msg_out_title, array("titel" => re($get['titel'])));
+                $titel = show(_msg_out_title, array("titel" => h($get['titel'])));
                 $delete = _msg_delete_sended;
                 $date = date("d.m.Y H:i", $get['datum']) . _uhr;
 

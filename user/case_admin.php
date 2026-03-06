@@ -21,11 +21,11 @@ if (defined('_UserMenu')) {
                 while ($getpos = _fetch($qrypos)) {
                     $check = db("SELECT `id` FROM `" . $db['userpos'] . "` WHERE `posi` = " . $getpos['id'] . " AND `squad` = " . $getsq['id'] . " AND `user` = " . $userid . ";", true);
                     $sel = $check ? 'selected="selected"' : '';
-                    $posi .= show(_select_field_posis, array("value" => $getpos['id'], "sel" => $sel, "what" => re($getpos['position'])));
+                    $posi .= show(_select_field_posis, array("value" => $getpos['id'], "sel" => $sel, "what" => h($getpos['position'])));
                 }
 
                 $check = db("SELECT `id` FROM `" . $db['squaduser'] . "` WHERE `user` = " . $userid . " AND `squad` = " . $getsq['id'] . ";", true) ? 'checked="checked"' : '';
-                $esquads .= show(_checkfield_squads, array("id" => $getsq['id'], "check" => $check, "eposi" => $posi, "noposi" => _user_noposi, "squad" => re($getsq['name'])));
+                $esquads .= show(_checkfield_squads, array("id" => $getsq['id'], "check" => $check, "eposi" => $posi, "noposi" => _user_noposi, "squad" => h($getsq['name'])));
             }
 
             $index = show($dir . "/admin_self", array("squadhead" => _admin_user_squadhead,
@@ -292,7 +292,7 @@ if (defined('_UserMenu')) {
                                         " AND `squad` = " . $getsq['id'] . " AND `user` = " . (int)($_GET['edit']) . ";", true);
 
                                     $sel = $check ? 'selected="selected"' : '';
-                                    $posi .= show(_select_field_posis, array("value" => $getpos['id'], "sel" => $sel, "what" => re($getpos['position'])));
+                                    $posi .= show(_select_field_posis, array("value" => $getpos['id'], "sel" => $sel, "what" => h($getpos['position'])));
                                 }
 
                                 $checksquser = db("SELECT `squad` FROM `" . $db['squaduser'] . "` WHERE `user` = " . $edit_userid . " AND `squad` = " . $getsq['id'] . ";", true);
@@ -302,7 +302,7 @@ if (defined('_UserMenu')) {
                                     "check" => $check,
                                     "eposi" => $posi,
                                     "noposi" => _user_noposi,
-                                    "squad" => re($getsq['name'])));
+                                    "squad" => h($getsq['name'])));
                             }
 
                             $get_identy = show(_admin_user_get_identitat, array("id" => $edit_userid));
@@ -338,10 +338,10 @@ if (defined('_UserMenu')) {
                                 $dsgvo = _admin_dsgvo_lock;
                             }
 
-                            $index = show($dir . "/admin", array("enick" => re($get['nick']),
+                            $index = show($dir . "/admin", array("enick" => h($get['nick']),
                                 "user" => $edit_userid,
                                 "value" => _button_value_edit,
-                                "eemail" => re($get['email']),
+                                "eemail" => h($get['email']),
                                 "eloginname" => $get['user'],
                                 "esquad" => $esquads,
                                 "editpwd" => $editpwd,

@@ -1218,6 +1218,12 @@ function re($txt, bool $only_stripslashes = false)
     return strval(trim(stripslashes(spChars(html_entity_decode(utf8_decode($txt), ENT_COMPAT, $charset), true))));
 }
 
+//-> HTML-escape for safe output in HTML context (re() + htmlspecialchars)
+function h($txt, bool $only_stripslashes = false)
+{
+    return htmlspecialchars(re($txt, $only_stripslashes), ENT_QUOTES, 'UTF-8');
+}
+
 //-> Smileys ausgeben
 function smileys(string $txt)
 {

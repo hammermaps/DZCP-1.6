@@ -87,9 +87,9 @@ if (defined('_UserMenu')) {
                     "pwd" => _pwd,
                     "pwd2" => _pwd2,
                     "email" => _email,
-                    "r_name" => $_POST['user'],
-                    "r_nick" => $_POST['nick'],
-                    "r_email" => $_POST['email'],
+                    "r_name" => htmlspecialchars($_POST['user'], ENT_QUOTES, 'UTF-8'),
+                    "r_nick" => htmlspecialchars($_POST['nick'], ENT_QUOTES, 'UTF-8'),
+                    "r_email" => htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8'),
                     "pflicht" => _contact_pflichtfeld,
                     "value" => _button_value_reg,
                     "regcode" => $regcode));
