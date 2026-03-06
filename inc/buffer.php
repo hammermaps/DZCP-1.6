@@ -4,17 +4,20 @@
  * http://www.dzcp.de
  */
 
+if (defined('_BUFFER_LOADED')) return;
+define('_BUFFER_LOADED', true);
+
+if (!defined('basePath'))
+    define('basePath', dirname(dirname(__FILE__) . '../'));
+
 ob_start();
 ob_implicit_flush(false);
-define('basePath', dirname(dirname(__FILE__) . '../'));
 
 if (version_compare(phpversion(), '7.0', '<')) {
     die('Bitte verwende PHP-Version 7.0 oder h&ouml;her.<p>Please use PHP-Version 7.0 or higher.');
 }
 
 include(basePath . '/vendor/autoload.php');
-
-use GUMP\GUMP;
 
 function getmicrotime()
 {
@@ -25,7 +28,7 @@ function getmicrotime()
 $time_start = getmicrotime();
 
 //Filter Sanitize
-$gump = GUMP::get_instance();
+$gump = new GUMP();
 $blacklist = array('comment', 'newstext', 'eintrag',
     'artikel', 'reason', 'text', 'ich', 'sig', 'bericht');
 $filter = $gump->sanitize($_POST);
