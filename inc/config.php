@@ -292,6 +292,17 @@ if ($db['host'] != '' && $db['user'] != '' && $db['pass'] != '' && $db['db'] != 
 
 // Start session if no headers were sent
 if (!headers_sent()) {
+    // Harden session cookie parameters before starting the session
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.use_strict_mode', 1);
+    ini_set('session.cookie_samesite', 'Lax');
+    if ((isset($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) === 'on' || $_SERVER['HTTPS'] === '1')) ||
+        (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] === '443') ||
+        (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https') ||
+        (isset($_SERVER['HTTP_X_FORWARDED_SSL']) && strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) === 'on')) {
+        ini_set('session.cookie_secure', 1);
+    }
+
     session_start();
 
     if (!isset($_SESSION['PHPSESSID'])) {

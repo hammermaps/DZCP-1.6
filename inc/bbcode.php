@@ -535,6 +535,13 @@ function lang(string $lng)
     //Set bBase-Content-type header
     header("Content-type: text/html; charset=" . $charset);
 
+    //Security headers
+    header("X-Frame-Options: SAMEORIGIN");
+    header("X-Content-Type-Options: nosniff");
+    header("Referrer-Policy: strict-origin-when-cross-origin");
+    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self';");
+    // TODO: Replace 'unsafe-inline'/'unsafe-eval' with nonces or hashes once inline scripts/styles are refactored
+
     //Set language for GUMP
     $gump->language(language_short_tag());
 
