@@ -33,6 +33,9 @@ if (defined('_UserMenu')) {
                             cookie::save();
                         }
 
+                        // Regenerate session ID on login to prevent session fixation attacks
+                        session_regenerate_id(true);
+
                         ## Aktualisiere Datenbank ##
                         db("UPDATE `" . $db['users'] . "` SET `online` = 1, `sessid` = '" . session_id() . "', `ip` = '" . $userip . "', `pkey` = '" . $permanent_key . "' WHERE `id` = " . $get['id'] . ";");
 
