@@ -197,7 +197,7 @@ if ($action == "gb") {
         if ($i == $allkats) $end = "";
         else $end = ",";
 
-        $kats .= re($get['kategorie']) . $end . " ";
+        $kats .= h($get['kategorie']) . $end . " ";
         $i++;
     }
     $qry = db("SELECT datum FROM " . $db['news'] . "

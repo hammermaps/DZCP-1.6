@@ -454,7 +454,7 @@ switch ($action):
                             "file" => _upload_file,
                             "showpic" => img_size("inc/images/uploads/usergallery/" . $get['user'] . "_" . $get['pic']),
                             "id" => $get['id'],
-                            "showbeschreibung" => re($get['beschreibung']),
+                            "showbeschreibung" => h($get['beschreibung']),
                             "name" => "file",
                             "upload" => _button_value_edit,
                             "beschreibung" => _upload_beschreibung,

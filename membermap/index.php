@@ -66,7 +66,7 @@ while ($mm_get = _fetch($mm_qry)) {
             $mm_infos .= "</tr>','<tr>";
         }
 
-        $mm_infos .= '<td><b style="font-size:13px">&nbsp;' . re($mm_get['city']) . '</td></tr><tr>';
+        $mm_infos .= '<td><b style="font-size:13px">&nbsp;' . h($mm_get['city']) . '</td></tr><tr>';
         $mm_coords .= 'new google.maps.LatLng(' . $mm_get['gmaps_koord'] . ')';
         $realCount++;
     } else {
@@ -94,7 +94,7 @@ while ($mm_user_get = _fetch($mm_qry)) {
         'userListPic' => userpic($mm_user_get['id'], 40, 50),
         'userListName' => autor($mm_user_get['id']),
         'userListRank' => getrank($mm_user_get['id']),
-        'userListCity' => re($mm_user_get['city']),
+        'userListCity' => h($mm_user_get['city']),
         'class' => $class));
 }
 

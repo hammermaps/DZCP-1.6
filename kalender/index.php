@@ -97,7 +97,7 @@ switch ($action):
                      WHERE DATE_FORMAT(FROM_UNIXTIME(datum), '%d.%m.%Y') = '" . cal($i) . "." . $monat . "." . $jahr . "'");
                     if (_rows($qry)) {
                         $infoCW = '';
-                        while ($get = _fetch($qry)) $infoCW .= '&lt;img src=../inc/images/cw.gif class=icon alt= /&gt;' . '&nbsp;' . jsconvert(_kal_cw . re($get['gegner'])) . '<br />';
+                        while ($get = _fetch($qry)) $infoCW .= '&lt;img src=../inc/images/cw.gif class=icon alt= /&gt;' . '&nbsp;' . jsconvert(_kal_cw . h($get['gegner'])) . '<br />';
 
                         $info = ' onmouseover="DZCP.showInfo(\'' . $infoCW . '\')" onmouseout="DZCP.hideInfo()"';
                         $cws = '<a href="../clanwars/?action=kalender&amp;time=' . $datum . '"' . $info . '><img src="../inc/images/cw.gif" alt="" /></a>';
@@ -109,7 +109,7 @@ switch ($action):
                    WHERE DATE_FORMAT(FROM_UNIXTIME(datum), '%d.%m.%Y') = '" . cal($i) . "." . $monat . "." . $jahr . "'");
                     if (_rows($qry)) {
                         $infoEvent = '';
-                        while ($get = _fetch($qry)) $infoEvent .= '&lt;img src=../inc/images/event.gif class=icon alt= /&gt;' . '&nbsp;' . jsconvert(_kal_event . re($get['title'])) . '<br />';
+                        while ($get = _fetch($qry)) $infoEvent .= '&lt;img src=../inc/images/event.gif class=icon alt= /&gt;' . '&nbsp;' . jsconvert(_kal_event . h($get['title'])) . '<br />';
 
                         $info = ' onmouseover="DZCP.showInfo(\'' . $infoEvent . '\')" onmouseout="DZCP.hideInfo()"';
                         $event = '<a href="?action=show&amp;time=' . $datum . '"' . $info . '><img src="../inc/images/event.gif" alt="" /></a>';
@@ -170,7 +170,7 @@ switch ($action):
                 "edit" => $edit,
                 "show_time" => date("H:i", $get['datum']) . _uhr,
                 "show_event" => bbcode(re($get['event'])),
-                "show_title" => re($get['title'])));
+                "show_title" => h($get['title'])));
         }
 
         $head = show(_kalender_events_head, array("datum" => date("d.m.Y", $_GET['time'])));

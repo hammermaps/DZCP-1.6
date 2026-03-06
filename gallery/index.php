@@ -41,7 +41,7 @@ switch ($action):
                 $cntpics = $cnt == 1 ? _gallery_image : _gallery_images;
                 $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
                 $color++;
-                $show .= show($dir . "/gallery_show", array("link" => re($get['kat']),
+                $show .= show($dir . "/gallery_show", array("link" => h($get['kat']),
                     "class" => $class,
                     "images" => $cntpics,
                     "image" => $imgArr[0],
@@ -108,7 +108,7 @@ switch ($action):
             $end = $end . "</tr>";
         }
 
-        $index = show($dir . "/show", array("gallery" => re($get['kat']),
+        $index = show($dir . "/show", array("gallery" => h($get['kat']),
             "show" => $show,
             "beschreibung" => bbcode(re($get['beschreibung'])),
             "end" => $end,

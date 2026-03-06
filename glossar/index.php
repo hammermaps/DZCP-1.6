@@ -36,7 +36,7 @@ while ($get = _fetch($qry)) {
     if (isset($_GET['word']) && $_GET['word'] == $get['word'])
         $class = 'highlightSearchTarget';
 
-    $show .= show($dir . "/glossar_show", array("word" => re($get['word']),
+    $show .= show($dir . "/glossar_show", array("word" => h($get['word']),
         "class" => $class,
         "glossar" => bbcode(re($get['glossar']))));
 }

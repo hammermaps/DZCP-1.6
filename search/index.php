@@ -59,7 +59,7 @@ switch ($action):
 
         $fkats = '';
         while ($get = _fetch($qry)) {
-            $fkats .= '<li><label class="searchKat" style="text-align:center">' . re($get['name']) . '</label></li>';
+            $fkats .= '<li><label class="searchKat" style="text-align:center">' . h($get['name']) . '</label></li>';
             $showt = "";
             $qrys = db("SELECT `id`,`kattopic` FROM `" . $db['f_skats'] . "` WHERE `sid` = " . $get['id'] . " ORDER BY `kattopic`;");
             while ($gets = _fetch($qrys)) {
@@ -70,7 +70,7 @@ switch ($action):
                     else
                         $kcheck = '';
 
-                    $fkats .= '<li><label class="search" for="k_' . $gets['id'] . '"><input type="checkbox" class="chksearch" name="k_' . $gets['id'] . '" id="k_' . $gets['id'] . '" ' . $kcheck . ' onclick="DZCP.hideForumFirst()" value="true" />&nbsp;&nbsp;' . re($gets['kattopic']) . '</label></li>';
+                    $fkats .= '<li><label class="search" for="k_' . $gets['id'] . '"><input type="checkbox" class="chksearch" name="k_' . $gets['id'] . '" id="k_' . $gets['id'] . '" ' . $kcheck . ' onclick="DZCP.hideForumFirst()" value="true" />&nbsp;&nbsp;' . h($gets['kattopic']) . '</label></li>';
                 }
             }
         }
@@ -209,7 +209,7 @@ switch ($action):
                     }
                     unset($getlp, $qrylp);
 
-                    $threadlink = show(_forum_thread_search_link, array("topic" => cut(re($get['topic']), config('l_forumtopic'), true, false),
+                    $threadlink = show(_forum_thread_search_link, array("topic" => cut(h($get['topic']), config('l_forumtopic'), true, false),
                         "id" => $get['id'],
                         "sticky" => $sticky,
                         "hl" => $_GET['search'],
@@ -221,7 +221,7 @@ switch ($action):
                     $color++;
                     $results .= show($dir . "/forum_search_results", array("new" => (check_new((int)get['lp']) ? _newicon : ''),
                         "topic" => $threadlink,
-                        "subtopic" => cut(re($get['subtopic']), config('l_forumsubtopic'), true, false),
+                        "subtopic" => cut(h($get['subtopic']), config('l_forumsubtopic'), true, false),
                         "hits" => $get['hits'],
                         "replys" => cnt($db['f_posts'], " WHERE sid = '" . $get['id'] . "'"),
                         "class" => $class,
@@ -267,7 +267,7 @@ switch ($action):
             "board" => _forum,
             "fkats" => $fkats,
             "show" => $show,
-            "search" => ($_GET['search'] != _search_word ? $_GET['search'] : ''),
+            "search" => ($_GET['search'] != _search_word ? htmlspecialchars($_GET['search'], ENT_QUOTES, 'UTF-8') : ''),
             "searchin" => _search_in,
             "onclick" => $onclick,
             "img" => $img,
@@ -304,7 +304,7 @@ switch ($action):
                 $shownews .= show($dir . "/search_show", array("class" => $class,
                     "type" => 'news',
                     "href" => '../news/index.php?action=show&amp;id=' . $get['id'],
-                    "titel" => re($get['titel'])));
+                    "titel" => h($get['titel'])));
             }
             unset($get, $qry);
 
@@ -319,7 +319,7 @@ switch ($action):
                 $showartikel .= show($dir . "/search_show", array("href" => '../artikel/index.php?action=show&amp;id=' . $get['id'],
                     "class" => $class,
                     "type" => 'artikel',
-                    "titel" => re($get['titel'])));
+                    "titel" => h($get['titel'])));
             }
             unset($get, $qry);
 
@@ -334,7 +334,7 @@ switch ($action):
                 $showsites .= show($dir . "/search_show", array("href" => '../sites/?show=' . $get['id'],
                     "class" => $class,
                     "type" => 'site',
-                    "titel" => re($get['titel'])));
+                    "titel" => h($get['titel'])));
             }
             unset($get, $qry, $color, $class);
 

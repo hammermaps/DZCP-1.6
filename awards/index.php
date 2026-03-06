@@ -56,11 +56,11 @@ switch ($action):
                 else
                     $replace = $getm['place'];
 
-                $event = show(_awards_event, array("event" => re($getm['event']), "url" => $getm['url']));
+                $event = show(_awards_event, array("event" => h($getm['event']), "url" => $getm['url']));
                 $awards .= show($dir . "/awards_show", array("class" => $class,
                     "date" => date("d.m.Y", $getm['date']),
                     "place" => $replace,
-                    "prize" => re($getm['prize']),
+                    "prize" => h($getm['prize']),
                     "event" => $event));
             }
 
@@ -77,7 +77,7 @@ switch ($action):
                 "show_all" => $show_all));
 
             if (cnt($db['awards'], " WHERE squad = " . $get['id']) != 0) {
-                $img = show(_gameicon, array("icon" => re($get['icon'])));
+                $img = show(_gameicon, array("icon" => h($get['icon'])));
                 $show .= show($dir . "/squads_show", array("id" => $get['id'],
                     "shown" => $shown,
                     "display" => $display,
@@ -93,7 +93,7 @@ switch ($action):
         while ($get = _fetch($qry)) {
             $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
             $color++;
-            $legende .= show(_awards_legende, array("game" => re($get['game']), "img" => squad(re($get['icon'])), "class" => $class));
+            $legende .= show(_awards_legende, array("game" => h($get['game']), "img" => squad(re($get['icon'])), "class" => $class));
         }
 
         $legende = show($dir . "/legende", array("legende_head" => _awards_head_legende, "legende" => $legende));
@@ -176,19 +176,19 @@ switch ($action):
                 else
                     $replace = $getm['place'];
 
-                $event = show(_awards_event, array("event" => $getm['event'], "url" => $getm['url']));
+                $event = show(_awards_event, array("event" => h($getm['event']), "url" => $getm['url']));
                 $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
                 $color++;
                 $awards .= show($dir . "/awards_show", array("class" => $class,
                     "date" => date("d.m.Y", $getm['date']),
                     "place" => $replace,
-                    "prize" => $getm['prize'],
+                    "prize" => h($getm['prize']),
                     "event" => $event));
 
             }
 
-            $squad = show(_member_squad_squadlink, array("squad" => re($get['name']), "id" => $get['id'], "shown" => $shown));
-            $img = show(_gameicon, array("icon" => re($get['icon'])));
+            $squad = show(_member_squad_squadlink, array("squad" => h($get['name']), "id" => $get['id'], "shown" => $shown));
+            $img = show(_gameicon, array("icon" => h($get['icon'])));
             $nav = nav($entrys, config('m_awards'), "?action=showall&amp;id=" . $get['id'] . "");
             $showawards = show($dir . "/awards_show_all", array("squad" => _awards_head_squad,
                 "date" => _awards_head_date,
@@ -214,7 +214,7 @@ switch ($action):
             $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
             $color++;
             $img = squad($get['icon']);
-            $legende .= show(_awards_legende, array("game" => re($get['game']), "img" => $img, "class" => $class));
+            $legende .= show(_awards_legende, array("game" => h($get['game']), "img" => $img, "class" => $class));
         }
 
         $legende = show($dir . "/legende", array("legende_head" => _awards_head_legende, "legende" => $legende));

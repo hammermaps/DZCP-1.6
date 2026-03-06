@@ -23,11 +23,11 @@ switch ($action):
         while ($get = _fetch($qry)) {
             if (empty($get['slink'])) {
                 $banner = show(_sponsors_bannerlink, array("id" => $get['id'],
-                    "title" => str_replace('http://', '', re($get['link'])),
-                    "banner" => "../banner/sponsors/site_" . $get['id'] . "." . re($get['send'])));
+                    "title" => htmlspecialchars(str_replace('http://', '', re($get['link'])), ENT_QUOTES, 'UTF-8'),
+                    "banner" => "../banner/sponsors/site_" . $get['id'] . "." . h($get['send'])));
             } else {
                 $banner = show(_sponsors_bannerlink, array("id" => $get['id'],
-                    "title" => str_replace('http://', '', re($get['link'])),
+                    "title" => htmlspecialchars(str_replace('http://', '', re($get['link'])), ENT_QUOTES, 'UTF-8'),
                     "banner" => $get['slink']));
             }
 

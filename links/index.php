@@ -24,10 +24,10 @@ switch ($action):
             while ($get = _fetch($qry)) {
                 if ($get['banner']) {
                     $banner = show(_links_bannerlink, array("id" => $get['id'],
-                        "banner" => re($get['text'])));
+                        "banner" => h($get['text'])));
                 } else {
                     $banner = show(_links_textlink, array("id" => $get['id'],
-                        "text" => str_replace('http://', '', re($get['url']))));
+                        "text" => htmlspecialchars(str_replace('http://', '', re($get['url'])), ENT_QUOTES, 'UTF-8')));
                 }
 
                 $show .= show($dir . "/links_show", array("beschreibung" => bbcode(re($get['beschreibung'])),

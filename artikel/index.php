@@ -30,7 +30,7 @@ switch ($action):
                 $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
                 $color++;
                 $show .= show($dir . "/artikel_show", array("titel" => $titel,
-                    "kat" => re($getk['kategorie']),
+                    "kat" => h($getk['kategorie']),
                     "id" => $get['id'],
                     "display" => "none",
                     "nautor" => _autor,
@@ -71,17 +71,17 @@ switch ($action):
                 $rel = "";
                 if ($get['url1']) {
                     $rel = _related_links;
-                    $links1 = show(_artikel_link, array("link" => re($get['link1']), "url" => $get['url1']));
+                    $links1 = show(_artikel_link, array("link" => h($get['link1']), "url" => $get['url1']));
                 }
 
                 if ($get['url2']) {
                     $rel = _related_links;
-                    $links2 = show(_artikel_link, array("link" => re($get['link2']), "url" => $get['url2']));
+                    $links2 = show(_artikel_link, array("link" => h($get['link2']), "url" => $get['url2']));
                 }
 
                 if ($get['url3']) {
                     $rel = _related_links;
-                    $links3 = show(_artikel_link, array("link" => re($get['link3']), "url" => $get['url3']));
+                    $links3 = show(_artikel_link, array("link" => h($get['link3']), "url" => $get['url3']));
                 }
 
                 if (!empty($links1) || !empty($links2) || !empty($links3)) {
@@ -97,7 +97,7 @@ switch ($action):
                 $i = ($entrys - ($page - 1) * config('m_comments'));
                 $comments = '';
                 while ($getc = _fetch($qryc)) {
-                    $hp = ($getc['hp'] ? show(_hpicon, array("hp" => re($getc['hp']))) : "");
+                    $hp = ($getc['hp'] ? show(_hpicon, array("hp" => h($getc['hp']))) : "");
 
                     $edit = "";
                     $delete = "";
@@ -113,11 +113,11 @@ switch ($action):
                     }
 
                     if (!$getc['reg']) {
-                        $hp = ($getc['hp'] ? show(_hpicon_forum, array("hp" => re($getc['hp']))) : "");
+                        $hp = ($getc['hp'] ? show(_hpicon_forum, array("hp" => h($getc['hp']))) : "");
                         $email = ($getc['email'] ? '<br />' . show(_emailicon_forum, array("email" => eMailAddr(re($getc['email'])))) : "");
                         $onoff = "";
                         $avatar = "";
-                        $nick = show(_link_mailto, array("nick" => re($getc['nick']), "email" => eMailAddr(re($getc['email']))));
+                        $nick = show(_link_mailto, array("nick" => h($getc['nick']), "email" => eMailAddr(re($getc['email']))));
                     } else {
                         $email = "";
                         $hp = "";
@@ -190,7 +190,7 @@ switch ($action):
                     "add" => $add));
 
                 $getkat = db("SELECT `katimg` FROM `" . $db['newskat'] . "` WHERE `id` = " . $get['kat'] . ";", false, true);
-                $artikelimage = '../inc/images/newskat/' . re($getkat['katimg']);
+                $artikelimage = '../inc/images/newskat/' . h($getkat['katimg']);
                 foreach ($picformat as $tmpendung) {
                     if (file_exists(basePath . "/inc/images/uploads/artikel/" . $get['id'] . "." . $tmpendung)) {
                         $artikelimage = '../inc/images/uploads/artikel/' . $get['id'] . '.' . $tmpendung;
@@ -198,7 +198,7 @@ switch ($action):
                     }
                 }
 
-                $index = show($dir . "/show_more", array("titel" => re($get['titel']),
+                $index = show($dir . "/show_more", array("titel" => h($get['titel']),
                     "id" => $get['id'],
                     "comments" => "",
                     "display" => "inline",
@@ -257,10 +257,10 @@ switch ($action):
                                     "prevurl" => '../artikel/?action=compreview&amp;id=' . $_GET['id'],
                                     "id" => $_GET['id'],
                                     "what" => _button_value_add,
-                                    "postemail" => $_POST['email'],
+                                    "postemail" => htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8'),
                                     "ip" => _iplog_info,
-                                    "posthp" => links(re($_POST['hp'], true)),
-                                    "postnick" => re($_POST['nick']),
+                                    "posthp" => htmlspecialchars(links(re($_POST['hp'], true)), ENT_QUOTES, 'UTF-8'),
+                                    "postnick" => htmlspecialchars($_POST['nick'], ENT_QUOTES, 'UTF-8'),
                                     "show" => "",
                                     "posteintrag" => re_bbcode(re($_POST['comment'], true)),
                                     "error" => $error,
@@ -319,9 +319,9 @@ switch ($action):
                         $form = show("page/editor_notregged", array("nickhead" => _nick,
                             "emailhead" => _email,
                             "hphead" => _hp,
-                            "postemail" => re($get['email']),
-                            "posthp" => links(re($get['hp'], true)),
-                            "postnick" => re($get['nick']),
+                            "postemail" => htmlspecialchars(re($get['email']), ENT_QUOTES, 'UTF-8'),
+                            "posthp" => htmlspecialchars(links(re($get['hp'], true)), ENT_QUOTES, 'UTF-8'),
+                            "postnick" => htmlspecialchars(re($get['nick']), ENT_QUOTES, 'UTF-8'),
                         ));
                     }
 
@@ -358,17 +358,17 @@ switch ($action):
         $links = "";
         if ($_POST['url1']) {
             $rel = _related_links;
-            $links1 = show(_artikel_link, array("link" => re($_POST['link1']), "url" => links(re($_POST['url1'], true))));
+            $links1 = show(_artikel_link, array("link" => htmlspecialchars($_POST['link1'], ENT_QUOTES, 'UTF-8'), "url" => links(re($_POST['url1'], true))));
         }
 
         if ($_POST['url2']) {
             $rel = _related_links;
-            $links2 = show(_artikel_link, array("link" => re($_POST['link2']), "url" => links(re($_POST['url2'], true))));
+            $links2 = show(_artikel_link, array("link" => htmlspecialchars($_POST['link2'], ENT_QUOTES, 'UTF-8'), "url" => links(re($_POST['url2'], true))));
         }
 
         if ($_POST['url3']) {
             $rel = _related_links;
-            $links3 = show(_artikel_link, array("link" => re($_POST['link3']), "url" => links(re($_POST['url3'], true))));
+            $links3 = show(_artikel_link, array("link" => htmlspecialchars($_POST['link3'], ENT_QUOTES, 'UTF-8'), "url" => links(re($_POST['url3'], true))));
         }
 
         if (!empty($links1) || !empty($links2) || !empty($links3)) {
@@ -376,7 +376,7 @@ switch ($action):
         }
 
         $getkat = db("SELECT `katimg` FROM `" . $db['newskat'] . "` WHERE `id` = " . (int)($_POST['kat']) . ";", false, true);
-        $artikelimage = '../inc/images/newskat/' . re($getkat['katimg']);
+        $artikelimage = '../inc/images/newskat/' . h($getkat['katimg']);
         foreach ($picformat as $tmpendung) {
             if (file_exists(basePath . "/inc/images/uploads/artikel/" . $get['id'] . "." . $tmpendung)) {
                 $artikelimage = '../inc/images/uploads/artikel/' . $get['id'] . '.' . $tmpendung;
@@ -384,7 +384,7 @@ switch ($action):
             }
         }
 
-        $index = show($dir . "/show_more", array("titel" => re($_POST['titel']),
+        $index = show($dir . "/show_more", array("titel" => htmlspecialchars($_POST['titel'], ENT_QUOTES, 'UTF-8'),
             "id" => $get['id'],
             "comments" => "",
             "display" => "inline",
@@ -442,7 +442,7 @@ switch ($action):
             $email = $get_email ? '<br />' . show(_emailicon_forum, array("email" => eMailAddr($get_email))) : "";
             $onoff = "";
             $avatar = "";
-            $nick = show(_link_mailto, array("nick" => re($get_nick), "email" => $get_email));
+            $nick = show(_link_mailto, array("nick" => htmlspecialchars($get_nick, ENT_QUOTES, 'UTF-8'), "email" => $get_email));
         } else {
             $hp = "";
             $email = "";

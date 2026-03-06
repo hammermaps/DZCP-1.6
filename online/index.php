@@ -28,7 +28,7 @@ $qry = db("SELECT `id`,`ip`,`nick`,`whereami` FROM `" . $db['users'] . "` WHERE 
 if (_rows($qry)) {
     while ($get = _fetch($qry)) {
         if (!preg_match("#autor_#is", $get['whereami']))
-            $whereami = re($get['whereami']);
+            $whereami = h($get['whereami']);
         else
             $whereami = preg_replace_callback("#autor_(.*?)$#", function ($id) {
                 return autor($id);
@@ -62,7 +62,7 @@ if (_rows($qry)) {
         }
 
         if (!preg_match("#autor_#is", $get['whereami']))
-            $whereami = re($get['whereami']);
+            $whereami = h($get['whereami']);
         else
             $whereami = preg_replace_callback("#autor_(.*?)$#", function ($id) {
                 return autor($id);

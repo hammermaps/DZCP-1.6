@@ -26,7 +26,7 @@ switch ($action):
                 $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
                 $color++;
                 $banner = show(_linkus_bannerlink, array("id" => $get['id'],
-                    "banner" => re($get['text'])));
+                    "banner" => h($get['text'])));
                 $edit = "";
                 $delete = "";
                 if (permission("links")) {
@@ -40,11 +40,11 @@ switch ($action):
                 }
 
                 $show .= show($dir . "/linkus_show", array("class" => $class,
-                    "beschreibung" => re($get['beschreibung']),
+                    "beschreibung" => h($get['beschreibung']),
                     "cnt" => $color,
                     "banner" => $banner,
-                    "besch" => re($get['beschreibung']),
-                    "url" => $get['url']));
+                    "besch" => h($get['beschreibung']),
+                    "url" => h($get['url'])));
             }
         }
 

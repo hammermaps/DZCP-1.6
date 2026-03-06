@@ -50,7 +50,7 @@ if (defined('_Votes')) {
                 $balken = show(_votes_balken, array("width" => $rawpercent));
                 $result_head = _votes_results_head;
                 $votebutton = "";
-                $results .= show($dir . "/votes_results", array("answer" => re($getv['sel']),
+                $results .= show($dir . "/votes_results", array("answer" => h($getv['sel']),
                     "percent" => $percent,
                     "lng_stimmen" => _votes_stimmen,
                     "class" => $class,
@@ -60,13 +60,13 @@ if (defined('_Votes')) {
                 $result_head = _votes_results_head_vote;
                 $votebutton = '<input id="voteSubmit_' . $get['id'] . '" type="submit" value="' . _button_value_vote . '" class="submit" />';
                 $results .= show($dir . "/votes_vote", array("id" => $getv['id'],
-                    "answer" => re($getv['sel']),
+                    "answer" => h($getv['sel']),
                     "class" => $class));
             } else {
                 $result_head = _votes_results_head_vote;
                 $votebutton = '';
                 $balken = show(_votes_balken, array("width" => 0));
-                $results .= show($dir . "/votes_results", array("answer" => re($getv['sel']),
+                $results .= show($dir . "/votes_results", array("answer" => h($getv['sel']),
                     "percent" => '0',
                     "lng_stimmen" => _votes_stimmen,
                     "class" => $class,
@@ -89,7 +89,7 @@ if (defined('_Votes')) {
             $display = "none";
         }
 
-        $ftitel = $get['forum'] ? re($get['titel']) . ' (Forum)' : re($get['titel']);
+        $ftitel = $get['forum'] ? h($get['titel']) . ' (Forum)' : h($get['titel']);
         $titel = show(_votes_titel, array("titel" => $ftitel,
             "vid" => $get['id'],
             "icon" => $moreicon,
