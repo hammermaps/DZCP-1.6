@@ -1561,7 +1561,9 @@ function highlight(string $word)
 function updateCounter()
 {
     global $db, $reload, $today, $datum, $userip, $CrawlerDetect;
-    $ipcheck = db("SELECT `id`,`ip`,`datum` FROM `" . $db['c_ips'] . "` WHERE `ip` = '" . $userip . "' AND FROM_UNIXTIME(datum,'%d.%m.%Y') = '" . date("d.m.Y") . "'");
+    $userip_escaped = _real_escape_string($userip);
+    $agent_escaped = _real_escape_string($CrawlerDetect->userAgent);
+    $ipcheck = db("SELECT `id`,`ip`,`datum` FROM `" . $db['c_ips'] . "` WHERE `ip` = '" . $userip_escaped . "' AND FROM_UNIXTIME(datum,'%d.%m.%Y') = '" . date("d.m.Y") . "'");
     db("DELETE FROM `" . $db['c_ips'] . "` WHERE `datum`+" . $reload . " <= " . time() . " OR FROM_UNIXTIME(datum,'%d.%m.%Y') != '" . date("d.m.Y") . "'");
     $count = db("SELECT id,visitors,today FROM " . $db['counter'] . " WHERE today = '" . $today . "'");
     if (_rows($ipcheck) >= 1) {
@@ -1573,10 +1575,10 @@ function updateCounter()
             else
                 db("INSERT INTO `" . $db['counter'] . "` SET `visitors` = '1', `today` = '" . $today . "'");
 
-            if (db("SELECT `id` FROM `" . $db['c_ips'] . "` WHERE `ip` = '" . $userip . "';", true)) {
-                db("UPDATE " . $db['c_ips'] . " SET `datum` = " . ((int)$datum) . ", `agent` = '" . $CrawlerDetect->userAgent . "' WHERE `ip` = '" . $userip . "';");
+            if (db("SELECT `id` FROM `" . $db['c_ips'] . "` WHERE `ip` = '" . $userip_escaped . "';", true)) {
+                db("UPDATE " . $db['c_ips'] . " SET `datum` = " . ((int)$datum) . ", `agent` = '" . $agent_escaped . "' WHERE `ip` = '" . $userip_escaped . "';");
             } else {
-                db("INSERT INTO `" . $db['c_ips'] . "` SET `ip` = '" . $userip . "', `datum` = '" . ((int)$datum) . "', `agent` = '" . $CrawlerDetect->userAgent . "';");
+                db("INSERT INTO `" . $db['c_ips'] . "` SET `ip` = '" . $userip_escaped . "', `datum` = '" . ((int)$datum) . "', `agent` = '" . $agent_escaped . "';");
             }
         }
     } else {
@@ -1585,10 +1587,10 @@ function updateCounter()
         else
             db("INSERT INTO `" . $db['counter'] . "` SET `visitors` = '1', `today` = '" . $today . "'");
 
-        if (db("SELECT `id` FROM `" . $db['c_ips'] . "` WHERE `ip` = '" . $userip . "';", true)) {
-            db("UPDATE `" . $db['c_ips'] . "` SET `datum` = '" . ((int)$datum) . "', `agent` = '" . $CrawlerDetect->userAgent . "' WHERE `ip` = '" . $userip . "';");
+        if (db("SELECT `id` FROM `" . $db['c_ips'] . "` WHERE `ip` = '" . $userip_escaped . "';", true)) {
+            db("UPDATE `" . $db['c_ips'] . "` SET `datum` = '" . ((int)$datum) . "', `agent` = '" . $agent_escaped . "' WHERE `ip` = '" . $userip_escaped . "';");
         } else {
-            db("INSERT INTO `" . $db['c_ips'] . "` SET `ip` = '" . $userip . "', `datum` = '" . ((int)$datum) . "', `agent` = '" . $CrawlerDetect->userAgent . "';");
+            db("INSERT INTO `" . $db['c_ips'] . "` SET `ip` = '" . $userip_escaped . "', `datum` = '" . ((int)$datum) . "', `agent` = '" . $agent_escaped . "';");
         }
     }
 }
@@ -2732,14 +2734,16 @@ function pfields_name(string $name)
 function ipcheck(string $what, int $time = 0)
 {
     global $db, $userip;
-    $get = db("SELECT `time`,`what` FROM `" . $db['ipcheck'] . "` WHERE `what` = '" . $what . "' AND `ip` = '" . $userip . "' ORDER BY `time` DESC;", false, true);
+    $what_escaped = _real_escape_string($what);
+    $userip_escaped = _real_escape_string($userip);
+    $get = db("SELECT `time`,`what` FROM `" . $db['ipcheck'] . "` WHERE `what` = '" . $what_escaped . "' AND `ip` = '" . $userip_escaped . "' ORDER BY `time` DESC;", false, true);
     if ($get != null && count($get) >= 1) {
         if (preg_match("#vid#", $get['what']))
             return true;
         else {
             if ($get['time'] + (int)($time) < time())
                 db("DELETE FROM `" . $db['ipcheck'] . "` WHERE `what` = '" .
-                    $what . "' AND `ip` = '" . $userip . "' AND (`time`+" . $time . ") < " . time() . ";");
+                    $what_escaped . "' AND `ip` = '" . $userip_escaped . "' AND (`time`+" . $time . ") < " . time() . ";");
 
             if (($get['time'] + $time) > time())
                 return true;

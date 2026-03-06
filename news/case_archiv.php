@@ -27,6 +27,7 @@ if (defined('_News')) {
     $n_kat = !$kat ? "" : "AND `kat` = '" . $kat . "'";
 
     if (($search = isset($_GET['search']) && !empty($_GET['search']) ? $_GET['search'] : false)) {
+        $search = _real_escape_string($search);
         $qry = db("SELECT `id`,`titel`,`autor`,`datum`,`kat`,`text`
                       FROM `" . $db['news'] . "`
                       WHERE `text` LIKE '%" . $search . "%'

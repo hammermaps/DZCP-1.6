@@ -32,7 +32,8 @@ if (defined('_Votes')) {
         $vid = 'vid_' . (int)$get['id'];
         if ($get['intern']) {
             $showVoted = '';
-            $check = db("SELECT id FROM " . $db['ipcheck'] . " WHERE what = '" . $vid . "' AND (user_id = '" . $userid . "' OR ip = '" . $userip . "')");
+            $userip_escaped = _real_escape_string($userip);
+            $check = db("SELECT id FROM " . $db['ipcheck'] . " WHERE what = '" . $vid . "' AND (user_id = '" . (int)$userid . "' OR ip = '" . $userip_escaped . "')");
             $ipcheck = _rows($check) == 1;
             $intern = _votes_intern;
         }

@@ -10,8 +10,9 @@ if (defined('_UserMenu')) {
     $show_sql = isset($_GET['show']) ? $_GET['show'] : '';
 
     if ($show_sql == "search") {
+        $search = _real_escape_string($_GET['search']);
         $qry = db("SELECT `id`,`nick`,`level`,`email`,`hp`,`steamid`,`skypename`,`xboxid`,`psnid`,`originid`,`battlenetid`,`bday`,`sex`,`status`,`position`,`regdatum`,`show` FROM `" . $db['users'] . "`
-                   WHERE `nick` LIKE '%" . $_GET['search'] . "%'
+                   WHERE `nick` LIKE '%" . $search . "%'
                    AND level != 0 " . (permission("editusers") ? '' : 'AND `dsgvo_lock` != 1 ') . "
                    ORDER BY nick
                    LIMIT " . ($page - 1) * config('m_userlist') . "," . config('m_userlist') . ";");

@@ -128,13 +128,13 @@ if (defined('_UserMenu')) {
 
                 $qry = db("UPDATE " . $db['userstats'] . "
                            SET `writtenmsg` = writtenmsg+1
-                           WHERE user = " . $userid);
+                           WHERE user = " . (int)$userid);
 
                 $index = info(_msg_answer_done, "?action=msg");
             }
         } elseif ($do == "delete") {
             $qry = db("SELECT * FROM " . $db['msg'] . "
-                 WHERE an = '" . $userid . "'
+                 WHERE an = '" . (int)$userid . "'
                  AND see_u = 0");
             while ($get = _fetch($qry)) {
                 if (isset($_POST['pe' . $get['id']])) {
@@ -167,7 +167,7 @@ if (defined('_UserMenu')) {
             $index = info(_msg_deleted, "?action=msg");
         } elseif ($do == "deletesended") {
             $qry = db("SELECT * FROM " . $db['msg'] . "
-                 WHERE von = '" . $userid . "'
+                 WHERE von = '" . (int)$userid . "'
                  AND see = 1");
             while ($get = _fetch($qry)) {
                 if (isset($_POST['pa' . $get['id']])) {
@@ -185,7 +185,7 @@ if (defined('_UserMenu')) {
             header("Location: ?action=msg");
         } elseif ($do == "new") {
             $users = "";
-            $qry = db("SELECT `id`,`nick` FROM `" . $db['users'] . "` WHERE `id` != " . $userid . " ORDER BY `nick`;");
+            $qry = db("SELECT `id`,`nick` FROM `" . $db['users'] . "` WHERE `id` != " . (int)$userid . " ORDER BY `nick`;");
             while ($get = _fetch($qry)) {
                 $users .= show(_to_users, array(
                     "id" => $get['id'],
@@ -194,7 +194,7 @@ if (defined('_UserMenu')) {
             }
 
             $buddys = "";
-            $qry = db("SELECT `id`,`user`,`buddy` FROM `" . $db['buddys'] . "` WHERE `user` = " . $userid . " ORDER BY `user`;");
+            $qry = db("SELECT `id`,`user`,`buddy` FROM `" . $db['buddys'] . "` WHERE `user` = " . (int)$userid . " ORDER BY `user`;");
             while ($get = _fetch($qry)) {
                 $buddys .= show(_to_buddys, array(
                     "id" => $get['buddy'],
@@ -228,7 +228,7 @@ if (defined('_UserMenu')) {
                 $error = show("errors/errortable", array("error" => $error));
 
                 $qry = db("SELECT id FROM " . $db['users'] . "
-                   WHERE id != '" . $userid . "'
+                   WHERE id != '" . (int)$userid . "'
                    ORDER BY nick");
                 while ($get = _fetch($qry)) {
                     if ($get['id'] == $_POST['users']) $selected = 'selected="selected"';
@@ -240,7 +240,7 @@ if (defined('_UserMenu')) {
                 }
 
                 $qry = db("SELECT id,user,buddy FROM " . $db['buddys'] . "
-                                 WHERE user = " . $userid);
+                                 WHERE user = " . (int)$userid);
                 while ($get = _fetch($qry)) {
                     if ($get['buddy'] == $_POST['buddys']) $selected = 'selected="selected"';
                     else $selected = "";
@@ -279,13 +279,13 @@ if (defined('_UserMenu')) {
 
                 $qry = db("UPDATE " . $db['userstats'] . "
                                  SET `writtenmsg` = writtenmsg+1
-                                 WHERE user = " . $userid);
+                                 WHERE user = " . (int)$userid);
 
                 $index = info(_msg_answer_done, "?action=msg");
             }
         } else {
             $qry = db("SELECT * FROM " . $db['msg'] . "
-                               WHERE an = " . $userid . "
+                               WHERE an = " . (int)$userid . "
                  AND see_u = '0'
                                ORDER BY datum DESC");
             $posteingang = '';
@@ -324,7 +324,7 @@ if (defined('_UserMenu')) {
             }
 
             $qry = db("SELECT * FROM " . $db['msg'] . "
-                               WHERE von = " . $userid . "
+                               WHERE von = " . (int)$userid . "
                                AND see = 1
                                ORDER BY datum DESC");
             $postausgang = '';

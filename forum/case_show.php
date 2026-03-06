@@ -21,13 +21,14 @@ if (defined('_Forum')) {
                  ORDER BY global DESC, sticky DESC, lp DESC, t_date DESC
                  LIMIT " . ($page - 1) * config('m_fthreads') . "," . config('m_fthreads') . ";");
         } else {
+            $search = _real_escape_string($_POST['suche']);
             $qry = db("SELECT s1.global,s1.topic,s1.subtopic,s1.t_text,s1.t_email,s1.hits,s1.t_reg,s1.t_date,s1.closed,s1.sticky,s1.id
                  FROM " . $db['f_threads'] . " AS s1
-                 WHERE s1.topic LIKE '%" . $_POST['suche'] . "%'
+                 WHERE s1.topic LIKE '%" . $search . "%'
                  AND s1.kid = '" . (int)($_GET['id']) . "'
-                 OR s1.subtopic LIKE '%" . $_POST['suche'] . "%'
+                 OR s1.subtopic LIKE '%" . $search . "%'
                  AND s1.kid = '" . (int)($_GET['id']) . "'
-                 OR s1.t_text LIKE '%" . $_POST['suche'] . "%'
+                 OR s1.t_text LIKE '%" . $search . "%'
                  AND s1.kid = '" . (int)($_GET['id']) . "'
                  ORDER BY s1.global DESC, s1.sticky DESC, s1.lp DESC, s1.t_date DESC
                  LIMIT " . ($page - 1) * config('m_fthreads') . "," . config('m_fthreads') . ";");
