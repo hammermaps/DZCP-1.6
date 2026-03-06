@@ -15,10 +15,8 @@ switch ($do) {
                 $addfile .= show($dir . "/form_gallery_addfile", array("file" => _gallery_image, "i" => $i));
             }
 
-            db("INSERT INTO " . $db['gallery'] . " SET `kat` = '" . up($_POST['gallery']) . "',
-                                                   `intern`   = " . (isset($_POST['intern']) ? (int)($_POST['intern']) : 0) . ",
-                                                   `beschreibung`   = '" . up($_POST['beschreibung']) . "',
-                                                   `datum`          = '" . time() . "'");
+            db_stmt("INSERT INTO " . $db['gallery'] . " SET `kat` = ?, `intern` = ?, `beschreibung` = ?, `datum` = ?",
+                array('sisi', up($_POST['gallery']), (isset($_POST['intern']) ? (int)($_POST['intern']) : 0), up($_POST['beschreibung']), time()));
 
             $show = show($dir . "/form_gallery_step2", array("head" => _gallery_admin_head,
                 "what" => re($_POST['gallery']),
@@ -49,13 +47,13 @@ switch ($do) {
         $show = info(_gallery_added, "?admin=gallery");
         break;
     case 'delgal':
-        db("DELETE FROM " . $db['gallery'] . " WHERE id = '" . (int)($_GET['id']) . "'");
+        db_stmt("DELETE FROM " . $db['gallery'] . " WHERE id = ?", array('i', (int)($_GET['id'])));
         $files = get_files("../gallery/images/", false, true, $picformat);
         foreach ($files as $file) {
-            if (preg_match("#" . $_GET['id'] . "_(.*?).(gif|jpg|jpeg|png)#", strtolower($file)) != FALSE) {
-                $res = preg_match("#" . $_GET['id'] . "_(.*)#", $file, $match);
-                if (file_exists(basePath . "/gallery/images/" . $_GET['id'] . "_" . $match[1]))
-                    @unlink(basePath . "/gallery/images/" . $_GET['id'] . "_" . $match[1]);
+            if (preg_match("#" . (int)($_GET['id']) . "_(.*?).(gif|jpg|jpeg|png)#", strtolower($file)) != FALSE) {
+                $res = preg_match("#" . (int)($_GET['id']) . "_(.*)#", $file, $match);
+                if (file_exists(basePath . "/gallery/images/" . (int)($_GET['id']) . "_" . $match[1]))
+                    @unlink(basePath . "/gallery/images/" . (int)($_GET['id']) . "_" . $match[1]);
             }
         }
 

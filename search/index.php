@@ -37,7 +37,8 @@ switch ($action):
         $i = 0;
         $strkat = '';
         $getstr = '';
-        for (reset($_GET); list($key, $value) = each($_GET); $i++) {
+        // Replace deprecated each() with foreach (PHP 8.0+ compatible)
+        foreach ($_GET as $key => $value) {
             $key = trim($key);
             if ($i == 0)
                 $sep = '?';
@@ -47,6 +48,7 @@ switch ($action):
             $getstr .= $sep . $key . '=' . $value;
             if (preg_match("#k_#", $key))
                 $strkat .= $key . '|';
+            $i++;
         }
 
         if (permission("intforum")) {

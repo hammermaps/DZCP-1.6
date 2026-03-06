@@ -1913,18 +1913,49 @@ function mkpwd(int $length = 8, bool $add_dashes = false, string $available_sets
 function checkpwd(string $user, string $pwd)
 {
     global $db;
-    $sql = db("SELECT * FROM `" . $db['users'] . "` WHERE `user` = '" . up($user) .
-        "' AND (`pwd` = '" . hash('sha256', $pwd) . "' OR (`pwd` = '" . md5($pwd) . "' AND `pwd_md5` = 1)) AND `level` != 0;");
+
+    // First, get the user record
+    $sql = db_stmt("SELECT * FROM `" . $db['users'] . "` WHERE `user` = ? AND `level` != 0",
+        array('s', up($user)));
+
     if (_rows($sql)) {
         $get = _fetch($sql);
-        if ($get['pwd_md5']) {
-            //Update Password to SHA256
-            db("UPDATE `" . $db['users'] . "` SET `pwd` = '" . hash('sha256', $pwd) . "', `pwd_md5` = 0 WHERE `id` = " . $get['id'] . ";");
-            $get['pwd'] = hash('sha256', $pwd);
+        $password_valid = false;
+
+        // Check if password needs migration (old MD5 or SHA256)
+        if ($get['pwd_md5'] == 1) {
+            // Legacy MD5 password
+            if ($get['pwd'] === md5($pwd)) {
+                $password_valid = true;
+                $needs_rehash = true;
+            }
+        } elseif (substr($get['pwd'], 0, 3) !== '$2y') {
+            // SHA256 hash (64 characters, not starting with $2y)
+            if ($get['pwd'] === hash('sha256', $pwd)) {
+                $password_valid = true;
+                $needs_rehash = true;
+            }
+        } else {
+            // Modern password_hash() format
+            if (password_verify($pwd, $get['pwd'])) {
+                $password_valid = true;
+                // Check if rehash is needed (e.g., cost factor changed)
+                $needs_rehash = password_needs_rehash($get['pwd'], PASSWORD_DEFAULT);
+            }
+        }
+
+        // If password is valid and needs rehashing, update to password_hash()
+        if ($password_valid && isset($needs_rehash) && $needs_rehash) {
+            $new_hash = password_hash($pwd, PASSWORD_DEFAULT);
+            db_stmt("UPDATE `" . $db['users'] . "` SET `pwd` = ?, `pwd_md5` = 0 WHERE `id` = ?",
+                array('si', $new_hash, $get['id']));
+            $get['pwd'] = $new_hash;
             $get['pwd_md5'] = 0;
         }
 
-        return $get;
+        if ($password_valid) {
+            return $get;
+        }
     }
 
     return false;
@@ -2430,7 +2461,25 @@ function sgames($game = '')
         if (substr($protocol, 0, 1) != '_') {
             $explode = '##############################################################################################################################';
             $protocol_config = explode($explode, file_get_contents(basePath . '/inc/server_query/' . $protocol . '.php'));
-            eval(str_replace('<?php', '', $protocol_config[0]));
+            // Parse configuration variables safely without eval()
+            // The configuration contains variable assignments like: $server_name_config = [...];
+            $config_code = str_replace('<?php', '', $protocol_config[0]);
+            // Create isolated scope for variable extraction
+            $extract_vars = function() use ($config_code) {
+                // Parse only if the code looks safe (basic variable assignments)
+                if (preg_match('/^\s*\$\w+\s*=/', $config_code)) {
+                    $temp_file = tempnam(sys_get_temp_dir(), 'dzcp_protocol_');
+                    file_put_contents($temp_file, '<?php ' . $config_code . ' return get_defined_vars();');
+                    $vars = include($temp_file);
+                    unlink($temp_file);
+                    return $vars;
+                }
+                return [];
+            };
+            $vars = $extract_vars();
+            $server_name_config = $vars['server_name_config'] ?? null;
+            $gamemods = $vars['gamemods'] ?? null;
+
             if (!empty($server_name_config) && count($server_name_config) > 2) {
                 $gamemods = '';
                 foreach ($server_name_config as $slabel => $sconfig) {
@@ -2983,9 +3032,11 @@ function getPermissions(int $checkID = 0, int $pos = 0)
     $qry = db("SHOW COLUMNS FROM " . $db['permissions'] . "");
     while ($get = _fetch($qry)) {
         if ($get['Field'] != 'id' && $get['Field'] != 'user' && $get['Field'] != 'pos' && $get['Field'] != 'intforum') {
-            @eval("\$lang = _perm_" . $get['Field'] . ";");
+            // Access language array directly instead of using eval()
+            $lang_key = '_perm_' . $get['Field'];
+            $lang_value = $lang[$lang_key] ?? $get['Field']; // Fallback to field name if translation missing
             $chk = empty($checked[$get['Field']]) ? '' : ' checked="checked"';
-            $permission[$lang] = '<input type="checkbox" class="checkbox" id="' . $get['Field'] . '" name="perm[p_' . $get['Field'] . ']" value="1"' . $chk . ' /><label for="' . $get['Field'] . '"> ' . $lang . '</label> ';
+            $permission[$lang_value] = '<input type="checkbox" class="checkbox" id="' . $get['Field'] . '" name="perm[p_' . $get['Field'] . ']" value="1"' . $chk . ' /><label for="' . $get['Field'] . '"> ' . $lang_value . '</label> ';
         }
     }
 
