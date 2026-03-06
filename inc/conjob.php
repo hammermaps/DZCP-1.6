@@ -17,15 +17,12 @@ $ajaxJob = true;
 ## INCLUDES ##
 include(basePath . '/vendor/autoload.php');
 
-use GUMP\GUMP;
-
 $gump = GUMP::get_instance();
 
 include(basePath . "/inc/debugger.php");
 include(basePath . "/inc/config.php");
 include(basePath . "/inc/bbcode.php");
 
-use BrightNucleus\CountryCodes\Country;
 
 if ((settings('last_conjob', false) + 90) <= time()) {
     @ignore_user_abort(true);
