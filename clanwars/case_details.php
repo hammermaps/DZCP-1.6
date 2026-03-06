@@ -46,10 +46,10 @@ if (defined('_Clanwars')) {
                         "status" => $status));
                 }
 
-                $cntPlayers = cnt($db['cw_player'], " WHERE cwid = '" . (int)($_GET['id']) . "' AND member = '" . $userid . "'", "cwid");
+                $cntPlayers = cnt($db['cw_player'], " WHERE cwid = '" . (int)($_GET['id']) . "' AND member = '" . (int)$userid . "'", "cwid");
                 $value = $cntPlayers ? _button_value_edit : _button_value_add;
                 $form_player = "";
-                if (db("SELECT id FROM " . $db['squaduser'] . " WHERE squad = '" . $get['squad_id'] . "' AND user = '" . $userid . "'", true)) {
+                if (db("SELECT id FROM " . $db['squaduser'] . " WHERE squad = '" . $get['squad_id'] . "' AND user = '" . (int)$userid . "'", true)) {
                     $form_player = show($dir . "/form_player", array("id" => (int)($_GET['id']),
                         "admin" => (permission('clanwars') ? '<input id="contentSubmitAdmin" type="button" value="' . _cw_reset_button . '" class="submit" onclick="DZCP.submitButton(\'contentSubmitAdmin\');DZCP.goTo(\'?action=resetplayers&amp;id=' . (int)($_GET['id']) . '\')" />' : ''),
                         "yes" => _yes,

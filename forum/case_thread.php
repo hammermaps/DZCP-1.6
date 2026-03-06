@@ -771,7 +771,7 @@ if (defined('_Forum')) {
 
                     $update = db("UPDATE " . $db['userstats'] . "
                                             SET `forumposts` = forumposts+1
-                                            WHERE `user`       = '" . $userid . "'");
+                                            WHERE `user`       = '" . (int)$userid . "'");
 
                     $index = info(_forum_newthread_successful, "?action=showthread&amp;id=" . $thisFID . "#p1");
                 }

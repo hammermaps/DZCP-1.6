@@ -19,7 +19,7 @@ $dir = "online";
 
 ## SECTIONS ##
 if ($chkMe)
-    db("UPDATE " . $db['users'] . " SET `time` = '" . time() . "', `whereami` = '" . up($where) . "' WHERE id = '" . $userid . "'");
+    db("UPDATE " . $db['users'] . " SET `time` = '" . time() . "', `whereami` = '" . up($where) . "' WHERE id = '" . (int)$userid . "'");
 
 //Users
 $qry = db("SELECT `id`,`ip`,`nick`,`whereami` FROM `" . $db['users'] . "` WHERE `time`+" . $useronline . " > " . time() .
