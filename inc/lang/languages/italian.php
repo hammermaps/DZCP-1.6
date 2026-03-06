@@ -2327,3 +2327,4 @@ $language_text['_upload_partners_info'] = 'Solo jpg, gif o png files. Dimensioni
 $language_text['_select_field_ranking_add'] = '<option value="[value]" [sel]>[what]</option>';
 $language_text['_user_list_ck'] = 'Lista Clan Cash?';
 $language_text['_fightus_squad'] = 'Cerca Teams';
+$language_text['_csrf_invalid'] = 'Token di sicurezza non valido o mancante. Si prega di tornare indietro e riprovare.';

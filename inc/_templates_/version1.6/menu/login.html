@@ -4,6 +4,7 @@
         <td>
             <form name="login" action="../user/?action=login&amp;do=yes" method="post"
                   onsubmit="return DZCP.submitButton('navLogin')">
+                <input type="hidden" name="csrf_token" value="[csrf_token]" />
                 <table class="navContent">
                     <tr style="height:25px">
                         <td>

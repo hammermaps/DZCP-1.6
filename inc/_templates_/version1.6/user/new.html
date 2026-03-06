@@ -1,6 +1,7 @@
 <tr>
     <td>
         <form name="sendmsg" action="?action=msg&amp;do=send" method="post" onsubmit="return(DZCP.submitButton())">
+                <input type="hidden" name="csrf_token" value="[csrf_token]" />
             <input type="hidden" name="von" value="[von]"/>
             <table class="hperc" cellspacing="1">
                 <tr>

@@ -36,6 +36,7 @@
                 <td colspan="5">
                     <form name="peingang" action="?action=msg&amp;do=delete" method="post"
                           onsubmit="return(DZCP.submitButton('submitIncoming'))">
+                <input type="hidden" name="csrf_token" value="[csrf_token]" />
                         <table class="mainContent" cellspacing="1">
                             [showincoming]
                             <tr>
@@ -63,6 +64,7 @@
                 <td colspan="5">
                     <form name="pausgang" action="?action=msg&amp;do=deletesended" method="post"
                           onsubmit="return(DZCP.submitButton('submitOutgoing'))">
+                <input type="hidden" name="csrf_token" value="[csrf_token]" />
                         <table class="mainContent" cellspacing="1">
                             [showsended]
                             <tr>

@@ -2262,4 +2262,4 @@ $language_text['_upload_partners_head'] = 'Partnerbuttons';
 $language_text['_upload_partners_info'] = 'Nur jpg, gif oder png Dateien. Empfohlene Gr&ouml;e: 88px * 31px';
 $language_text['_select_field_ranking_add'] = '<option value="[value]" [sel]>[what]</option>';
 $language_text['_user_list_ck'] = 'In der Clankasse auflisten?';
-$language_text['_fightus_squad'] = 'gew&uuml;nschtes Team';
+$language_text['_fightus_squad'] = 'gew&uuml;nschtes Team';$language_text['_csrf_invalid'] = 'Ungültiges oder fehlendes Sicherheits-Token. Bitte gehen Sie zurück und versuchen Sie es erneut.';

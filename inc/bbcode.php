@@ -226,6 +226,14 @@ if ($chkMe && $userid && !empty($_SESSION['ip'])) {
     }
 }
 
+// CSRF Protection: validate all POST requests (skip installer, updater, thumbgen and ajax jobs)
+if (!$ajaxJob && !$installation && !$updater && !$thumbgen &&
+    GetServerVars('REQUEST_METHOD') === 'POST') {
+    if (!csrf_check()) {
+        die(error2(_csrf_invalid));
+    }
+}
+
 /**
  * Prüft ob die DSGVO akzeptiert wurde
  * @return bool
@@ -1859,6 +1867,40 @@ function links(string $hp)
     }
 
     return $hp;
+}
+
+/**
+ * Generates or retrieves the CSRF token for the current session.
+ * @return string
+ */
+function csrf_token(): string
+{
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+/**
+ * Returns an HTML hidden input field containing the CSRF token.
+ * @return string
+ */
+function csrf_field(): string
+{
+    return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') . '" />';
+}
+
+/**
+ * Validates the CSRF token submitted with a POST request.
+ * @return bool
+ */
+function csrf_check(): bool
+{
+    if (empty($_SESSION['csrf_token'])) {
+        return false;
+    }
+    $token = (isset($_POST['csrf_token']) && is_string($_POST['csrf_token'])) ? $_POST['csrf_token'] : '';
+    return hash_equals($_SESSION['csrf_token'], $token);
 }
 
 /**

@@ -2256,4 +2256,4 @@ $language_text['_upload_partners_head'] = 'Партнер Кнопки';
 $language_text['_upload_partners_info'] = 'Только jpg, gif и png Файлы. Рекомендуемый размер: 88px * 31px';
 $language_text['_select_field_ranking_add'] = '<option value="[value]" [sel]>[what]</option>';
 $language_text['_user_list_ck'] = 'Указать в меню: Капилку клана?';
-$language_text['_fightus_squad'] = 'Желаемую команду';
+$language_text['_fightus_squad'] = 'Желаемую команду';$language_text['_csrf_invalid'] = 'Недействительный или отсутствующий токен безопасности. Пожалуйста, вернитесь назад и попробуйте снова.';

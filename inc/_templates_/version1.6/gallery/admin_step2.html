@@ -6,6 +6,7 @@
 </tr>
 <form enctype="multipart/form-data" name="gallery" action="?action=admin&amp;do=[do]&amp;id=[id]" method="post"
       onsubmit="DZCP.submitButton()">
+                <input type="hidden" name="csrf_token" value="[csrf_token]" />
     <input type="hidden" name="anzahl" value="[anzahl]">
     [addfile]
     <tr>
