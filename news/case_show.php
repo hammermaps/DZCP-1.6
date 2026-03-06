@@ -20,7 +20,7 @@ if (defined('_News')) {
 
             $klapp = "";
             if ($get['klapptext'])
-                $klapp = show(_news_klapplink, array("klapplink" => re($get['klapplink']),
+                $klapp = show(_news_klapplink, array("klapplink" => h($get['klapplink']),
                     "which" => "expand",
                     "id" => $get['id']));
 
@@ -30,21 +30,21 @@ if (defined('_News')) {
             $rel = "";
             if (!empty($get['url1'])) {
                 $rel = _related_links;
-                $links1 = show(_news_link, array("link" => re($get['link1']),
+                $links1 = show(_news_link, array("link" => h($get['link1']),
                     "url" => $get['url1']));
             }
 
             $links2 = "";
             if (!empty($get['url2'])) {
                 $rel = _related_links;
-                $links2 = show(_news_link, array("link" => re($get['link2']),
+                $links2 = show(_news_link, array("link" => h($get['link2']),
                     "url" => $get['url2']));
             }
 
             $links3 = "";
             if (!empty($get['url3'])) {
                 $rel = _related_links;
-                $links3 = show(_news_link, array("link" => re($get['link3']),
+                $links3 = show(_news_link, array("link" => h($get['link3']),
                     "url" => $get['url3']));
             }
 
@@ -91,7 +91,7 @@ if (defined('_News')) {
                     if ($getc['email'])
                         $email = '<br />' . show(_emailicon_forum, array("email" => eMailAddr(re($getc['email']))));
 
-                    $nick = show(_link_mailto, array("nick" => re($getc['nick']), "email" => eMailAddr(re($getc['email']))));
+                    $nick = show(_link_mailto, array("nick" => h($getc['nick']), "email" => eMailAddr(re($getc['email']))));
                 }
 
                 $titel = show(_eintrag_titel, array("postid" => $i,
@@ -176,7 +176,7 @@ if (defined('_News')) {
             }
 
             $where = re($get['titel']);
-            $index = show($dir . "/news_show_full", array("titel" => re($get['titel']),
+            $index = show($dir . "/news_show_full", array("titel" => h($get['titel']),
                 "kat" => $newsimage,
                 "id" => $get['id'],
                 "dp" => "none",
@@ -240,9 +240,9 @@ if (defined('_News')) {
                                         "id" => $_GET['id'],
                                         "what" => _button_value_add,
                                         "show" => "",
-                                        "postemail" => $_POST['email'],
+                                        "postemail" => htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8'),
                                         "posthp" => links(re($_POST['hp'], true)),
-                                        "postnick" => re($_POST['nick']),
+                                        "postnick" => htmlspecialchars($_POST['nick'], ENT_QUOTES, 'UTF-8'),
                                         "posteintrag" => re_bbcode(re($_POST['comment'], true)),
                                         "error" => $error,
                                         "eintraghead" => _eintrag));
@@ -298,9 +298,9 @@ if (defined('_News')) {
                             $form = show("page/editor_notregged", array("nickhead" => _nick,
                                 "emailhead" => _email,
                                 "hphead" => _hp,
-                                "postemail" => re($get['email']),
+                                "postemail" => h($get['email']),
                                 "posthp" => links(re($get['hp'])),
-                                "postnick" => re($get['nick'])));
+                                "postnick" => h($get['nick']));
                         }
 
                         $index = show("page/comments_add", array("titel" => _comments_edit,

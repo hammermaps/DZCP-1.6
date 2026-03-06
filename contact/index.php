@@ -45,8 +45,8 @@ switch ($action):
             $squads = '';
             while ($get = _fetch($qry)) {
                 $squads .= show(_select_field_fightus, array("id" => $get['id'],
-                    "squad" => re($get['name']),
-                    "game" => re($get['game'])));
+                    "squad" => h($get['name']),
+                    "game" => h($get['game'])));
             }
 
             if (!_rows($qry)) {
@@ -96,8 +96,8 @@ switch ($action):
             $squads = '';
             while ($getsquads = _fetch($qrysquads)) {
                 $squads .= show(_select_field_fightus, array("id" => $getsquads['id'],
-                    "squad" => re($getsquads['name']),
-                    "game" => re($getsquads['game'])));
+                    "squad" => h($getsquads['name']),
+                    "game" => h($getsquads['game'])));
             }
 
             if (!_rows($qrysquads)) {
@@ -206,7 +206,7 @@ switch ($action):
                         "email" => $email,
                         "age" => $_POST['age'],
                         "text" => $_POST['text'],
-                        "squad" => re($qrysquads['name']),
+                        "squad" => h($qrysquads['name']),
                         "nick" => $_POST['nick']));
 
                     $qry = db("SELECT s1.id FROM " . $db['users'] . " AS s1

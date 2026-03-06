@@ -22,7 +22,7 @@ while ($get = _fetch($qry)) {
 
     $show_ .= show($dir . "/dlkats_show", array("gameicon" => $gameicon,
         "edit" => $edit,
-        "name" => re($get['position']),
+        "name" => h($get['position']),
         "class" => $class,
         "delete" => $delete));
 }
@@ -40,7 +40,7 @@ if ($do == "edit") {
                     ORDER BY pid");
     while ($get1 = _fetch($qry1)) {
         $positions .= show(_select_field, array("value" => $get1['pid'] + 1,
-            "what" => _nach . ' ' . re($get1['position']),
+            "what" => _nach . ' ' . h($get1['position']),
             "sel" => ""));
     }
 
@@ -112,7 +112,7 @@ if ($do == "edit") {
                    ORDER BY pid");
     while ($get = _fetch($qry)) {
         $positions .= show(_select_field, array("value" => $get['pid'] + 1,
-            "what" => _nach . ' ' . re($get['position']),
+            "what" => _nach . ' ' . h($get['position']),
             "sel" => ""));
     }
     $show = show($dir . "/form_pos", array("newhead" => _pos_new_head,

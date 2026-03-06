@@ -21,7 +21,7 @@ if (defined('_Clanwars')) {
         while ($get = _fetch($qry)) {
             $img = squad($get['icon']);
             $flagge = flag($get['gcountry']);
-            $gegner = show(_cw_details_gegner, array("gegner" => cut(re($get['clantag']) . " - " . re($get['gegner']), config('l_clanwars'), true, true),
+            $gegner = show(_cw_details_gegner, array("gegner" => cut(h($get['clantag']) . " - " . h($get['gegner']), config('l_clanwars'), true, true),
                 "url" => '?action=details&amp;id=' . $get['id']));
 
             $details = show(_cw_show_details, array("id" => $get['id']));
@@ -32,9 +32,9 @@ if (defined('_Clanwars')) {
                 "img" => $img,
                 "flagge" => $flagge,
                 "gegner" => $gegner,
-                "xonx" => re($get['xonx']),
-                "liga" => re($get['liga']),
-                "gametype" => re($get['gametype']),
+                "xonx" => h($get['xonx']),
+                "liga" => h($get['liga']),
+                "gametype" => h($get['gametype']),
                 "class" => $class,
                 "result" => cw_result_nopic($get['punkte'], $get['gpunkte']),
                 "details" => $details));
@@ -112,7 +112,7 @@ if (defined('_Clanwars')) {
             $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
             $color++;
             $img = squad($get['icon']);
-            $legende .= show(_cw_legende, array("game" => re($get['game']),
+            $legende .= show(_cw_legende, array("game" => h($get['game']),
                 "img" => $img,
                 "class" => $class));
         }

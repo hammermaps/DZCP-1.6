@@ -17,14 +17,14 @@ while ($getsq = _fetch($qrysq)) {
     $qrypos = db("SELECT id,position FROM " . $db['pos'] . " ORDER BY pid");
     $posi = "";
     while ($getpos = _fetch($qrypos)) {
-        $posi .= show(_select_field_posis, array("value" => $getpos['id'], "sel" => '', "what" => re($getpos['position'])));
+        $posi .= show(_select_field_posis, array("value" => $getpos['id'], "sel" => '', "what" => h($getpos['position'])));
     }
 
     $esquads .= show(_checkfield_squads, array("id" => $getsq['id'],
         "check" => '',
         "eposi" => $posi,
         "noposi" => _user_noposi,
-        "squad" => re($getsq['name'])));
+        "squad" => h($getsq['name'])));
 }
 
 $show = show($dir . "/register", array("registerhead" => _useradd_head,

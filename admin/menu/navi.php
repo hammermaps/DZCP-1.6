@@ -13,13 +13,13 @@ if ($do == "add") {
     while ($get = _fetch($qry)) {
         if ($thiskat != $get['kat']) {
             $position .= '
-              <option class="dropdownKat" value="lazy">' . re($get['katname']) . '</option>
-              <option value="' . re($get['placeholder']) . '-1">-> ' . _admin_first . '</option>
+              <option class="dropdownKat" value="lazy">' . h($get['katname']) . '</option>
+              <option value="' . h($get['placeholder']) . '-1">-> ' . _admin_first . '</option>
             ';
         }
         $thiskat = $get['kat'];
 
-        $position .= empty($get['name']) ? '' : '<option value="' . re($get['placeholder']) . '-' . ($get['pos'] + 1) . '">' . _nach . ' -> ' . navi_name(re($get['name'])) . '</option>';
+        $position .= empty($get['name']) ? '' : '<option value="' . h($get['placeholder']) . '-' . ($get['pos'] + 1) . '">' . _nach . ' -> ' . navi_name(h($get['name'])) . '</option>';
     }
 
     $show = show($dir . "/form_navi", array("do" => "addnavi",
@@ -87,14 +87,14 @@ if ($do == "add") {
     while ($get = _fetch($qry)) {
         if ($thiskat != $get['kat']) {
             $position .= '
-              <option class="dropdownKat" value="lazy">' . re($get['katname']) . '</option>
-              <option value="' . re($get['placeholder']) . '-1">-> ' . _admin_first . '</option>
+              <option class="dropdownKat" value="lazy">' . h($get['katname']) . '</option>
+              <option value="' . h($get['placeholder']) . '-1">-> ' . _admin_first . '</option>
             ';
         }
         $thiskat = $get['kat'];
         $sel[$i] = ($get['id'] == $_GET['id']) ? 'selected="selected"' : '';
 
-        $position .= empty($get['name']) ? '' : '<option value="' . re($get['placeholder']) . '-' . ($get['pos'] + 1) . '" ' . $sel[$i] . '>' . _nach . ' -> ' . navi_name(re($get['name'])) . '</option>';
+        $position .= empty($get['name']) ? '' : '<option value="' . h($get['placeholder']) . '-' . ($get['pos'] + 1) . '" ' . $sel[$i] . '>' . _nach . ' -> ' . navi_name(h($get['name'])) . '</option>';
 
         $i++;
     }
@@ -104,10 +104,10 @@ if ($do == "add") {
     $get = _fetch($qry);
 
     if ($get['type'] == "1") {
-        $name = re($get['name']);
+        $name = h($get['name']);
         $read = "readonly";
     } else {
-        $name = re($get['name']);
+        $name = h($get['name']);
         $read = "";
     }
 
@@ -180,8 +180,8 @@ if ($do == "add") {
         "visible" => _menu_visible,
         "what" => _menu_edit_kat,
         "menu_kat_info" => _menu_kat_info,
-        "n_name" => re($get['name']),
-        "n_placeholder" => str_replace('nav_', '', re($get['placeholder'])),
+        "n_name" => h($get['name']),
+        "n_placeholder" => str_replace('nav_', '', h($get['placeholder'])),
         "sel_user" => ($get['level'] == 1 ? ' selected="selected"' : ''),
         "sel_trial" => ($get['level'] == 2 ? ' selected="selected"' : ''),
         "sel_member" => ($get['level'] == 3 ? ' selected="selected"' : ''),
@@ -248,7 +248,7 @@ if ($do == "add") {
             $edit = "&nbsp;";
             $type = _navi_space;
         } else {
-            $type = re($get['name']);
+            $type = h($get['name']);
             $edit = show("page/button_edit_single", array("id" => $get['id'],
                 "action" => "admin=navi&amp;do=edit",
                 "title" => _button_title_edit));
@@ -275,8 +275,8 @@ if ($do == "add") {
             "name" => $type,
             "id" => $get['id'],
             "set" => $set,
-            "url" => cut(re($get['url']), 34, true, false),
-            "kat" => re($get['katname']),
+            "url" => cut(h($get['url']), 34, true, false),
+            "kat" => h($get['katname']),
             "shown" => $shown,
             "edit" => $edit,
             "del" => $delete));
@@ -288,7 +288,7 @@ if ($do == "add") {
         $class = ($color % 2) ? 'contentMainFirst' : 'contentMainSecond';
         $color++;
 
-        $type = re($get['name']);
+        $type = h($get['name']);
         $edit = '';
         $delete = '';
         if ($get['placeholder'] != 'nav_admin') {
@@ -302,11 +302,11 @@ if ($do == "add") {
                 "del" => convSpace(_confirm_del_menu)));
         }
 
-        $show_kats .= show($dir . "/navi_kats", array("name" => re($get['name']),
+        $show_kats .= show($dir . "/navi_kats", array("name" => h($get['name']),
             "intern" => (empty($get['intern']) ? _noicon : _yesicon),
             "id" => $get['id'],
             "set" => (empty($get['intern']) ? 1 : 0),
-            "placeholder" => str_replace('nav_', '', re($get['placeholder'])),
+            "placeholder" => str_replace('nav_', '', h($get['placeholder'])),
             "class" => $class,
             "edit" => $edit,
             "del" => $delete));

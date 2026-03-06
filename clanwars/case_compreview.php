@@ -46,7 +46,7 @@ if (defined('_Clanwars')) {
         if ($get_email) $email = '<br />' . show(_emailicon_forum, array("email" => eMailAddr($get_email)));
         $onoff = "";
         $avatar = "";
-        $nick = show(_link_mailto, array("nick" => re($get_nick),
+        $nick = show(_link_mailto, array("nick" => htmlspecialchars($get_nick, ENT_QUOTES, 'UTF-8'),
             "email" => $get_email));
     } else {
         $hp = "";

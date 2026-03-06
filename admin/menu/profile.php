@@ -56,7 +56,7 @@ if ($do == "add") {
     $type = str_replace("<option value='" . $get['type'] . "'>", "<option selected=\"selected\" value='" . $get['type'] . "'>", _profile_type_dropdown);
 
     $show = show($dir . "/form_profil_edit", array("name" => _profile_name,
-        "p_name" => re($get['name']),
+        "p_name" => h($get['name']),
         "kat" => _profile_kat,
         "type" => _profile_type,
         "id" => $_GET['id'],
@@ -113,7 +113,7 @@ if ($do == "add") {
             "title" => _button_title_del,
             "del" => convSpace(_confirm_del_profil)));
         $show_about .= show($dir . "/profil_show", array("class" => $class,
-            "name" => re($get['name']),
+            "name" => h($get['name']),
             "type" => $type,
             "shown" => $shown,
             "edit" => $edit,
@@ -142,7 +142,7 @@ if ($do == "add") {
             "title" => _button_title_del,
             "del" => convSpace(_confirm_del_profil)));
         $show_clan .= show($dir . "/profil_show", array("class" => $class,
-            "name" => re($get['name']),
+            "name" => h($get['name']),
             "type" => $type,
             "shown" => $shown,
             "edit" => $edit,
@@ -170,7 +170,7 @@ if ($do == "add") {
             "title" => _button_title_del,
             "del" => convSpace(_confirm_del_profil)));
         $show_contact .= show($dir . "/profil_show", array("class" => $class,
-            "name" => re($get['name']),
+            "name" => h($get['name']),
             "type" => $type,
             "shown" => $shown,
             "edit" => $edit,
@@ -198,7 +198,7 @@ if ($do == "add") {
             "title" => _button_title_del,
             "del" => convSpace(_confirm_del_profil)));
         $show_favos .= show($dir . "/profil_show", array("class" => $class,
-            "name" => re($get['name']),
+            "name" => h($get['name']),
             "type" => $type,
             "shown" => $shown,
             "edit" => $edit,
@@ -226,7 +226,7 @@ if ($do == "add") {
             "title" => _button_title_del,
             "del" => convSpace(_confirm_del_profil)));
         $show_hardware .= show($dir . "/profil_show", array("class" => $class,
-            "name" => re($get['name']),
+            "name" => h($get['name']),
             "type" => $type,
             "shown" => $shown,
             "edit" => $edit,

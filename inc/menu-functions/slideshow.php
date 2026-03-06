@@ -23,7 +23,7 @@ function slideshow()
             $pic .= show("menu/slideshowbild", array(
                 "image" => "<img src=\"../inc/images/slideshow/" . $get['id'] . ".jpg\" alt=\"\" />",
                 "link" => "'" . $get['url'] . "'" . $target,
-                "bez" => re(cut($get['bez'], 32)),
+                "bez" => h(cut($get['bez'], 32)),
                 "text" => $slideroverlay));
 
             $tabs .= '<a href="#" class="slidertabs" id="slider' . $get['id'] . '"></a>';

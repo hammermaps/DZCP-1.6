@@ -166,7 +166,7 @@ switch ($action):
                         if (!empty($server_link_config[$server['gamemod']]))
                             $server_link = $server_link_config[$server['gamemod']];
 
-                        if (!empty($get['pwd']) && permission("gs_showpw")) $pwds = show(_server_pwd, array("pwd" => re($get['pwd'])));
+                        if (!empty($get['pwd']) && permission("gs_showpw")) $pwds = show(_server_pwd, array("pwd" => h($get['pwd'])));
                         else $pwds = "";
 
                         if ($_GET['show'] == $get['id']) {
@@ -197,13 +197,13 @@ switch ($action):
                             "colspan" => (empty($colspan) ? '' : ' colspan="' . $colspan . '"'),
                             "data_status" => $server['status'],
                             "data_gametype" => $server['gametype'],
-                            "data_gamemod" => re($server_name),
+                            "data_gamemod" => h($server_name),
                             "launch" => strtr($server_link, array('{IP}' => $get['ip'], '{S_PORT}' => $get['port'])),
                             "port" => $get['port'],
                             "aktplayers" => $server['players'],
                             "maxplayers" => $server['maxplayers'],
-                            "map" => (empty($server['mapname']) ? '-' : re($server['mapname'])),
-                            "rawmap" => re($server['mapname']),
+                            "map" => (empty($server['mapname']) ? '-' : h($server['mapname'])),
+                            "rawmap" => h($server['mapname']),
                             "icon" => $game_icon,
                             "gamename" => $gamename,
                             "game" => _game,
@@ -221,7 +221,7 @@ switch ($action):
                             "time" => _server_time,
                             "ip" => $get['ip'],
                             "playerstats" => $playerstats,
-                            "name" => re($server['hostname']),
+                            "name" => h($server['hostname']),
                             "mappath" => $mappath,
                             "image_map" => $image_map));
                         $CachedString->set($index)->expiresAfter(config('cache_server'));
@@ -230,11 +230,11 @@ switch ($action):
                         $index .= $CachedString->get();
                     }
                 } else {
-                    if (!empty($get['pwd'])) $pwds = show(_server_pwd, array("pwd" => re($get['pwd'])));
+                    if (!empty($get['pwd'])) $pwds = show(_server_pwd, array("pwd" => h($get['pwd'])));
                     else $pwds = "";
 
                     $gameicon = show(_gameicon, array("icon" => $get['game']));
-                    $index .= show($dir . "/server_show_nope", array("name" => re($get['name']),
+                    $index .= show($dir . "/server_show_nope", array("name" => h($get['name']),
                         "ip" => $get['ip'],
                         "icon" => $gameicon,
                         "pwd" => $pwds,

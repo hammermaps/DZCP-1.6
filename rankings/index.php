@@ -27,8 +27,8 @@ switch ($action):
                    " . orderby_sql(array("rank", "league"), orderby_sql(array("name"), 'ORDER BY s1.postdate DESC', 's2'), 's1'));
         if (_rows($qry)) {
             while ($get = _fetch($qry)) {
-                $squad = '<a href="../squads/?showsquad=' . $get['squad'] . '">' . re($get['name']) . '</a>';
-                $league = '<a href="' . $get['url'] . '" target="_blank">' . $get['league'] . '</a>';
+                $squad = '<a href="../squads/?showsquad=' . $get['squad'] . '">' . h($get['name']) . '</a>';
+                $league = '<a href="' . h($get['url']) . '" target="_blank">' . h($get['league']) . '</a>';
                 $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
                 $color++;
                 $show .= show($dir . "/rankings_show", array("class" => $class,

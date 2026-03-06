@@ -19,7 +19,7 @@ switch ($do) {
                 array('sisi', up($_POST['gallery']), (isset($_POST['intern']) ? (int)($_POST['intern']) : 0), up($_POST['beschreibung']), time()));
 
             $show = show($dir . "/form_gallery_step2", array("head" => _gallery_admin_head,
-                "what" => re($_POST['gallery']),
+                "what" => htmlspecialchars($_POST['gallery'], ENT_QUOTES, 'UTF-8'),
                 "addfile" => $addfile,
                 "id" => mysqli_insert_id($mysql),
                 "do" => "add",
@@ -81,9 +81,9 @@ switch ($do) {
             "beschr" => _beschreibung,
             "value" => _button_value_edit,
             "id" => $get['id'],
-            "e_gal" => re($get['kat']),
+            "e_gal" => h($get['kat']),
             "e_intern" => $get['intern'] ? 'checked="checked"' : '',
-            "e_beschr" => re($get['beschreibung'])));
+            "e_beschr" => h($get['beschreibung'])));
         break;
     case 'editgallery':
         db("UPDATE " . $db['gallery'] . " SET `kat` = '" . up($_POST['gallery']) . "',
@@ -104,7 +104,7 @@ switch ($do) {
             "count" => _gallery_count_new,
             "gallery" => _subgallery_head,
             "value" => _error_fwd,
-            "gal" => re($get['kat']),
+            "gal" => h($get['kat']),
             "id" => $get['id'],
             "option" => $option));
         break;
@@ -116,7 +116,7 @@ switch ($do) {
         }
 
         $show = show($dir . "/form_gallery_step2", array("head" => _gallery_admin_edit,
-            "what" => re($get['kat']),
+            "what" => h($get['kat']),
             "do" => "editpics",
             "addfile" => $addfile,
             "id" => $get['id'],
@@ -190,7 +190,7 @@ switch ($do) {
 
             $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
             $color++;
-            $show .= show($dir . "/gallery_show", array("link" => re($get['kat']),
+            $show .= show($dir . "/gallery_show", array("link" => h($get['kat']),
                 "class" => $class,
                 "del" => $del,
                 "edit" => $edit,

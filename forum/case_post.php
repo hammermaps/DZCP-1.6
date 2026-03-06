@@ -15,9 +15,9 @@ if (defined('_Forum')) {
                     "nickhead" => _nick,
                     "emailhead" => _email,
                     "hphead" => _hp,
-                    "postemail" => re($get['email']),
-                    "posthp" => re($get['hp']),
-                    "postnick" => re($get['nick'])));
+                    "postemail" => h($get['email']),
+                    "posthp" => h($get['hp']),
+                    "postnick" => h($get['nick'])));
             }
 
             $dowhat = show(_forum_dowhat_edit_post, array(
@@ -94,8 +94,8 @@ if (defined('_Forum')) {
                     "kid" => $_GET['kid'],
                     "br1" => "<!--",
                     "br2" => "-->",
-                    "postemail" => re($get['email']),
-                    "postnick" => re($get['nick']),
+                    "postemail" => h($get['email']),
+                    "postnick" => h($get['nick']),
                     "posteintrag" => re_bbcode(re($_POST['eintrag'], true)),
                     "error" => $error,
                     "eintraghead" => _eintrag));
@@ -347,7 +347,7 @@ if (defined('_Forum')) {
                             "hphead" => _hp));
                     }
 
-                    $title = re($gett['topic']) . ' - ' . $title;
+                    $title = h($gett['topic']) . ' - ' . $title;
                     $index = show($dir . "/post", array("titel" => _forum_new_post_head,
                         "nickhead" => _nick,
                         "emailhead" => _email,
@@ -511,7 +511,7 @@ if (defined('_Forum')) {
                                 $text = bbcode(re($ftxt['text']));
                         }
 
-                        $posted_ip = ($chkMe == 4 ? re($gett['ip']) : _logged);
+                        $posted_ip = ($chkMe == 4 ? h($gett['ip']) : _logged);
                         if ($gett['t_reg'] != 0) {
                             $getu = db("SELECT `nick`,`hp`,`email` FROM `" . $db['users'] . "` WHERE `id` = " . $gett['t_reg'] . ";", false, true);
 
@@ -576,9 +576,9 @@ if (defined('_Forum')) {
                         "id" => $_GET['id'],
                         "ip" => _iplog_info,
                         "kid" => $_GET['kid'],
-                        "postemail" => re($_POST['email']),
-                        "posthp" => re($_POST['hp']),
-                        "postnick" => re($_POST['nick']),
+                        "postemail" => htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8'),
+                        "posthp" => htmlspecialchars($_POST['hp'], ENT_QUOTES, 'UTF-8'),
+                        "postnick" => htmlspecialchars($_POST['nick'], ENT_QUOTES, 'UTF-8'),
                         "posteintrag" => re_bbcode(re($_POST['eintrag'], true)),
                         "error" => $error,
                         "eintraghead" => _eintrag));

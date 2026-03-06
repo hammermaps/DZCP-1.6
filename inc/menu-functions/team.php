@@ -82,7 +82,7 @@ function team($tID = '')
 
         //Output
         $team = show("menu/team", array("row" => config('teamrow'),
-            "team" => cut(re($get['name'], config('l_team'), true, false)),
+            "team" => h(cut($get['name'], config('l_team'), true, false)),
             "id" => $get['id'],
             "next" => $next['id'],
             "last" => $last['id'],

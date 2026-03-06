@@ -14,7 +14,7 @@ if ($do == "new") {
     while ($get = _fetch($qry)) {
         $positions .= show(_select_field, array("value" => $get['pos'] + 1,
             "sel" => "",
-            "what" => _nach . ' ' . re($get['name'])));
+            "what" => _nach . ' ' . h($get['name'])));
         $posname = $get['name'];
     }
 
@@ -74,7 +74,7 @@ if ($do == "new") {
                 else $sel = '';
 
                 $positions .= show(_select_field, array("value" => $getpos['pos'] + 1,
-                    "what" => _nach . ' ' . re($getpos['name']),
+                    "what" => _nach . ' ' . h($getpos['name']),
                     "sel" => $sel));
             }
         }
@@ -224,7 +224,7 @@ if ($do == "new") {
             else $sel = '';
 
             $positions .= show(_select_field, array("value" => $getpos['pos'] + 1,
-                "what" => _nach . ' ' . re($getpos['name']),
+                "what" => _nach . ' ' . h($getpos['name']),
                 "sel" => $sel));
             $posname = $getpos['name'];
         }
@@ -280,7 +280,7 @@ if ($do == "new") {
         "link" => _links_link,
         "slink" => $get['link'],
         "beschreibung" => _beschreibung,
-        "sbeschreibung" => re($get['beschreibung']),
+        "sbeschreibung" => h($get['beschreibung']),
         "site" => _sponsors_admin_site,
         "addsite" => _sponsors_admin_addsite,
         "schecked" => $schecked,
@@ -333,7 +333,7 @@ if ($do == "new") {
                 else $sel = '';
 
                 $positions .= show(_select_field, array("value" => $getpos['pos'] + 1,
-                    "what" => _nach . ' ' . re($getpos['name']),
+                    "what" => _nach . ' ' . h($getpos['name']),
                     "sel" => $sel));
                 $posname = $getpos['name'];
             }
@@ -538,7 +538,7 @@ if ($do == "new") {
         $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
         $color++;
 
-        $show .= show($dir . "/sponsors_show", array("link" => cut(re($get['link']), 40, true, false),
+        $show .= show($dir . "/sponsors_show", array("link" => cut(h($get['link']), 40, true, false),
             "class" => $class,
             "name" => $get['name'],
             "edit" => $edit,

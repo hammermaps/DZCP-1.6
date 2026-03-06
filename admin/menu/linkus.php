@@ -47,10 +47,10 @@ if ($do == "new") {
         "art" => _linkus_art,
         "text" => _linkus_admin_textlink,
         "banner" => _linkus_admin_bannerlink,
-        "llink" => re($get['url']),
-        "lbeschreibung" => re($get['beschreibung']),
+        "llink" => h($get['url']),
+        "lbeschreibung" => h($get['beschreibung']),
         "btext" => _linkus_text,
-        "ltext" => re($get['text']),
+        "ltext" => h($get['text']),
         "what" => _button_value_edit,
         "do" => "editlink&amp;id=" . $_GET['id'] . ""));
 } elseif ($do == "editlink") {
@@ -80,7 +80,7 @@ if ($do == "new") {
     while ($get = _fetch($qry)) {
         $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
         $color++;
-        $banner = show(_linkus_bannerlink, array("id" => $get['id'], "banner" => re($get['text'])));
+        $banner = show(_linkus_bannerlink, array("id" => $get['id'], "banner" => h($get['text'])));
 
         $edit = show("page/button_edit", array("id" => $get['id'],
             "action" => "admin=linkus&amp;do=edit",
@@ -91,12 +91,12 @@ if ($do == "new") {
             "title" => _button_title_del));
 
         $show .= show($dir . "/linkus_show", array("class" => $class,
-            "beschreibung" => re($get['beschreibung']),
+            "beschreibung" => h($get['beschreibung']),
             "edit" => $edit,
             "delete" => $delete,
             "cnt" => $cnt,
             "banner" => $banner,
-            "besch" => re($get['beschreibung']),
+            "besch" => h($get['beschreibung']),
             "url" => $get['url']));
         $cnt++;
     }

@@ -143,9 +143,9 @@ if (defined('_Forum')) {
 
             $kat = db("SELECT `name` FROM `" . $db['f_kats'] . "` WHERE `id` = " . $getw['sid'] . ";", false, true);
 
-            $wheres = show(_forum_post_where, array("wherepost" => re($getw['topic']),
-                "wherekat" => re($getw['kattopic']),
-                "mainkat" => re($kat['name']),
+            $wheres = show(_forum_post_where, array("wherepost" => h($getw['topic']),
+                "wherekat" => h($getw['kattopic']),
+                "mainkat" => h($kat['name']),
                 "tid" => $_GET['id'],
                 "kid" => $getw['kid']));
 
@@ -199,11 +199,11 @@ if (defined('_Forum')) {
                     $qryo = db("SELECT * FROM " . $db['f_skats'] . " WHERE sid = '" . $getok['id'] . "' ORDER BY kattopic;");
                     while ($geto = _fetch($qryo)) {
                         $skat .= show(_forum_select_field_skat, array("value" => $geto['id'],
-                            "what" => re($geto['kattopic'])));
+                            "what" => h($geto['kattopic'])));
                     }
 
                     $move .= show(_forum_select_field_kat, array("value" => "lazy",
-                        "what" => re($getok['name']),
+                        "what" => h($getok['name']),
                         "skat" => $skat));
                 }
 
@@ -299,7 +299,7 @@ if (defined('_Forum')) {
                 $add = '';
             }
 
-            $title = re($getw['topic']) . ' - ' . $title;
+            $title = h($getw['topic']) . ' - ' . $title;
             $email = ($chkMe >= 1 ? $email : '');
             $fastreply = "";
 
@@ -343,7 +343,7 @@ if (defined('_Forum')) {
                     "where" => $wheres,
                     "admin" => $admin,
                     "nick" => $nick,
-                    "threadhead" => re($getw['topic']),
+                    "threadhead" => h($getw['topic']),
                     "titel" => $titel,
                     "postnr" => "1",
                     "class" => $ftxt['class'],

@@ -24,7 +24,7 @@ function fvote($id, $ajax = false)
                         $balken = show(_votes_balken, array("width" => $rawpercent));
 
                         $votebutton = "";
-                        $results .= show("forum/vote_results", array("answer" => re($getv['sel']),
+                        $results .= show("forum/vote_results", array("answer" => h($getv['sel']),
                             "percent" => $percent,
                             "stimmen" => $getv['stimmen'],
                             "balken" => $balken));
@@ -40,7 +40,7 @@ function fvote($id, $ajax = false)
         }
 
         $getf = db("SELECT `id`,`kid` FROM " . $db['f_threads'] . " WHERE `vote` = '" . $get['id'] . "'", false, true);
-        $vote = show("forum/vote", array("titel" => re($get['titel']),
+        $vote = show("forum/vote", array("titel" => h($get['titel']),
             "vid" => $get['id'],
             "fid" => $getf['id'],
             "kid" => $getf['kid'],

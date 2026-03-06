@@ -82,11 +82,11 @@ if (defined('_Clanwars')) {
             $game = squad($getm['icon']);
 
             $flagge = flag($getm['gcountry']);
-            $gegner = show(_cw_details_gegner, array("gegner" => cut(re($getm['clantag']) . " - " . re($getm['gegner']), config('l_clanwars'), true, true),
+            $gegner = show(_cw_details_gegner, array("gegner" => cut(h($getm['clantag']) . " - " . h($getm['gegner']), config('l_clanwars'), true, true),
                 "url" => '?action=details&amp;id=' . $getm['id']));
 
             $details = show(_cw_show_details, array("id" => $getm['id']));
-            $squad = show(_member_squad_squadlink, array("squad" => re($get['name']),
+            $squad = show(_member_squad_squadlink, array("squad" => h($get['name']),
                 "id" => $get['id'],
                 "shown" => $shown));
 
@@ -94,9 +94,9 @@ if (defined('_Clanwars')) {
                 "img" => $img,
                 "flagge" => $flagge,
                 "gegner" => $gegner,
-                "xonx" => re($getm['xonx']),
-                "liga" => re($getm['liga']),
-                "gametype" => re($getm['gametype']),
+                "xonx" => h($getm['xonx']),
+                "liga" => h($getm['liga']),
+                "gametype" => h($getm['gametype']),
                 "class" => $class,
                 "result" => cw_result_nopic($getm['punkte'], $getm['gpunkte']),
                 "details" => $details));
@@ -185,7 +185,7 @@ if (defined('_Clanwars')) {
         $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
         $color++;
         $img = squad($get['icon']);
-        $legende .= show(_cw_legende, array("game" => re($get['game']),
+        $legende .= show(_cw_legende, array("game" => h($get['game']),
             "img" => $img,
             "class" => $class));
     }

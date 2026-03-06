@@ -13,7 +13,7 @@ $qry = db("SELECT i_domain,i_autor FROM " . $db['settings'] . "");
 $get = _fetch($qry);
 
 $show_ = show($dir . "/form_impressum", array("idomain" => _config_impressum_domains,
-    "domain" => re($get['i_domain']),
+    "domain" => h($get['i_domain']),
     "bbcode" => bbcode("seitenautor"),
     "iautor" => _config_impressum_autor,
     "postautor" => re_bbcode(re($get['i_autor']))));
