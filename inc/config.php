@@ -202,8 +202,8 @@ function show($tpl = "", $array = array(), $array_lang_constant = array(), $arra
         }
 
         // Auto-inject CSRF token for any [csrf_token] placeholder in templates
-        if (function_exists('csrf_field') && strpos($tpl, '[csrf_token]') !== false) {
-            $tpl = str_replace('[csrf_token]', csrf_field(), $tpl);
+        if (function_exists('csrf_token') && strpos($tpl, '[csrf_token]') !== false) {
+            $tpl = str_replace('[csrf_token]', htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8'), $tpl);
         }
     }
 
