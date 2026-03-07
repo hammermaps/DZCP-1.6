@@ -132,9 +132,9 @@ div#wrapper {
 }
 
 div#header {
-    min-height: 100px;
+    min-height: 0;
     height: auto;
-    position: relative
+    position: relative;
 }
 
 div#footer {
@@ -145,23 +145,25 @@ div#footer {
     text-align: center;
 }
 
-/* ClanLogoLeft banner in header */
+/* ClanLogoLeft banner in header – now in #clanlogo_banner fullwidth box */
 div#clanlogo_left {
-    position: relative;
+    position: static;
     left: auto;
     top: auto;
+    display: block;
+    text-align: center;
 }
 
-/* ClanLogoRight banner in header */
+/* ClanLogoRight banner – now in #clanlogo_banner fullwidth box */
 div#clanlogo_right {
-    position: relative;
+    position: static;
     left: auto;
     top: auto;
 }
 
-/* ClanName banner in header */
+/* ClanName banner – now in #clanlogo_banner fullwidth box */
 div#clanname {
-    position: relative;
+    position: static;
     left: auto;
     top: auto;
     flex: 1;

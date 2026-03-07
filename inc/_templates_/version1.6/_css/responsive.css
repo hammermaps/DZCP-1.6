@@ -5,6 +5,114 @@
  */
 
 /* ============================================================
+   CLANLOGO BANNER – weiße Box, exakt so breit wie wrapper
+   (sideLeft + middleContent + sideRight)
+   ============================================================ */
+
+#clanlogo_banner {
+    width: 100%;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 5px 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    gap: 20px;
+    margin-top: 10px;
+}
+
+#clanlogo_banner #clanlogo_left,
+#clanlogo_banner #clanname,
+#clanlogo_banner #clanlogo_right {
+    position: static;
+    left: auto;
+    top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 0;
+    min-width: 0;
+    text-align: center;
+}
+
+#clanlogo_banner #clanlogo_left {
+    justify-content: flex-start;
+}
+
+#clanlogo_banner #clanname {
+    justify-content: center;
+    align-items: flex-end;
+    align-self: flex-end;
+}
+
+#clanlogo_banner #clanlogo_right {
+    justify-content: flex-end;
+}
+
+#clanlogo_banner img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Header ist jetzt nur noch für den Hamburger-Button */
+div#header {
+    min-height: 0;
+    height: auto;
+    padding: 0;
+    position: relative;
+    display: none; /* standardmäßig versteckt – nur auf Mobile sichtbar */
+}
+
+/* Hamburger-Button im Header – auf Desktop nicht nötig, aber auf Mobile */
+@media screen and (max-width: 767px) {
+    div#header {
+        display: block;
+        min-height: 48px;
+        background: #2f2f2f;
+        background-image: linear-gradient(to top, #2f2f2f 80%, #000);
+    }
+
+    #clanlogo_banner {
+        padding: 8px 15px;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    #clanlogo_banner #clanlogo_right {
+        display: none;
+    }
+
+    #clanlogo_banner #clanname img {
+        max-height: 50px;
+        width: auto;
+    }
+
+    #clanlogo_banner #clanlogo_left img {
+        max-height: 50px;
+        width: auto;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    #clanlogo_banner #clanlogo_left {
+        display: none;
+    }
+
+    #clanlogo_banner {
+        justify-content: center;
+        padding: 8px 10px;
+    }
+
+    #clanlogo_banner #clanname img {
+        max-height: 40px;
+    }
+}
+
+/* ============================================================
    GLOBAL RESPONSIVE RESETS
    ============================================================ */
 
@@ -34,46 +142,6 @@ div#wrapper {
     padding: 0 10px;
 }
 
-/* ============================================================
-   HEADER – responsive
-   ============================================================ */
-
-div#header {
-    height: auto;
-    min-height: 100px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 50px;
-    flex-wrap: wrap;
-}
-
-div#clanlogo_left {
-    position: static;
-    order: 1;
-    flex-shrink: 0;
-}
-
-div#clanname {
-    position: static;
-    order: 2;
-    flex: 1;
-    text-align: center;
-}
-
-div#clanlogo_right {
-    position: static;
-    order: 3;
-    flex-shrink: 0;
-}
-
-div#clanname img,
-div#clanlogo_left img,
-div#clanlogo_right img {
-    max-width: 100%;
-    height: auto;
-}
 
 /* ============================================================
    LAYOUT – 3-Column-Flexbox
@@ -82,7 +150,6 @@ div#clanlogo_right img {
 div#content {
     display: flex;
     flex-wrap: nowrap;
-    gap: 7px;
     width: 100%;
     align-items: flex-start;
 }
@@ -427,10 +494,6 @@ div#navTeamspeakContent {
         width: 190px;
     }
 
-    div#clanlogo_right {
-        display: none; /* Platz sparen auf Tablet */
-    }
-
     div#footwrapper {
         padding: 10px 10px;
     }
@@ -453,27 +516,6 @@ div#navTeamspeakContent {
         padding: 0 4px;
     }
 
-    /* Header kompakter */
-    div#header {
-        min-height: 70px;
-        padding: 8px 50px 8px 56px;
-        justify-content: flex-start;
-    }
-
-    div#clanlogo_left,
-    div#clanlogo_right {
-        display: none;
-    }
-
-    div#clanname {
-        flex: 1;
-        text-align: left;
-    }
-
-    div#clanname img {
-        max-height: 50px;
-        width: auto;
-    }
 
     /* 2-Column Layout: Links verstecken, Hamburger zeigen */
     .mobile-nav-toggle {
