@@ -6,10 +6,36 @@
 <img src="https://dzcp.de/dzcp.png"/>
 </p>
 
-<h2>Aktuelle Version: 1.6.1.2 (06.03.2026)</h2>
+<h2>Aktuelle Version: 1.6.1.3 (07.03.2026)</h2>
 
 <h2>live Demo:</h2>
 http://demo.dzcp.de/news/
+
+---
+
+## Changelog 1.6.1.3 (07.03.2026)
+
+### Neuerungen
+- Monolog-basiertes Logging-System eingeführt (mehrere Kanäle, Konfiguration, Integration)
+- Templates responsiv gemacht: mobile Navigation, `responsive.css`, Viewport-Meta-Tag für `version1.6`
+- Validierungsfunktionen für Installer und Updater hinzugefügt
+- Exception-Handling für phpFastCache und PHPMailer-Operationen hinzugefügt
+
+### Updates, Verbesserungen
+- Header-Layout überarbeitet: Clan-Banner in eigenen `#clanlogo_banner`-Container verschoben
+- `buffer.php` überarbeitet: Ladenprüfungen und GUMP-Instanziierung verbessert
+- `index.php` für verbesserte Modulverarbeitung refaktoriert
+- Abhängigkeiten in `composer.json` aktualisiert
+- `bbcode.php` überarbeitet: GUMP-Sprachbehandlung verbessert, CacheManager-Nutzung entfernt, Steam-API aktualisiert
+- CSRF-Token-Ausgabe mit `htmlspecialchars` gesichert
+- `mb_convert_encoding` für bessere Zeichencodierung und Charset-Kompatibilität angepasst
+- Fehlerreporting aktiviert, Logging-Konfigurationen verbessert, Cache mit Fehlerbehandlung refaktoriert
+- `sum()`-Funktion-Aufrufe in `vote.php`, `fvote.php` u.a. überarbeitet
+- Veraltetes `gmaps_koord` durch `geolocation` ersetzt
+- Auto-Migration für fehlende Datenbankspalten verbessert
+- GUMP-Sprachdateien und nicht verwendeter Test-Skript entfernt
+- Explizites Integer-Casting für CURL-Timeout hinzugefügt
+- Installer-Verzeichniswarnung schließt 'dev' Edition aus
 
 ---
 
