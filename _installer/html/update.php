@@ -27,6 +27,7 @@
                 <input type="radio" name="version" value="ab 1.5.4 bis 1.5.5.4"> <b>ab 1.5.4 bis 1.5.5.4</b><br/>
                 <input type="radio" name="version" value="1.6.0.x"> <b>ab 1.6.0.x bis 1.6.0.4</b><br/>
                 <input type="radio" name="version" value="1.6.0.4"> <b>ab 1.6.0.4</b><br/>
+                <input type="radio" name="version" value="1.6.1.x"> <b>ab 1.6.1.x</b><br/>
             </td>
         </tr>
         <tr>

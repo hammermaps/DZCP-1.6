@@ -112,7 +112,7 @@ if (defined('_Clanwars')) {
         "cw_result" => $result,
         "cw_bericht" => $bericht,
         "screenshots" => $screens));
-    echo utf8_encode('<table class="mainContent" cellspacing="1">' . $index . '</table>');
+    echo mb_convert_encoding('<table class="mainContent" cellspacing="1">' . $index . '</table>', 'UTF-8', 'ISO-8859-1');
 
     if (!mysqli_persistconns)
         $mysql->close(); //MySQL

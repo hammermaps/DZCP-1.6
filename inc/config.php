@@ -85,9 +85,7 @@ $config_cache = array(
         "autoTmpFallback" => true,
         "defaultTtl" => 10,
         "defaultChmod" => 0775,
-        "fallback" => 'files',
         "compressData" => true,
-        "cacheFileExtension" => 'pfc',
         "path" => basePath . "/inc/_cache_/"
     ]),
     "dbc" => true,  //use database query caching * only use with memory cache
@@ -321,12 +319,16 @@ if (!headers_sent()) {
 //MySQLi-Funktionen
 function _rows($rows)
 {
-    return array_key_exists('_stmt_rows_', $rows) ? $rows['_stmt_rows_'] : $rows->num_rows;
+    if ($rows === true || $rows === false || $rows === null) return 0;
+    if (is_array($rows)) return array_key_exists('_stmt_rows_', $rows) ? $rows['_stmt_rows_'] : 0;
+    return $rows->num_rows;
 }
 
 function _fetch($fetch)
 {
-    return array_key_exists('_stmt_rows_', $fetch) ? $fetch[0] : $fetch->fetch_assoc();
+    if ($fetch === true || $fetch === false || $fetch === null) return null;
+    if (is_array($fetch)) return array_key_exists('_stmt_rows_', $fetch) ? $fetch[0] : null;
+    return $fetch->fetch_assoc();
 }
 
 function _real_escape_string($string = '')
@@ -378,15 +380,15 @@ function db_stmt($query, $params = array('si', 'hallo', '4'), $rows = false, $fe
 {
     global $prefix, $mysql;
     if (!$statement = $mysql->prepare($query)) die('<b>MySQL-Query failed:</b><br /><br /><ul>' .
-    '<li><b>ErrorNo</b> = ' . !empty($prefix) ? str_replace($prefix, '', $mysql->connect_errno) : $mysql->connect_errno .
-    '<li><b>Error</b>   = ' . !empty($prefix) ? str_replace($prefix, '', $mysql->connect_error) : $mysql->connect_error .
-    '<li><b>Query</b>   = ' . !empty($prefix) ? str_replace($prefix, '', $query) . '</ul>' : $query);
+    '<li><b>ErrorNo</b> = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_errno) : $mysql->connect_errno) .
+    '<li><b>Error</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_error) : $mysql->connect_error) .
+    '<li><b>Query</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $query) . '</ul>' : $query));
 
     call_user_func_array(array($statement, 'bind_param'), refValues($params));
     if (!$statement->execute()) die('<b>MySQL-Query failed:</b><br /><br /><ul>' .
-    '<li><b>ErrorNo</b> = ' . !empty($prefix) ? str_replace($prefix, '', $mysql->connect_errno) : $mysql->connect_errno .
-    '<li><b>Error</b>   = ' . !empty($prefix) ? str_replace($prefix, '', $mysql->connect_error) : $mysql->connect_error .
-    '<li><b>Query</b>   = ' . !empty($prefix) ? str_replace($prefix, '', $query) . '</ul>' : $query);
+    '<li><b>ErrorNo</b> = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_errno) : $mysql->connect_errno) .
+    '<li><b>Error</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_error) : $mysql->connect_error) .
+    '<li><b>Query</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $query) . '</ul>' : $query));
 
     $meta = mysqli_stmt_result_metadata($statement);
     if (!$meta || empty($meta)) {

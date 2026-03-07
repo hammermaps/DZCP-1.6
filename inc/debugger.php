@@ -256,7 +256,7 @@ class DebugConsole
     }
 }
 
-function dzcp_error_handler($code, $msg, $file, $line, $context)
+function dzcp_error_handler($code, $msg, $file, $line, $context = [])
 {
     $file = str_replace(basePath, '', $file);
     switch ($code) {

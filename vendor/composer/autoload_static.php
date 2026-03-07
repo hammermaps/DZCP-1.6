@@ -28,6 +28,10 @@ class ComposerStaticInit3ae559e2dbc63b5d16fbfdfeb86b5b35
         array (
             'Jaybizzle\\CrawlerDetect\\' => 24,
         ),
+        'G' =>
+        array (
+            'GUMP\\' => 5,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -62,6 +66,10 @@ class ComposerStaticInit3ae559e2dbc63b5d16fbfdfeb86b5b35
         'Jaybizzle\\CrawlerDetect\\' =>
         array (
             0 => __DIR__ . '/..' . '/jaybizzle/crawler-detect/src',
+        ),
+        'GUMP\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/wixel/gump/src',
         ),
     );
 

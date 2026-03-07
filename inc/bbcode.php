@@ -474,9 +474,9 @@ function sysTemplateswitch()
 function GetServerVars(string $var)
 {
     if (array_key_exists($var, $_SERVER) && !empty($_SERVER[$var])) {
-        return utf8_encode($_SERVER[$var]);
+        return mb_convert_encoding($_SERVER[$var], 'UTF-8', 'ISO-8859-1');
     } else if (array_key_exists($var, $_ENV) && !empty($_ENV[$var])) {
-        return utf8_encode($_ENV[$var]);
+        return mb_convert_encoding($_ENV[$var], 'UTF-8', 'ISO-8859-1');
     }
 
     if ($var == 'HTTP_REFERER') { //Fix for empty HTTP_REFERER
@@ -585,7 +585,7 @@ function parse_csv($csv_string, $delimiter = ",", $skip_empty_lines = true, $tri
             preg_replace_callback(
                 '/"(.*?)"/s',
                 function ($field) {
-                    return urlencode(utf8_encode($field[1]));
+                    return urlencode(mb_convert_encoding($field[1], 'UTF-8', 'ISO-8859-1'));
                 },
                 $enc = preg_replace('/(?<!")""/', '!!Q!!', $csv_string)
             )
@@ -1504,7 +1504,7 @@ function up($txt, bool $escape = true)
     $txt = htmlentities($txt, ENT_COMPAT, $charset);
     $txt = spChars($txt);
     $txt = stripcslashes($txt);
-    $txt = utf8_encode($txt);
+    $txt = mb_convert_encoding($txt, 'UTF-8', 'ISO-8859-1');
     return $escape ? _real_escape_string($txt) : $txt;
 }
 
@@ -3165,7 +3165,7 @@ function jsconvert($txt)
         array("\'", "\'", "&quot;", "", "", "\u00dc", "\u00fc", "\u00c4", "\u00e4", "\u00d6", "\u00f6", "\u00df"), $txt);
 
     $txt = htmlentities($txt, ENT_COMPAT, $charset);
-    return utf8_encode($txt);
+    return mb_convert_encoding($txt, 'UTF-8', 'ISO-8859-1');
 }
 
 /**

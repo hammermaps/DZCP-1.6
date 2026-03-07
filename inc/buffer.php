@@ -28,7 +28,7 @@ function getmicrotime()
 $time_start = getmicrotime();
 
 //Filter Sanitize
-$gump = new GUMP();
+$gump = GUMP::get_instance();
 $blacklist = array('comment', 'newstext', 'eintrag',
     'artikel', 'reason', 'text', 'ich', 'sig', 'bericht');
 $filter = $gump->sanitize($_POST);

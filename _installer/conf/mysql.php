@@ -1465,3 +1465,292 @@ function update_mysql_1_6_1_0()
     ignore_user_abort(false);
     set_time_limit(30);
 }
+
+function update_mysql_1_6_1_2()
+{
+    global $db;
+
+    // ============================================================
+    // 1) FEHLENDE INDEXES – Verknüpfungsfelder (FK-Referenzen)
+    // ============================================================
+
+    // dzcp_acomments: artikel -> dzcp_artikel.id
+    db("ALTER TABLE `" . $db['acomments'] . "` ADD INDEX `idx_acomments_artikel` (`artikel`);");
+    db("ALTER TABLE `" . $db['acomments'] . "` ADD INDEX `idx_acomments_datum`   (`datum`);");
+    db("ALTER TABLE `" . $db['acomments'] . "` ADD INDEX `idx_acomments_reg`     (`reg`);");
+
+    // dzcp_artikel: kat -> dzcp_newskat.id
+    db("ALTER TABLE `" . $db['artikel'] . "` ADD INDEX `idx_artikel_kat`    (`kat`);");
+    db("ALTER TABLE `" . $db['artikel'] . "` ADD INDEX `idx_artikel_autor`  (`autor`);");
+    db("ALTER TABLE `" . $db['artikel'] . "` ADD INDEX `idx_artikel_public` (`public`);");
+
+    // dzcp_awards: squad -> dzcp_squads.id
+    db("ALTER TABLE `" . $db['awards'] . "` ADD INDEX `idx_awards_squad` (`squad`);");
+
+    // dzcp_away: userid -> dzcp_users.id
+    db("ALTER TABLE `" . $db['away'] . "` ADD INDEX `idx_away_userid` (`userid`);");
+    db("ALTER TABLE `" . $db['away'] . "` ADD INDEX `idx_away_start`  (`start`);");
+    db("ALTER TABLE `" . $db['away'] . "` ADD INDEX `idx_away_end`    (`end`);");
+
+    // dzcp_clankasse
+    db("ALTER TABLE `" . $db['clankasse'] . "` ADD INDEX `idx_clankasse_pm` (`pm`);");
+
+    // dzcp_clankasse_payed: user -> dzcp_users.id
+    db("ALTER TABLE `" . $db['c_payed'] . "` ADD INDEX `idx_c_payed_user` (`user`);");
+
+    // dzcp_clanwars
+    db("ALTER TABLE `" . $db['cw'] . "` ADD INDEX `idx_cw_squad_id` (`squad_id`);");
+    db("ALTER TABLE `" . $db['cw'] . "` ADD INDEX `idx_cw_datum`    (`datum`);");
+    db("ALTER TABLE `" . $db['cw'] . "` ADD INDEX `idx_cw_top`      (`top`);");
+
+    // dzcp_clanwar_players: cwid -> dzcp_clanwars.id, member -> dzcp_users.id
+    db("ALTER TABLE `" . $db['cw_player'] . "` ADD INDEX `idx_cw_player_cwid`   (`cwid`);");
+    db("ALTER TABLE `" . $db['cw_player'] . "` ADD INDEX `idx_cw_player_member` (`member`);");
+    db("ALTER TABLE `" . $db['cw_player'] . "` ADD INDEX `idx_cw_player_status` (`status`);");
+
+    // dzcp_cw_comments: cw -> dzcp_clanwars.id
+    db("ALTER TABLE `" . $db['cw_comments'] . "` ADD INDEX `idx_cw_comments_cw`    (`cw`);");
+    db("ALTER TABLE `" . $db['cw_comments'] . "` ADD INDEX `idx_cw_comments_datum`  (`datum`);");
+    db("ALTER TABLE `" . $db['cw_comments'] . "` ADD INDEX `idx_cw_comments_reg`    (`reg`);");
+
+    // dzcp_counter_ips
+    db("ALTER TABLE `" . $db['c_ips'] . "` ADD INDEX `idx_c_ips_datum` (`datum`);");
+
+    // dzcp_counter_who
+    db("ALTER TABLE `" . $db['c_who'] . "` ADD INDEX `idx_c_who_online`  (`online`);");
+    db("ALTER TABLE `" . $db['c_who'] . "` ADD INDEX `idx_c_who_login`   (`login`);");
+
+    // dzcp_downloads: kat -> dzcp_dl_kat.id
+    db("ALTER TABLE `" . $db['downloads'] . "` ADD INDEX `idx_downloads_kat`    (`kat`);");
+    db("ALTER TABLE `" . $db['downloads'] . "` ADD INDEX `idx_downloads_hits`   (`hits`);");
+    db("ALTER TABLE `" . $db['downloads'] . "` ADD INDEX `idx_downloads_intern` (`intern`);");
+
+    // dzcp_events: datum
+    db("ALTER TABLE `" . $db['events'] . "` ADD INDEX `idx_events_datum` (`datum`);");
+
+    // dzcp_forum_kats: kid
+    db("ALTER TABLE `" . $db['f_kats'] . "` ADD INDEX `idx_f_kats_kid`    (`kid`);");
+    db("ALTER TABLE `" . $db['f_kats'] . "` ADD INDEX `idx_f_kats_intern` (`intern`);");
+
+    // dzcp_forum_posts: kid -> dzcp_f_kats.id
+    db("ALTER TABLE `" . $db['f_posts'] . "` ADD INDEX `idx_f_posts_kid`  (`kid`);");
+    db("ALTER TABLE `" . $db['f_posts'] . "` ADD INDEX `idx_f_posts_reg`  (`reg`);");
+
+    // dzcp_forum_skats: sid -> dzcp_f_kats.id
+    db("ALTER TABLE `" . $db['f_skats'] . "` ADD INDEX `idx_f_skats_sid` (`sid`);");
+    db("ALTER TABLE `" . $db['f_skats'] . "` ADD INDEX `idx_f_skats_pos` (`pos`);");
+
+    // dzcp_forum_threads
+    db("ALTER TABLE `" . $db['f_threads'] . "` ADD INDEX `idx_f_threads_sticky` (`sticky`);");
+    db("ALTER TABLE `" . $db['f_threads'] . "` ADD INDEX `idx_f_threads_closed` (`closed`);");
+    db("ALTER TABLE `" . $db['f_threads'] . "` ADD INDEX `idx_f_threads_global` (`global`);");
+    db("ALTER TABLE `" . $db['f_threads'] . "` ADD INDEX `idx_f_threads_t_reg`  (`t_reg`);");
+
+    // dzcp_forum_abo: fid -> dzcp_f_threads.id, user -> dzcp_users.id
+    db("ALTER TABLE `" . $db['f_abo'] . "` ADD INDEX `idx_f_abo_fid`   (`fid`);");
+    db("ALTER TABLE `" . $db['f_abo'] . "` ADD INDEX `idx_f_abo_user`  (`user`);");
+    db("ALTER TABLE `" . $db['f_abo'] . "` ADD INDEX `idx_f_abo_datum` (`datum`);");
+
+    // dzcp_gallery: datum, intern
+    db("ALTER TABLE `" . $db['gallery'] . "` ADD INDEX `idx_gallery_datum`  (`datum`);");
+    db("ALTER TABLE `" . $db['gallery'] . "` ADD INDEX `idx_gallery_intern` (`intern`);");
+
+    // dzcp_gb: datum, reg, public
+    db("ALTER TABLE `" . $db['gb'] . "` ADD INDEX `idx_gb_datum`  (`datum`);");
+    db("ALTER TABLE `" . $db['gb'] . "` ADD INDEX `idx_gb_reg`    (`reg`);");
+    db("ALTER TABLE `" . $db['gb'] . "` ADD INDEX `idx_gb_public` (`public`);");
+
+    // dzcp_ipcheck
+    db("ALTER TABLE `" . $db['ipcheck'] . "` ADD INDEX `idx_ipcheck_user_id` (`user_id`);");
+    db("ALTER TABLE `" . $db['ipcheck'] . "` ADD INDEX `idx_ipcheck_time`    (`time`);");
+
+    // dzcp_links
+    db("ALTER TABLE `" . $db['links'] . "` ADD INDEX `idx_links_banner` (`banner`);");
+    db("ALTER TABLE `" . $db['links'] . "` ADD INDEX `idx_links_hits`   (`hits`);");
+
+    // dzcp_msg: von -> dzcp_users.id, an -> dzcp_users.id
+    db("ALTER TABLE `" . $db['msg'] . "` ADD INDEX `idx_msg_von`          (`von`);");
+    db("ALTER TABLE `" . $db['msg'] . "` ADD INDEX `idx_msg_datum`        (`datum`);");
+    db("ALTER TABLE `" . $db['msg'] . "` ADD INDEX `idx_msg_see`          (`see`);");
+    db("ALTER TABLE `" . $db['msg'] . "` ADD INDEX `idx_msg_sendnews`     (`sendnews`);");
+    db("ALTER TABLE `" . $db['msg'] . "` ADD INDEX `idx_msg_senduser`     (`senduser`);");
+
+    // dzcp_navi
+    db("ALTER TABLE `" . $db['navi'] . "` ADD INDEX `idx_navi_kat`      (`kat`(20));");
+    db("ALTER TABLE `" . $db['navi'] . "` ADD INDEX `idx_navi_shown`    (`shown`);");
+    db("ALTER TABLE `" . $db['navi'] . "` ADD INDEX `idx_navi_internal` (`internal`);");
+    db("ALTER TABLE `" . $db['navi'] . "` ADD INDEX `idx_navi_type`     (`type`);");
+    db("ALTER TABLE `" . $db['navi'] . "` ADD INDEX `idx_navi_pos`      (`pos`);");
+
+    // dzcp_news: kat -> dzcp_newskat.id, autor -> dzcp_users.id
+    db("ALTER TABLE `" . $db['news'] . "` ADD INDEX `idx_news_kat`       (`kat`);");
+    db("ALTER TABLE `" . $db['news'] . "` ADD INDEX `idx_news_autor`     (`autor`);");
+    db("ALTER TABLE `" . $db['news'] . "` ADD INDEX `idx_news_sticky`    (`sticky`);");
+    db("ALTER TABLE `" . $db['news'] . "` ADD INDEX `idx_news_intern`    (`intern`);");
+    db("ALTER TABLE `" . $db['news'] . "` ADD INDEX `idx_news_public`    (`public`);");
+    db("ALTER TABLE `" . $db['news'] . "` ADD INDEX `idx_news_datum`     (`datum`(20));");
+
+    // dzcp_newscomments: news -> dzcp_news.id
+    db("ALTER TABLE `" . $db['newscomments'] . "` ADD INDEX `idx_newscomments_news`  (`news`);");
+    db("ALTER TABLE `" . $db['newscomments'] . "` ADD INDEX `idx_newscomments_datum` (`datum`);");
+    db("ALTER TABLE `" . $db['newscomments'] . "` ADD INDEX `idx_newscomments_reg`   (`reg`);");
+
+    // dzcp_permissions: user -> dzcp_users.id
+    db("ALTER TABLE `" . $db['permissions'] . "` ADD INDEX `idx_permissions_user` (`user`);");
+    db("ALTER TABLE `" . $db['permissions'] . "` ADD INDEX `idx_permissions_pos`  (`pos`);");
+
+    // dzcp_rankings: squad, postdate
+    db("ALTER TABLE `" . $db['rankings'] . "` ADD INDEX `idx_rankings_squad`    (`squad`);");
+    db("ALTER TABLE `" . $db['rankings'] . "` ADD INDEX `idx_rankings_postdate` (`postdate`);");
+
+    // dzcp_serverliste
+    db("ALTER TABLE `" . $db['serverliste'] . "` ADD INDEX `idx_serverliste_checked` (`checked`);");
+    db("ALTER TABLE `" . $db['serverliste'] . "` ADD INDEX `idx_serverliste_datum`   (`datum`);");
+
+    // dzcp_shout: datum
+    db("ALTER TABLE `" . $db['shout'] . "` ADD INDEX `idx_shout_datum` (`datum`);");
+
+    // dzcp_sponsoren: pos, hits
+    db("ALTER TABLE `" . $db['sponsoren'] . "` ADD INDEX `idx_sponsoren_pos`  (`pos`);");
+    db("ALTER TABLE `" . $db['sponsoren'] . "` ADD INDEX `idx_sponsoren_hits` (`hits`);");
+
+    // dzcp_squads: shown, status
+    db("ALTER TABLE `" . $db['squads'] . "` ADD INDEX `idx_squads_shown`     (`shown`);");
+    db("ALTER TABLE `" . $db['squads'] . "` ADD INDEX `idx_squads_status`    (`status`);");
+    db("ALTER TABLE `" . $db['squads'] . "` ADD INDEX `idx_squads_team_show` (`team_show`);");
+
+    // dzcp_squaduser: user -> dzcp_users.id, squad -> dzcp_squads.id
+    db("ALTER TABLE `" . $db['squaduser'] . "` ADD INDEX `idx_squaduser_user`  (`user`);");
+    db("ALTER TABLE `" . $db['squaduser'] . "` ADD INDEX `idx_squaduser_squad` (`squad`);");
+
+    // dzcp_taktik: autor -> dzcp_users.id
+    db("ALTER TABLE `" . $db['taktik'] . "` ADD INDEX `idx_taktik_autor` (`autor`);");
+    db("ALTER TABLE `" . $db['taktik'] . "` ADD INDEX `idx_taktik_datum` (`datum`);");
+    db("ALTER TABLE `" . $db['taktik'] . "` ADD INDEX `idx_taktik_map`   (`map`);");
+
+    // dzcp_buddys: user -> dzcp_users.id, buddy -> dzcp_users.id
+    db("ALTER TABLE `" . $db['buddys'] . "` ADD INDEX `idx_buddys_user`  (`user`);");
+    db("ALTER TABLE `" . $db['buddys'] . "` ADD INDEX `idx_buddys_buddy` (`buddy`);");
+
+    // dzcp_usergallery: user -> dzcp_users.id
+    db("ALTER TABLE `" . $db['usergallery'] . "` ADD INDEX `idx_usergallery_user` (`user`);");
+
+    // dzcp_usergb: user -> dzcp_users.id
+    db("ALTER TABLE `" . $db['usergb'] . "` ADD INDEX `idx_usergb_user`  (`user`);");
+    db("ALTER TABLE `" . $db['usergb'] . "` ADD INDEX `idx_usergb_datum` (`datum`);");
+    db("ALTER TABLE `" . $db['usergb'] . "` ADD INDEX `idx_usergb_reg`   (`reg`);");
+
+    // dzcp_userpos: posi -> dzcp_pos.id
+    db("ALTER TABLE `" . $db['userpos'] . "` ADD INDEX `idx_userpos_posi` (`posi`);");
+
+    // dzcp_userstats: user -> dzcp_users.id
+    db("ALTER TABLE `" . $db['userstats'] . "` ADD INDEX `idx_userstats_user`      (`user`);");
+    db("ALTER TABLE `" . $db['userstats'] . "` ADD INDEX `idx_userstats_lastvisit` (`lastvisit`);");
+
+    // dzcp_users: level, status, banned, regdatum, online
+    db("ALTER TABLE `" . $db['users'] . "` ADD INDEX `idx_users_level`    (`level`);");
+    db("ALTER TABLE `" . $db['users'] . "` ADD INDEX `idx_users_status`   (`status`);");
+    db("ALTER TABLE `" . $db['users'] . "` ADD INDEX `idx_users_banned`   (`banned`);");
+    db("ALTER TABLE `" . $db['users'] . "` ADD INDEX `idx_users_regdatum` (`regdatum`);");
+    db("ALTER TABLE `" . $db['users'] . "` ADD INDEX `idx_users_online`   (`online`);");
+    db("ALTER TABLE `" . $db['users'] . "` ADD INDEX `idx_users_country`  (`country`);");
+    db("ALTER TABLE `" . $db['users'] . "` ADD INDEX `idx_users_nick`     (`nick`(50));");
+    db("ALTER TABLE `" . $db['users'] . "` ADD INDEX `idx_users_email`    (`email`(100));");
+
+    // dzcp_votes: datum, closed, intern, menu
+    db("ALTER TABLE `" . $db['votes'] . "` ADD INDEX `idx_votes_datum`  (`datum`);");
+    db("ALTER TABLE `" . $db['votes'] . "` ADD INDEX `idx_votes_closed` (`closed`);");
+    db("ALTER TABLE `" . $db['votes'] . "` ADD INDEX `idx_votes_intern` (`intern`);");
+    db("ALTER TABLE `" . $db['votes'] . "` ADD INDEX `idx_votes_menu`   (`menu`);");
+    db("ALTER TABLE `" . $db['votes'] . "` ADD INDEX `idx_votes_von`    (`von`);");
+
+    // dzcp_vote_results: vid -> dzcp_votes.id
+    db("ALTER TABLE `" . $db['vote_results'] . "` ADD INDEX `idx_vote_results_vid` (`vid`);");
+
+    // dzcp_dsgvo_log: uid -> dzcp_users.id (falls Tabelle existiert)
+    db("ALTER TABLE `" . $db['dsgvo_log'] . "` ADD INDEX `idx_dsgvo_log_date` (`date`);");
+
+    // ============================================================
+    // 2) DATENBANKOPTIMIERUNG – Datentyp-Korrekturen
+    // ============================================================
+
+    // news.datum wurde als varchar(20) angelegt – besser INT
+    db("ALTER TABLE `" . $db['news'] . "` CHANGE `datum` `datum` INT(20) NOT NULL DEFAULT '0';");
+
+    // artikel.datum ebenfalls varchar -> INT
+    db("ALTER TABLE `" . $db['artikel'] . "` CHANGE `datum` `datum` INT(20) NOT NULL DEFAULT '0';");
+
+    // clanwars.squad_id: war int(19) – normalisieren
+    db("ALTER TABLE `" . $db['cw'] . "` CHANGE `squad_id` `squad_id` INT(11) NOT NULL DEFAULT '0';");
+
+    // users.id – int(5) zu klein für große Clans -> int(11)
+    db("ALTER TABLE `" . $db['users'] . "` CHANGE `id` `id` INT(11) NOT NULL AUTO_INCREMENT;");
+    db("ALTER TABLE `" . $db['userstats'] . "` CHANGE `user` `user` INT(11) NOT NULL DEFAULT '0';");
+    db("ALTER TABLE `" . $db['permissions'] . "` CHANGE `user` `user` INT(11) NOT NULL DEFAULT '0';");
+    db("ALTER TABLE `" . $db['userpos'] . "` CHANGE `user` `user` INT(11) NOT NULL DEFAULT '0';");
+    db("ALTER TABLE `" . $db['squaduser'] . "` CHANGE `user` `user` INT(11) NOT NULL DEFAULT '0';");
+    db("ALTER TABLE `" . $db['msg'] . "` CHANGE `von` `von` INT(11) NOT NULL DEFAULT '0';");
+    db("ALTER TABLE `" . $db['msg'] . "` CHANGE `an` `an` INT(11) NOT NULL DEFAULT '0';");
+    db("ALTER TABLE `" . $db['buddys'] . "` CHANGE `user` `user` INT(11) NOT NULL DEFAULT '0';");
+    db("ALTER TABLE `" . $db['buddys'] . "` CHANGE `buddy` `buddy` INT(11) NOT NULL DEFAULT '0';");
+    db("ALTER TABLE `" . $db['usergb'] . "` CHANGE `user` `user` INT(11) NOT NULL DEFAULT '0';");
+    db("ALTER TABLE `" . $db['usergallery'] . "` CHANGE `user` `user` INT(11) NOT NULL DEFAULT '0';");
+    db("ALTER TABLE `" . $db['taktik'] . "` CHANGE `autor` `autor` INT(11) NOT NULL DEFAULT '0';");
+    db("ALTER TABLE `" . $db['away'] . "` CHANGE `userid` `userid` INT(11) NOT NULL DEFAULT '0';");
+
+    // squads.id – int(5) zu klein
+    db("ALTER TABLE `" . $db['squads'] . "` CHANGE `id` `id` INT(11) NOT NULL AUTO_INCREMENT;");
+    db("ALTER TABLE `" . $db['squaduser'] . "` CHANGE `squad` `squad` INT(11) NOT NULL DEFAULT '0';");
+    db("ALTER TABLE `" . $db['awards'] . "` CHANGE `squad` `squad` INT(11) NOT NULL DEFAULT '0';");
+    db("ALTER TABLE `" . $db['cw'] . "` CHANGE `squad_id` `squad_id` INT(11) NOT NULL DEFAULT '0';");
+    db("ALTER TABLE `" . $db['userpos'] . "` CHANGE `squad` `squad` INT(11) NOT NULL DEFAULT '0';");
+
+    // votes.id / vote_results.vid
+    db("ALTER TABLE `" . $db['votes'] . "` CHANGE `id` `id` INT(11) NOT NULL AUTO_INCREMENT;");
+    db("ALTER TABLE `" . $db['vote_results'] . "` CHANGE `vid` `vid` INT(11) NOT NULL DEFAULT '0';");
+    db("ALTER TABLE `" . $db['vote_results'] . "` CHANGE `id` `id` INT(11) NOT NULL AUTO_INCREMENT;");
+
+    // f_posts.kid/sid – int(2) zu klein
+    db("ALTER TABLE `" . $db['f_posts'] . "` CHANGE `kid` `kid` INT(10) NOT NULL DEFAULT '0';");
+    db("ALTER TABLE `" . $db['f_posts'] . "` CHANGE `sid` `sid` INT(10) NOT NULL DEFAULT '0';");
+
+    // serverliste.datum war int(4) – zu klein für Unix-Timestamp
+    db("ALTER TABLE `" . $db['serverliste'] . "` CHANGE `datum` `datum` INT(20) NOT NULL DEFAULT '0';");
+
+    // ============================================================
+    // 3) TABELLEN-ENGINE & CHARSET – auf InnoDB/utf8mb4 umstellen
+    // ============================================================
+    $tables = array(
+        $db['acomments'], $db['artikel'],     $db['awards'],      $db['away'],
+        $db['clankasse'], $db['c_kats'],      $db['c_payed'],     $db['cw'],
+        $db['cw_player'], $db['cw_comments'], $db['counter'],     $db['c_ips'],
+        $db['c_who'],     $db['downloads'],   $db['dl_kat'],      $db['events'],
+        $db['f_kats'],    $db['f_posts'],     $db['f_skats'],     $db['f_threads'],
+        $db['f_abo'],     $db['f_access'],    $db['gallery'],     $db['gb'],
+        $db['glossar'],   $db['ipcheck'],     $db['links'],       $db['linkus'],
+        $db['msg'],       $db['navi'],        $db['navi_kats'],   $db['news'],
+        $db['newscomments'],$db['newskat'],   $db['partners'],    $db['permissions'],
+        $db['pos'],       $db['profile'],     $db['rankings'],    $db['server'],
+        $db['serverliste'],$db['settings'],   $db['shout'],       $db['sites'],
+        $db['sponsoren'], $db['squads'],      $db['squaduser'],   $db['taktik'],
+        $db['buddys'],    $db['usergallery'], $db['usergb'],      $db['userpos'],
+        $db['users'],     $db['userstats'],   $db['votes'],       $db['vote_results'],
+        $db['dsgvo'],     $db['dsgvo_pers'],  $db['dsgvo_log'],   $db['config'],
+        $db['slideshow'], $db['navi_kats']
+    );
+
+    foreach ($tables as $table) {
+        db("ALTER TABLE `" . $table . "` ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+    }
+
+    // ============================================================
+    // 4) DATENBANK OPTIMIEREN (ANALYZE + OPTIMIZE)
+    // ============================================================
+    db_optimize();
+
+    // Zeitstempel des Updates setzen
+    db("UPDATE `" . $db['settings'] . "` SET `db_optimize` = '" . (time() + auto_db_optimize_interval) . "' WHERE `id` = 1;");
+
+    ignore_user_abort(false);
+    set_time_limit(30);
+}

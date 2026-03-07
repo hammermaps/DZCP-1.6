@@ -122,7 +122,7 @@ else {
             "content" => _content,
             "newsticker" => admin_view_dzcp_news && api_enabled && !empty($dzcp_news['results']['news'])
                 ? ('<div style="padding:3px"><b>DZCP News:</b><br />' .
-                    '<div id="dzcpticker">' . utf8_encode($dzcp_news['results']['news']) .
+                    '<div id="dzcpticker">' . mb_convert_encoding($dzcp_news['results']['news'], 'UTF-8', 'ISO-8859-1') .
                     '</div></div>') : '',
             "rootadmin" => _rootadmin,
             "rootmenu" => $rootmenu,

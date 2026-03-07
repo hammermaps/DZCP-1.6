@@ -113,7 +113,7 @@ if (defined('_Forum')) {
             "f_abo" => "",
             "show" => $show));
 
-        echo utf8_encode('<table class="mainContent" cellspacing="1" style="margin-top:17px">' . $index . '</table>');
+        echo mb_convert_encoding('<table class="mainContent" cellspacing="1" style="margin-top:17px">' . $index . '</table>', 'UTF-8', 'ISO-8859-1');
 
         if (!mysqli_persistconns)
             $mysql->close(); //MySQL
@@ -192,7 +192,7 @@ if (defined('_Forum')) {
             "zitat" => _forum_zitat_preview,
             "onoff" => $onoff));
 
-        echo utf8_encode('<table class="mainContent" cellspacing="1" style="margin-top:17px">' . $index . '</table>');
+        echo mb_convert_encoding('<table class="mainContent" cellspacing="1" style="margin-top:17px">' . $index . '</table>', 'UTF-8', 'ISO-8859-1');
 
         if (!mysqli_persistconns)
             $mysql->close(); //MySQL
