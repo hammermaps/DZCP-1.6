@@ -1,0 +1,94 @@
+<?php
+
+return [
+    'required' => 'Поле {field} є обов’язковим',
+    'valid_email' => 'Поле {field} має бути Email адресою',
+    'max_len' => 'У полі {field} має бути максимум {param} символів',
+    'min_len' => 'У полі {field} має бути мінімум {param} символів',
+    'exact_len' => 'Поле {field} має містити рівно {param} символів',
+    'between_len' => 'Поле "{field}" має містити від {param[0]} до {param[1]} символів',
+    'alpha' => 'Поле {field} може містити тільки літери',
+    'alpha_numeric' => 'Поле {field} може містити тільки букви і цифри',
+    'alpha_numeric_space' => 'Поле {field} може містити тільки букви, цифри та пробіли',
+    'alpha_numeric_dash' => 'Поле {field} може містити тільки букви, цифри, дефіси та підкреслення',
+    'alpha_dash' => 'Поле {field} може містити тільки букви та дефіс',
+    'alpha_space' => 'Поле {field} може містити тільки букви та пробіл',
+    'numeric' => 'Поле {field} має бути числом',
+    'integer' => 'Поле {field} має бути цілим числом',
+    'boolean' => 'У поля {field} повинен бути логічний (булевий) тип даних true або false',
+    'float' => 'Поле {field} має бути не цілим числом',
+    'valid_url' => 'Поле {field} має бути гіперпосиланням',
+    'url_exists' => 'Гіперпосилання {field} недоступне',
+    'valid_ip' => 'Поле {field} має бути IP адресою',
+    'valid_ipv4' => 'Поле {field} має бути IPv4 адресою',
+    'valid_ipv6' => 'Поле {field} має бути IPv6 адресою',
+    'guidv4' => 'Поле {field} має бути GUIDом',
+    'valid_cc' => 'Номер картки {field} не є валідним',
+    'valid_name' => 'Поле {field} має містити повне ім’я',
+    'contains' => 'Поле {field} може містити наступні значення: {param}',
+    'contains_list' => 'Значення {field} не може бути використано як відповідь',
+    'doesnt_contain_list' => 'Значення {field} не може бути використано',
+    'street_address' => 'Поле {field} має бути адресою',
+    'date' => 'Поле {field} має бути датою',
+    'min_numeric' => 'Поле {field} має бути числом не менше ніж {param}',
+    'max_numeric' => 'Поле {field} має бути числом не більше ніж {param}',
+    'min_age' => 'Вік повинен бути більшим ніж {param}',
+    'starts' => 'Поле {field} має починатися з {param}',
+    'extension' => 'Файл {field} повинен бути наступного типу: {param}',
+    'required_file' => 'Файл {field} обов’язковий до завантаження',
+    'equalsfield' => 'Поле {field} має бути ідентичним {param}',
+    'iban' => 'Поле {field} має бути валідним IBAN',
+    'phone_number' => 'Поле {field} має бути правильним номером телефону',
+    'regex' => 'Поле {field} повинно містити правильне значення',
+    'valid_json_string' => 'Поле {field} має бути валідним JSON рядком',
+    'valid_array_size_greater' => 'Поле {field} має містити мінімум {param} значень',
+    'valid_array_size_lesser' => 'Поле {field} повинно містити максимум {param} значень',
+    'valid_array_size_equal' => 'Поле {field} має містити рівно {param} значень',
+
+    // Security validators
+    'strong_password' => 'Поле {field} має містити принаймні 8 символів з великими, малими літерами, цифрами та спеціальними символами',
+    'jwt_token' => 'Поле {field} має бути дійсним форматом JWT токена',
+    'hash' => 'Поле {field} має бути дійсним {param} хешем',
+    'no_sql_injection' => 'Поле {field} містить потенційні шаблони SQL ін\'єкції',
+    'no_xss' => 'Поле {field} містить потенційні XSS шаблони',
+
+    // Modern web validators
+    'uuid' => 'Поле {field} має бути дійсним UUID',
+    'base64' => 'Поле {field} має бути дійсними даними в кодуванні base64',
+    'hex_color' => 'Поле {field} має бути дійсним шістнадцятковим кодом кольору (наприклад, #FF0000)',
+    'rgb_color' => 'Поле {field} має бути дійсним форматом кольору RGB (наприклад, rgb(255,0,0))',
+    'timezone' => 'Поле {field} має бути дійсним ідентифікатором часової зони',
+    'language_code' => 'Поле {field} має бути дійсним кодом мови (наприклад, en, en-US)',
+    'country_code' => 'Поле {field} має бути дійсним кодом країни (наприклад, US, CA)',
+    'currency_code' => 'Поле {field} має бути дійсним кодом валюти (наприклад, USD, EUR)',
+
+    // Network validators
+    'mac_address' => 'Поле {field} має бути дійсним форматом MAC адреси',
+    'domain_name' => 'Поле {field} має бути дійсним іменем домену',
+    'port_number' => 'Поле {field} має бути дійсним номером порту (1-65535)',
+    'social_handle' => 'Поле {field} має бути дійсним форматом хендла соціальних мереж',
+
+    // Geographic validators
+    'latitude' => 'Поле {field} має бути дійсною широтою (-90 до 90)',
+    'longitude' => 'Поле {field} має бути дійсною довготою (-180 до 180)',
+    'postal_code' => 'Поле {field} має бути дійсним поштовим індексом для {param}',
+    'coordinates' => 'Поле {field} має бути дійсними координатами в форматі lat,lng',
+
+    // Enhanced date/time validators
+    'future_date' => 'Поле {field} має бути майбутньою датою',
+    'past_date' => 'Поле {field} має бути минулою датою',
+    'business_day' => 'Поле {field} має припадати на робочий день (понеділок-п\'ятниця)',
+    'valid_time' => 'Поле {field} має бути дійсним форматом часу (HH:MM або HH:MM:SS)',
+    'date_range' => 'Поле {field} має бути датою між {param[0]} та {param[1]}',
+
+    // Mathematical validators
+    'even' => 'Поле {field} має бути парним числом',
+    'odd' => 'Поле {field} має бути непарним числом',
+    'prime' => 'Поле {field} має бути простим числом',
+
+    // Content validators
+    'word_count' => 'Кількість слів у полі {field} не відповідає вимогам',
+    'camel_case' => 'Поле {field} має бути в форматі camelCase',
+    'snake_case' => 'Поле {field} має бути в форматі snake_case',
+    'url_slug' => 'Поле {field} має бути дійсним форматом URL slug',
+];
