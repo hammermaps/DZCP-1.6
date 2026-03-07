@@ -20,6 +20,12 @@ if (defined('_UserMenu')) {
                 db("UPDATE " . $db['users'] . " SET `online` = 0, `sessid` = '' WHERE `id` = " . $userid . ";"); //Logout old user
                 session_regenerate_id();
 
+                DzcpLogger::app()->info('Admin Identity-Swap: Zurück zur eigenen Session', [
+                    'admin_id'      => $_SESSION['identy_id'],
+                    'impersonated'  => $userid,
+                    'ip'            => $userip,
+                ]);
+
                 $_SESSION['id'] = (int)$_SESSION['identy_id'];
                 $_SESSION['pwd'] = data("pwd", (int)($_SESSION['identy_id']));
                 $_SESSION['identy_ip'] = '';
@@ -34,6 +40,10 @@ if (defined('_UserMenu')) {
         }
 
         if ($chkMe && $userid) {
+            DzcpLogger::app()->info('Logout erfolgreich', [
+                'user_id' => $userid,
+                'ip'      => $userip,
+            ]);
             db("UPDATE `" . $db['users'] . "` SET `online` = 0, `pkey` = '', `sessid` = '', `time` = " . time() . " WHERE `id` = " . $userid . ";");
             setIpcheck("logout(" . $userid . ")");
             cookie::clear();

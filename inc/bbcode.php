@@ -104,6 +104,13 @@ if (array_key_exists('language', $_SESSION) && !empty($_SESSION['language'])) {
 //-> einzelne Definitionen
 $CrawlerDetect = new CrawlerDetect();
 $isSpider = $CrawlerDetect->isCrawler();
+if ($isSpider) {
+    DzcpLogger::access()->info('Spider/Bot erkannt', [
+        'user_agent' => $CrawlerDetect->getUserAgent(),
+        'ip'         => isset($userip) ? $userip : ($_SERVER['REMOTE_ADDR'] ?? 'unknown'),
+        'url'        => GetServerVars('REQUEST_URI'),
+    ]);
+}
 $subfolder = basename(dirname(dirname(GetServerVars('PHP_SELF')) . '../'));
 $httphost = GetServerVars('HTTP_HOST') . (empty($subfolder) ? '' : '/' . $subfolder);
 $domain = str_replace('www.', '', $httphost);
@@ -170,6 +177,10 @@ if (is_validate_ip($userip) && HasDSGVO() && (cookie::get('id') != false &&
 
             //-> Aktualisiere die User-Statistik
             db("UPDATE `" . $db['userstats'] . "` SET `logins` = (logins+1) WHERE `user` = " . $get['id'] . ";");
+            DzcpLogger::app()->info('Auto-Login via Cookie erfolgreich', [
+                'user_id' => $get['id'],
+                'ip'      => $userip,
+            ]);
             unset($get, $permanent_key);
         }
     } else {
@@ -178,6 +189,10 @@ if (is_validate_ip($userip) && HasDSGVO() && (cookie::get('id') != false &&
         $_SESSION['ip'] = '';
         $_SESSION['lastvisit'] = '';
         $_SESSION['pkey'] = '';
+        DzcpLogger::security()->warning('Auto-Login via Cookie fehlgeschlagen (User nicht gefunden)', [
+            'ip'        => $userip,
+            'cookie_id' => cookie::get('id'),
+        ]);
     }
 
     unset($sql);
@@ -191,6 +206,10 @@ $chkMe = checkme();
 if (isset($_GET['set_language'])) {
     if (file_exists(basePath . "/inc/lang/languages/" . $_GET['set_language'] . ".php")) {
         $_SESSION['language'] = $_GET['set_language'];
+        DzcpLogger::app()->info('Sprache geändert', [
+            'language' => $_GET['set_language'],
+            'user_id'  => isset($userid) ? $userid : 0,
+        ]);
     }
 
     if ($chkMe && $userid) {
@@ -213,6 +232,13 @@ if (!$chkMe) {
 //-> Prueft ob der User gebannt ist, oder die IP des Clients warend einer offenen session verändert wurde.
 if ($chkMe && $userid && !empty($_SESSION['ip'])) {
     if ($_SESSION['ip'] != visitorIp() || isBanned($userid, false)) {
+        $reason = ($_SESSION['ip'] != visitorIp()) ? 'IP-Änderung' : 'User gebannt';
+        DzcpLogger::security()->warning('Session invalidiert: ' . $reason, [
+            'user_id'      => $userid,
+            'session_ip'   => $_SESSION['ip'],
+            'current_ip'   => visitorIp(),
+            'is_banned'    => isBanned($userid, false),
+        ]);
         $_SESSION['id'] = '';
         $_SESSION['pwd'] = '';
         $_SESSION['ip'] = '';
@@ -230,6 +256,13 @@ if ($chkMe && $userid && !empty($_SESSION['ip'])) {
 if (!$ajaxJob && !$installation && !$updater && !$thumbgen &&
     GetServerVars('REQUEST_METHOD') === 'POST') {
     if (!csrf_check()) {
+        DzcpLogger::security()->critical('CSRF-Token ungültig', [
+            'ip'      => isset($userip) ? $userip : ($_SERVER['REMOTE_ADDR'] ?? 'unknown'),
+            'url'     => GetServerVars('REQUEST_URI'),
+            'referer' => GetServerVars('HTTP_REFERER'),
+            'user_id' => isset($userid) ? $userid : 0,
+            'method'  => 'POST',
+        ]);
         die(error2(_csrf_invalid));
     }
 }
@@ -519,7 +552,12 @@ function lang(string $lng)
     global $gump;
     if (!file_exists(basePath . "/inc/lang/languages/" . $lng . ".php")) {
         $files = get_files(basePath . '/inc/lang/languages/', false, true, array('php'));
-        $lng = str_replace('.php', '', $files[0]);
+        $fallback_lng = str_replace('.php', '', $files[0]);
+        DzcpLogger::app()->warning('Sprachdatei nicht gefunden, Fallback wird genutzt', [
+            'requested' => $lng,
+            'fallback'  => $fallback_lng,
+        ]);
+        $lng = $fallback_lng;
     }
 
     $language_text = array();
@@ -1607,6 +1645,10 @@ function updateCounter()
             } else {
                 db("INSERT INTO `" . $db['c_ips'] . "` SET `ip` = '" . $userip_escaped . "', `datum` = '" . ((int)$datum) . "', `agent` = '" . $agent_escaped . "';");
             }
+            DzcpLogger::access()->debug('Wiederkehrer-Besuch gezählt (nach Reload-Zeit)', [
+                'ip'  => $userip,
+                'day' => $today,
+            ]);
         }
     } else {
         if (_rows($count))
@@ -1619,6 +1661,11 @@ function updateCounter()
         } else {
             db("INSERT INTO `" . $db['c_ips'] . "` SET `ip` = '" . $userip_escaped . "', `datum` = '" . ((int)$datum) . "', `agent` = '" . $agent_escaped . "';");
         }
+        DzcpLogger::access()->info('Neuer Besucher gezählt', [
+            'ip'         => $userip,
+            'user_agent' => $CrawlerDetect->getUserAgent(),
+            'day'        => $today,
+        ]);
     }
 }
 
@@ -1698,6 +1745,10 @@ function isBanned(int $userid_set = 0, bool $logout = true)
     if (checkme($userid_set) >= 1 || $userid_set) {
         $get = db("SELECT `banned` FROM `" . $db['users'] . "` WHERE `id` = " . (int)($userid_set) . " LIMIT 1;", false, true);
         if ($get['banned']) {
+            DzcpLogger::security()->warning('Gesperrter User erkannt', [
+                'user_id'      => $userid_set,
+                'auto_logout'  => $logout,
+            ]);
             if ($logout) {
                 $_SESSION['id'] = '';
                 $_SESSION['pwd'] = '';
@@ -3308,6 +3359,16 @@ function page(string $index = '', string $title = '', string $where = '', string
 
     // Timer Stop
     $time = round(generatetime() - $time_start, 4);
+
+    DzcpLogger::app()->debug('Seitenaufruf', [
+        'where'   => $where,
+        'title'   => $title,
+        'user_id' => isset($userid) ? $userid : 0,
+        'ip'      => isset($userip) ? $userip : '',
+        'time_ms' => $time,
+        'method'  => GetServerVars('REQUEST_METHOD'),
+        'uri'     => GetServerVars('REQUEST_URI'),
+    ]);
 
     // JS-Dateine einbinden
     $lng = language_short_tag();

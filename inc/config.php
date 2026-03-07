@@ -72,6 +72,65 @@ define('phpmailer_smtp_password', '');//Password to use for SMTP authentication
 define('phpmailer_smtp_secure', 'tls');//Enable TLS encryption, `ssl` also accepted
 
 /*
+ * =========================================================
+ * Logging Configuration (Monolog)
+ * =========================================================
+ *
+ * Kanäle (werden als separate Logdateien angelegt):
+ *   app      – Allgemeine Anwendungs-Events (Login, Logout, Session, Navigation)
+ *   security – CSRF-Fehler, fehlgeschlagene Logins, Bans, Brute-Force-Schutz
+ *   sql      – SQL-Queries (nur wenn debug_all_sql_querys = true) und DB-Fehler
+ *   error    – PHP-Fehler, Exceptions, fatale Abbrüche
+ *   access   – Besucher-Counter, Spider-/Bot-Erkennung, User-Agents
+ *   cache    – Cache-Hits, Misses, Fallbacks (phpfastcache / dbc_index)
+ *
+ * Log-Level Hierarchie (aufsteigend):
+ *   debug → info → notice → warning → error → critical → alert → emergency
+ *
+ * =========================================================
+ */
+$config_logging = [
+    // ── Globaler Schalter ──────────────────────────────────────────────────
+    'log_enabled'            => true,   // false = kein Logging (NullHandler)
+
+    // ── Mindest-Level für alle Kanäle ─────────────────────────────────────
+    // Im Produktionsbetrieb empfohlen: 'warning'
+    // Im Entwicklungsbetrieb empfohlen: 'debug'
+    'log_level'              => 'debug',
+
+    // ── Kanalspezifische Level-Überschreibung ──────────────────────────────
+    // Überschreibt 'log_level' für einzelne Kanäle
+    'log_channel_levels'     => [
+        'app'      => 'info',
+        'security' => 'debug',   // Sicherheits-Events immer vollständig loggen
+        'sql'      => 'warning', // SQL nur Fehler (debug_all_sql_querys steuert SQL-Queries)
+        'error'    => 'debug',
+        'access'   => 'info',
+        'cache'    => 'debug',
+    ],
+
+    // ── Ausgabe-Ziele ──────────────────────────────────────────────────────
+    'log_to_file'            => true,   // In rotierende Dateien schreiben
+    'log_errors_separately'  => true,   // error/security: zusätzlich *_critical.log anlegen
+    'log_to_browser_console' => false,  // Browser-Console (nur wenn view_error_reporting = true)
+    'log_to_firephp'         => false,  // FirePHP (nur wenn view_error_reporting = true)
+
+    // ── Datei-Einstellungen ────────────────────────────────────────────────
+    'log_path'               => basePath . '/inc/_logs',  // Speicherort der Logdateien
+    'log_max_files'          => 30,     // Maximale Anzahl rotierter Tagesdateien
+    'log_file_permissions'   => 0664,   // Datei-Berechtigungen (octal)
+
+    // ── Format ────────────────────────────────────────────────────────────
+    // 'line' = lesbare Textzeilen | 'json' = JSON (für Log-Aggregatoren wie Graylog)
+    'log_format'             => 'line',
+
+    // ── Processors ────────────────────────────────────────────────────────
+    'log_with_web_processor'    => true,  // IP, URL, HTTP-Method, Referrer zu jedem Eintrag
+    'log_with_introspection'    => false, // Datei/Zeile des Aufrufers (nur Dev, kostet Performance)
+    'log_bubble'                => false, // Handler-Bubbling (false = nach erstem Handler stopp)
+];
+
+/*
  * Cache Configuration
  */
 
@@ -142,6 +201,8 @@ if (!isset($sql_host) || !isset($sql_user) || !isset($sql_pass) || !isset($sql_d
 if (file_exists(basePath . "/inc/mysql.php"))
     require_once(basePath . "/inc/mysql.php");
 
+require_once(basePath . "/inc/logger.php");
+
 if (!isset($installation)) $installation = false;
 if (!isset($updater)) $updater = false;
 if (!isset($global_index)) $global_index = false;
@@ -165,11 +226,15 @@ function show($tpl = "", $array = array(), $array_lang_constant = array(), $arra
                     if (!is_null($CachedString) && !view_error_reporting && $config_cache['tpl'] && dbc_index::MemSetIndex()) {
                         $CachedString->set(base64_encode($tpl))->expiresAfter(60);
                         $cache->save($CachedString);
+                        DzcpLogger::cache()->debug('Template gecacht', ['template' => $template . '.html']);
                     }
+                } else {
+                    DzcpLogger::cache()->warning('Template nicht gefunden', ['template' => $template . '.html']);
                 }
             }
         } else {
             $tpl = base64_decode($CachedString->get());
+            DzcpLogger::cache()->debug('Template aus Cache geladen', ['template' => $template . '.html']);
         }
 
         //put placeholders in array
@@ -316,6 +381,9 @@ if (!headers_sent()) {
     exit("Die Session konnte nicht gestartet werden! ( headers has already sent )<p> STOP!");
 }
 
+// ── Monolog Logger initialisieren ────────────────────────────────────────────
+DzcpLogger::init($config_logging);
+
 //MySQLi-Funktionen
 function _rows($rows)
 {
@@ -341,11 +409,20 @@ function db($query = '', $rows = false, $fetch = false)
 {
     global $mysql, $updater, $db;
 
-    if (debug_all_sql_querys) DebugConsole::wire_log('debug', 9, 'SQL_Query', $query);
+    if (debug_all_sql_querys) {
+        DebugConsole::wire_log('debug', 9, 'SQL_Query', $query);
+        DzcpLogger::sql()->debug('SQL Query', ['query' => $query]);
+    }
+
     if ($updater) {
         $qry = $mysql->query($query);
     } else {
         if (!$qry = $mysql->query($query)) {
+            DzcpLogger::sql()->critical('SQL-Fehler', [
+                'query'    => $query,
+                'errno'    => $mysql->errno,
+                'error'    => $mysql->error,
+            ]);
             DebugConsole::sql_error_handler($query);
             $language_text = [];
             include_once(basePath . '/inc/lang/languages/english.php');
@@ -379,16 +456,35 @@ function db($query = '', $rows = false, $fetch = false)
 function db_stmt($query, $params = array('si', 'hallo', '4'), $rows = false, $fetch = false)
 {
     global $prefix, $mysql;
-    if (!$statement = $mysql->prepare($query)) die('<b>MySQL-Query failed:</b><br /><br /><ul>' .
-    '<li><b>ErrorNo</b> = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_errno) : $mysql->connect_errno) .
-    '<li><b>Error</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_error) : $mysql->connect_error) .
-    '<li><b>Query</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $query) . '</ul>' : $query));
+
+    if (debug_all_sql_querys) {
+        DzcpLogger::sql()->debug('SQL Prepared Query', ['query' => $query, 'params' => array_slice($params, 1)]);
+    }
+
+    if (!$statement = $mysql->prepare($query)) {
+        DzcpLogger::sql()->critical('SQL Prepared-Statement Fehler (prepare)', [
+            'query' => $query,
+            'errno' => $mysql->connect_errno,
+            'error' => $mysql->connect_error,
+        ]);
+        die('<b>MySQL-Query failed:</b><br /><br /><ul>' .
+        '<li><b>ErrorNo</b> = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_errno) : $mysql->connect_errno) .
+        '<li><b>Error</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_error) : $mysql->connect_error) .
+        '<li><b>Query</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $query) . '</ul>' : $query));
+    }
 
     call_user_func_array(array($statement, 'bind_param'), refValues($params));
-    if (!$statement->execute()) die('<b>MySQL-Query failed:</b><br /><br /><ul>' .
-    '<li><b>ErrorNo</b> = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_errno) : $mysql->connect_errno) .
-    '<li><b>Error</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_error) : $mysql->connect_error) .
-    '<li><b>Query</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $query) . '</ul>' : $query));
+    if (!$statement->execute()) {
+        DzcpLogger::sql()->critical('SQL Prepared-Statement Fehler (execute)', [
+            'query' => $query,
+            'errno' => $mysql->connect_errno,
+            'error' => $mysql->connect_error,
+        ]);
+        die('<b>MySQL-Query failed:</b><br /><br /><ul>' .
+        '<li><b>ErrorNo</b> = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_errno) : $mysql->connect_errno) .
+        '<li><b>Error</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_error) : $mysql->connect_error) .
+        '<li><b>Query</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $query) . '</ul>' : $query));
+    }
 
     $meta = mysqli_stmt_result_metadata($statement);
     if (!$meta || empty($meta)) {
