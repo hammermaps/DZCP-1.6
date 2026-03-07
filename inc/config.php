@@ -224,6 +224,10 @@ function show($tpl = "", $array = array(), $array_lang_constant = array(), $arra
 {
     global $tmpdir, $chkMe, $cache, $config_cache;
     if (!empty($tpl) && $tpl != null) {
+        // Prüfen ob $tpl ein echter Dateipfad ist (nur a-z, 0-9, /, _, -)
+        // oder ein direkter Template-String (Sprachkonstante mit Leerzeichen/HTML/Platzhaltern)
+        $is_file_path = !preg_match('#[\s<>\[\]"\'&]#', $tpl);
+
         $template = basePath . "/inc/_templates_/" . $tmpdir . "/" . $tpl;
         $array['dir'] = '../inc/_templates_/' . $tmpdir;
 
@@ -233,7 +237,7 @@ function show($tpl = "", $array = array(), $array_lang_constant = array(), $arra
         } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
         }
         if (is_null($CachedString) || is_null($CachedString->get())) {
-            if (strlen($template . ".html") <= 128) {
+            if ($is_file_path && strlen($template . ".html") <= 256) {
                 if (file_exists($template . ".html")) {
                     $tpl = file_get_contents($template . ".html");
                     if (!is_null($CachedString) && !view_error_reporting && $config_cache['tpl'] && dbc_index::MemSetIndex()) {
@@ -245,6 +249,7 @@ function show($tpl = "", $array = array(), $array_lang_constant = array(), $arra
                     DzcpLogger::cache()->warning('Template nicht gefunden', ['template' => $template . '.html']);
                 }
             }
+            // Kein else: Wenn $tpl kein Dateipfad ist, wird er direkt als Template-String verwendet
         } else {
             $tpl = base64_decode($CachedString->get());
             DzcpLogger::cache()->debug('Template aus Cache geladen', ['template' => $template . '.html']);
