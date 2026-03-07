@@ -18,7 +18,7 @@ function vote($ajax = false)
         $qryv = db("SELECT `id`,`stimmen`,`sel` FROM " . $db['vote_results'] . " WHERE `vid` = '" . $get['id'] . "' ORDER BY what");
         $results = '';
         while ($getv = _fetch($qryv)) {
-            $stimmen = sum($db['vote_results'], " WHERE `vid` = '" . $get['id'] . "'", "stimmen");
+            $stimmen = sum($db['vote_results'], "stimmen", " WHERE `vid` = '" . $get['id'] . "'");
             if ($stimmen != 0) {
                 if (ipcheck("vid_" . $get['id']) || cookie::get('vid_' . $get['id']) != false || $get['closed'] == 1) {
                     $percent = round($getv['stimmen'] / $stimmen * 100, 1);
