@@ -618,7 +618,7 @@ function parse_csv($csv_string, $delimiter = ",", $skip_empty_lines = true, $tri
         function ($line) use ($delimiter, $trim_fields) {
             return array_map(
                 function ($field) {
-                    return str_replace('!!Q!!', '"', utf8_decode(urldecode($field)));
+                    return str_replace('!!Q!!', '"', mb_convert_encoding(urldecode($field), 'ISO-8859-1', 'UTF-8'));
                 },
                 $trim_fields ? array_map('trim', explode($delimiter, $line)) : explode($delimiter, $line)
             );
@@ -1274,7 +1274,7 @@ function re($txt, bool $only_stripslashes = false)
     if ($only_stripslashes)
         return strval(stripslashes($txt));
 
-    return strval(trim(stripslashes(spChars(html_entity_decode(utf8_decode($txt), ENT_COMPAT, $charset), true))));
+    return strval(trim(stripslashes(spChars(html_entity_decode(mb_convert_encoding($txt, 'ISO-8859-1', 'UTF-8'), ENT_COMPAT, $charset), true))));
 }
 
 //-> HTML-escape for safe output in HTML context (re() + htmlspecialchars)
@@ -3447,7 +3447,7 @@ function page(string $index = '', string $title = '', string $where = '', string
         $arr = array("idir" => '../inc/images/admin', "dir" => $designpath);
 
         //check if placeholders are given
-        $pholder = file_get_contents($designpath . "/index.html");
+        $pholder = file_get_contents(basePath . '/inc/_templates_/' . $tmpdir . '/index.html');
 
         //filter placeholders
         $blArr = array("[clanname]", "[title]", "[copyright]", "[java_vars]", "[min]",

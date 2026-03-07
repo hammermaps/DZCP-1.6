@@ -8,9 +8,9 @@
 //-> DZCP Settings Start
 #########################################
 
-define('view_error_reporting', false); // Zeigt alle Fehler und Notices etc.
+define('view_error_reporting', true); // Zeigt alle Fehler und Notices etc.
 define('debug_all_sql_querys', false);
-define('debug_save_to_file', false);
+define('debug_save_to_file', true);
 define('debug_dzcp_handler', true);
 define('fsockopen_support_bypass', false); //Umgeht die fsockopen pruefung
 define('use_curl_support', true); //Soll CURL verwendet werden
@@ -100,12 +100,20 @@ $config_logging = [
 
     // ── Kanalspezifische Level-Überschreibung ──────────────────────────────
     // Überschreibt 'log_level' für einzelne Kanäle
-    'log_channel_levels'     => [
+   /* 'log_channel_levels'     => [
         'app'      => 'info',
         'security' => 'debug',   // Sicherheits-Events immer vollständig loggen
         'sql'      => 'warning', // SQL nur Fehler (debug_all_sql_querys steuert SQL-Queries)
         'error'    => 'debug',
         'access'   => 'info',
+        'cache'    => 'debug',
+    ],*/
+    'log_channel_levels'     => [
+        'app'      => 'debug',
+        'security' => 'debug',   // Sicherheits-Events immer vollständig loggen
+        'sql'      => 'debug', // SQL nur Fehler (debug_all_sql_querys steuert SQL-Queries)
+        'error'    => 'debug',
+        'access'   => 'debug',
         'cache'    => 'debug',
     ],
 
@@ -135,21 +143,26 @@ $config_logging = [
  */
 
 use Phpfastcache\Config\Config;
+use Phpfastcache\Exceptions\PhpfastcacheInvalidConfigurationException;
 
-$config_cache = array(
-    //auto ,apc, apcu, cassandra, cookie, couchbase, couchdb, files, leveldb, memcache, memcached, memstatic, mongodb, predis
-    //redis, riak, sqlite, ssdb, wincache, xcache, zenddisk, zendshm
-    "storage" => "files",
-    "config" => new Config([
-        "autoTmpFallback" => true,
-        "defaultTtl" => 10,
-        "defaultChmod" => 0775,
-        "compressData" => true,
-        "path" => basePath . "/inc/_cache_/"
-    ]),
-    "dbc" => true,  //use database query caching * only use with memory cache
-    "tpl" => false  //use template caching * only use with memory cache
-);
+try {
+    $config_cache = array(
+        //auto ,apc, apcu, cassandra, cookie, couchbase, couchdb, files, leveldb, memcache, memcached, memstatic, mongodb, predis
+        //redis, riak, sqlite, ssdb, wincache, xcache, zenddisk, zendshm
+        "storage" => "files",
+        "config" => new Config([
+            "autoTmpFallback" => true,
+            "defaultTtl" => 10,
+            "defaultChmod" => 0775,
+            "compressData" => true,
+            "path" => basePath . "/inc/_cache_/"
+        ]),
+        "dbc" => true,  //use database query caching * only use with memory cache
+        "tpl" => false  //use template caching * only use with memory cache
+    );
+} catch (PhpfastcacheInvalidConfigurationException|ReflectionException $e) {
+    exit('Fehler in der Cache-Konfiguration: ' . $e->getMessage());
+}
 
 //-> Legt die UserID des Rootadmins fest
 //-> (dieser darf bestimmte Dinge, den normale Admins nicht duerfen, z.B. andere Admins editieren)

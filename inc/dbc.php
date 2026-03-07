@@ -127,7 +127,6 @@ final class dbc_index
 
         try {
             $ref  = new \ReflectionProperty($cache, 'fallback');
-            $ref->setAccessible(true);
             if ($ref->getValue($cache) === true) {
                 DzcpLogger::cache()->notice('dbc_index: Cache-Treiber im Fallback-Modus, Memory-Cache deaktiviert');
                 return false;
