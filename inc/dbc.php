@@ -5,7 +5,6 @@
  */
 
 //-> Speichert Rückgaben der MySQL Datenbank zwischen um SQL-Queries einzusparen
-use Phpfastcache\CacheManager;
 
 final class dbc_index
 {
@@ -106,8 +105,21 @@ final class dbc_index
     public static final function MemSetIndex()
     {
         global $config_cache, $cache;
-        if (!$config_cache['dbc'] || CacheManager::$fallback) {
+
+        if (!$config_cache['dbc'] || !is_object($cache)) {
             return false;
+        }
+
+        // phpfastcache v8 hat CacheManager::$fallback entfernt.
+        // Fallback-Status aus der Treiber-Instanz per Reflection lesen.
+        try {
+            $ref  = new \ReflectionProperty($cache, 'fallback');
+            $ref->setAccessible(true);
+            if ($ref->getValue($cache) === true) {
+                return false;
+            }
+        } catch (\ReflectionException $e) {
+            // Property existiert nicht (zukünftige Versionen) – ignorieren
         }
 
         switch ($cache->getDriverName()) {

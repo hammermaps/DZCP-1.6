@@ -125,7 +125,7 @@ class SteamAPI
      * @param string $version
      * @return boolean
      */
-    private static final function get_api(string $interface = 'ISteamUser', string $method = 'GetPlayerSummaries', string $version = 'v0002')
+    private static function get_api(string $interface = 'ISteamUser', string $method = 'GetPlayerSummaries', string $version = 'v0002')
     {
         global $cache;
         if (empty(self::$api_key) || empty(self::$user_data['steamID'])) return false;
@@ -185,7 +185,7 @@ class SteamAPI
      * @param string $xml
      * @return boolean
      */
-    private static final function get_steamcommunity(string $zone = '', string $xml = 'profile')
+    private static function get_steamcommunity(string $zone = '', string $xml = 'profile')
     {
         global $cache;
         $zone_url = !empty($zone) ? '/' . $zone . '/' : '';

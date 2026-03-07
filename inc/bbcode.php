@@ -543,7 +543,12 @@ function lang(string $lng)
     // TODO: Replace 'unsafe-inline'/'unsafe-eval' with nonces or hashes once inline scripts/styles are refactored
 
     //Set language for GUMP
-    $gump->language(language_short_tag());
+    $gump_lang = language_short_tag();
+    $gump_lang_file = __DIR__ . '/../vendor/wixel/gump/lang/' . $gump_lang . '.php';
+    if (!file_exists($gump_lang_file)) {
+        $gump_lang = 'en';
+    }
+    $gump = new GUMP($gump_lang);
 
     //-> Neue Languages einbinden, sofern vorhanden
     if ($language_files = get_files(basePath . '/inc/additional-languages/' . $lng . '/', false, true, array('php'))) {
