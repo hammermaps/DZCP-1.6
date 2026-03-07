@@ -441,7 +441,7 @@ function db($query = '', $rows = false, $fetch = false)
             include_once(basePath . '/inc/lang/languages/english.php');
             $get = _fetch($mysql->query("SELECT `clanname` FROM `" . $db['settings'] . "`;"));
             die('<img src="../inc/images/dberror.png" align="absmiddle"/>&nbsp;&nbsp;<b>Upps...</b><br /><br />Entschuldige bitte! Das h&auml;tte nicht passieren d&uuml;rfen.<p>' .
-                'Wir k&uuml;mmern uns so schnell wie m&ouml;glich darum.<br><br>' . utf8_decode($get['clanname']) . '<br><br>' . $language_text['_back']);
+                'Wir k&uuml;mmern uns so schnell wie m&ouml;glich darum.<br><br>' . mb_convert_encoding($get['clanname'] ?? '', 'ISO-8859-1', 'UTF-8') . '<br><br>' . $language_text['_back']);
         }
     }
 

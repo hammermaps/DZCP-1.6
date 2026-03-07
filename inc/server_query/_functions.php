@@ -98,7 +98,11 @@ function ping_port($address = '', $port = 0000, $timeout = 2, $udp = false)
     if (!$ip = DNSToIp($address))
         return false;
 
-    if ($fp = @fsockopen(($udp ? "udp://" . $ip : $ip), $port, $errno, $errstr, $timeout)) {
+    $prev_reporting = error_reporting(error_reporting() & ~E_WARNING);
+    $fp = @fsockopen(($udp ? "udp://" . $ip : $ip), $port, $errno, $errstr, $timeout);
+    error_reporting($prev_reporting);
+
+    if ($fp) {
         unset($ip, $port, $errno, $errstr, $timeout);
         @fclose($fp);
         return true;

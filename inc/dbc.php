@@ -35,7 +35,7 @@ final class dbc_index
                     ]);
                 }
                 if (!is_null($data_cache)) {
-                    $data_cache->set(serialize($data))->expiresAfter(1.5);
+                    $data_cache->set(serialize($data))->expiresAfter(2);
                     $cache->save($data_cache);
                     DzcpLogger::cache()->debug('dbc_index: Index in Memory-Cache gespeichert', ['key' => $index_key]);
                 }
@@ -126,13 +126,15 @@ final class dbc_index
         }
 
         try {
-            $ref  = new \ReflectionProperty($cache, 'fallback');
-            if ($ref->getValue($cache) === true) {
+            // PHP 8.1+: setAccessible() hat keinen Effekt mehr, getValue() funktioniert direkt auf alle Properties.
+            // Fallback-Prüfung über Closure-Binding um Deprecation-Warnungen zu vermeiden.
+            $isFallback = (function() { return isset($this->fallback) && $this->fallback === true; })->bindTo($cache, $cache)();
+            if ($isFallback === true) {
                 DzcpLogger::cache()->notice('dbc_index: Cache-Treiber im Fallback-Modus, Memory-Cache deaktiviert');
                 return false;
             }
-        } catch (\ReflectionException $e) {
-            // Property existiert nicht – ignorieren
+        } catch (\Throwable $e) {
+            // Property existiert nicht oder Binding nicht möglich – ignorieren
         }
 
         switch ($cache->getDriverName()) {

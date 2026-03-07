@@ -696,7 +696,7 @@ function get_external_contents(string $url, $post = false, bool $nogzip = false,
         curl_setopt($curl, CURLOPT_USERAGENT, "DZCP");
 
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $timeout);
-        curl_setopt($curl, CURLOPT_TIMEOUT, $timeout * 2); // x 2
+        curl_setopt($curl, CURLOPT_TIMEOUT, (int)($timeout * 2)); // x 2
 
         //For POST
         /** @var TYPE_NAME $post */
@@ -3332,7 +3332,7 @@ class javascript
 
     public static function get($key = '')
     {
-        return utf8_decode(self::$data_array[$key]);
+        return mb_convert_encoding(self::$data_array[$key] ?? '', 'ISO-8859-1', 'UTF-8');
     }
 
     public static function encode()
@@ -3447,7 +3447,8 @@ function page(string $index = '', string $title = '', string $where = '', string
         $arr = array("idir" => '../inc/images/admin', "dir" => $designpath);
 
         //check if placeholders are given
-        $pholder = file_get_contents(basePath . '/inc/_templates_/' . $tmpdir . '/index.html');
+        $indexHtmlPath = basePath . '/inc/_templates_/' . $tmpdir . '/index.html';
+        $pholder = file_exists($indexHtmlPath) ? @file_get_contents($indexHtmlPath) : '';
 
         //filter placeholders
         $blArr = array("[clanname]", "[title]", "[copyright]", "[java_vars]", "[min]",
