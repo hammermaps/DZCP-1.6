@@ -1,0 +1,730 @@
+/*
+ * DZCP responsive.css
+ * Responsive & Modern Styles for DZCP Template version1.6
+ * Supports: Mobile (< 768px), Tablet (768px–1024px), Desktop (> 1024px)
+ */
+
+/* ============================================================
+   GLOBAL RESPONSIVE RESETS
+   ============================================================ */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ============================================================
+   WRAPPER – fluid ab 1241px, max-width 1400px
+   ============================================================ */
+
+div#wrapper {
+    width: 100%;
+    max-width: 1400px;
+    min-width: 0;
+    margin: 0 auto;
+    padding: 0 10px;
+}
+
+/* ============================================================
+   HEADER – responsive
+   ============================================================ */
+
+div#header {
+    height: auto;
+    min-height: 100px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 50px;
+    flex-wrap: wrap;
+}
+
+div#clanlogo_left {
+    position: static;
+    order: 1;
+    flex-shrink: 0;
+}
+
+div#clanname {
+    position: static;
+    order: 2;
+    flex: 1;
+    text-align: center;
+}
+
+div#clanlogo_right {
+    position: static;
+    order: 3;
+    flex-shrink: 0;
+}
+
+div#clanname img,
+div#clanlogo_left img,
+div#clanlogo_right img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ============================================================
+   LAYOUT – 3-Column-Flexbox
+   ============================================================ */
+
+div#content {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 7px;
+    width: 100%;
+    align-items: flex-start;
+}
+
+div.sideContent {
+    flex: 0 0 221px;
+    width: 221px;
+    min-width: 0;
+    float: none;
+}
+
+div#middleContent {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    float: none;
+}
+
+/* ============================================================
+   NEWS TABLE – fluid
+   ============================================================ */
+
+table.news {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    box-sizing: border-box;
+}
+
+/* ============================================================
+   GALLERY BOX – fluid
+   ============================================================ */
+
+#galleriebox {
+    width: auto;
+    max-width: 100%;
+    margin: 10px 0;
+    box-sizing: border-box;
+}
+
+/* ============================================================
+   SLIDESHOW – fluid
+   ============================================================ */
+
+div#slideshow,
+div.images {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 120px;
+}
+
+/* ============================================================
+   FOOTER – responsive
+   ============================================================ */
+
+div#footwrapper {
+    padding: 10px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+div.footNavigation {
+    width: auto;
+    min-width: 140px;
+    max-width: 200px;
+    flex: 1 1 140px;
+    text-align: left;
+}
+
+div#rotationsbanner {
+    position: static;
+    flex: 1 1 200px;
+}
+
+/* ============================================================
+   HAMBURGER BUTTON – nur mobile sichtbar
+   ============================================================ */
+
+.mobile-nav-toggle {
+    display: none;
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1100;
+    background: #2f2f2f;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 8px 10px;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 42px;
+    height: 36px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+
+.mobile-nav-toggle span {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background: #fff;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.mobile-nav-toggle[aria-expanded="true"] span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+.mobile-nav-toggle[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+}
+.mobile-nav-toggle[aria-expanded="true"] span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+/* ============================================================
+   MOBILE NAVIGATION OVERLAY
+   ============================================================ */
+
+.mobile-nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+
+.mobile-nav-overlay.is-open {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.mobile-nav-inner {
+    background: #1e1e1e;
+    background-image: linear-gradient(to bottom, #2f2f2f, #1a1a1a);
+    width: 280px;
+    max-width: 85vw;
+    height: 100%;
+    overflow-y: auto;
+    padding: 20px 15px 30px;
+    box-shadow: 3px 0 15px rgba(0,0,0,0.6);
+    position: relative;
+}
+
+.mobile-nav-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 6px;
+    border-radius: 3px;
+    transition: background 0.2s;
+}
+
+.mobile-nav-close:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.mobile-nav-logo {
+    text-align: center;
+    margin: 10px 0 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+.mobile-nav-logo img {
+    max-width: 180px;
+    max-height: 60px;
+    height: auto;
+}
+
+.mobile-main-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.mobile-main-nav ul li a,
+.mobile-main-nav ul li a:link,
+.mobile-main-nav ul li a:visited {
+    display: block;
+    padding: 10px 15px;
+    color: #ddd;
+    font-size: 13px;
+    font-weight: normal;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+    border-radius: 3px;
+}
+
+.mobile-main-nav ul li a:hover,
+.mobile-main-nav ul li a:active {
+    background: rgba(255,0,0,0.15);
+    color: #ff4444;
+}
+
+.mobile-user-area {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    color: #bbb;
+}
+
+.mobile-user-area a,
+.mobile-user-area a:link,
+.mobile-user-area a:visited {
+    color: #ccc;
+}
+
+/* Prevent body scroll when nav open */
+body.nav-open {
+    overflow: hidden;
+}
+
+/* ============================================================
+   BACK TO TOP BUTTON
+   ============================================================ */
+
+#backToTop {
+    display: none;
+    position: fixed;
+    bottom: 24px;
+    right: 20px;
+    z-index: 999;
+    background: #cc0033;
+    background-image: linear-gradient(to top, #cc0033 70%, #880022);
+    color: #fff;
+    border-radius: 6px;
+    width: 42px;
+    height: 42px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 24px;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    text-decoration: none;
+    transition: opacity 0.3s, transform 0.3s;
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+#backToTop.visible {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#backToTop:hover {
+    background-image: linear-gradient(to top, #ff0044 70%, #cc0033);
+    color: #fff;
+}
+
+/* ============================================================
+   MODERN SCROLLBAR (Webkit)
+   ============================================================ */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f0f0f0;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c0c0c0;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #cc0033;
+}
+
+/* ============================================================
+   SMOOTH TRANSITIONS für Boxen
+   ============================================================ */
+
+.box, .box_tabs, .mainNavigation, .index {
+    transition: box-shadow 0.2s ease;
+}
+
+.box:hover, .mainNavigation:hover {
+    box-shadow: 0 2px 8px rgba(200, 0, 0, 0.25);
+}
+
+/* ============================================================
+   TICKER – fluid
+   ============================================================ */
+
+div#ticker {
+    position: static;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* ============================================================
+   SEARCH PANEL – fluid
+   ============================================================ */
+
+#searchpanel {
+    max-width: 100%;
+    width: auto;
+}
+
+/* ============================================================
+   NAVIGATION GAME SERVER – fluid
+   ============================================================ */
+
+div.navGameServer,
+div#navTeamspeakContent {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* ============================================================
+   TABLET: 768px – 1100px
+   ============================================================ */
+
+@media screen and (max-width: 1100px) {
+    div#wrapper {
+        padding: 0 6px;
+    }
+
+    div.sideContent {
+        flex: 0 0 190px;
+        width: 190px;
+    }
+
+    div#clanlogo_right {
+        display: none; /* Platz sparen auf Tablet */
+    }
+
+    div#footwrapper {
+        padding: 10px 10px;
+    }
+
+    table.news {
+        margin-left: 0;
+    }
+
+    #galleriebox {
+        margin: 6px 0;
+    }
+}
+
+/* ============================================================
+   SMALL TABLET / LARGE MOBILE: 600px – 767px
+   ============================================================ */
+
+@media screen and (max-width: 767px) {
+    div#wrapper {
+        padding: 0 4px;
+    }
+
+    /* Header kompakter */
+    div#header {
+        min-height: 70px;
+        padding: 8px 50px 8px 56px;
+        justify-content: flex-start;
+    }
+
+    div#clanlogo_left,
+    div#clanlogo_right {
+        display: none;
+    }
+
+    div#clanname {
+        flex: 1;
+        text-align: left;
+    }
+
+    div#clanname img {
+        max-height: 50px;
+        width: auto;
+    }
+
+    /* 2-Column Layout: Links verstecken, Hamburger zeigen */
+    .mobile-nav-toggle {
+        display: flex;
+    }
+
+    div.sideContent-left {
+        display: none;
+    }
+
+    div#content {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    div.sideContent-right {
+        flex: 0 0 auto;
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    div.sideContent-right .box,
+    div.sideContent-right .box_tabs {
+        flex: 1 1 280px;
+        min-width: 0;
+    }
+
+    div#middleContent {
+        width: 100%;
+        order: -1; /* Hauptinhalt zuerst */
+    }
+
+    /* Brackets (Breadcrumb + Search) */
+    div#brackets {
+        height: auto;
+        line-height: 1.4;
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+
+    div#brackets div#search {
+        position: static;
+        margin-top: 5px;
+    }
+
+    /* Index Bereich */
+    div#index {
+        padding: 8px;
+    }
+
+    .index {
+        margin: 0 3px;
+    }
+
+    /* Welcome + Languages */
+    .index .leftFloat,
+    .index .rightFloat {
+        float: none;
+        display: block;
+    }
+
+    /* Footer */
+    div#footwrapper {
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+        gap: 12px;
+    }
+
+    div.footNavigation {
+        width: 100%;
+        max-width: 100%;
+        text-align: left;
+    }
+
+    div#rotationsbanner {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* News */
+    td.news img.newsImage {
+        max-width: 100%;
+        float: none;
+        display: block;
+        margin: 0 0 10px 0;
+    }
+
+    /* Tables fluid */
+    table.highlightSquads,
+    table.highlightStats,
+    table.highlightAwards,
+    table.highlightServer {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Login Inputs */
+    input.loginName_dis,
+    input.loginPwd_dis,
+    input.loginName_en,
+    input.loginPwd_en,
+    input.loginSubmit {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    input.voteSubmit,
+    input.shoutSubmit {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    input.shoutEmail_dis,
+    input.shoutNick_dis,
+    textarea.shoutTextfield_dis,
+    input.shoutEmail_en,
+    input.shoutNick_en,
+    textarea.shoutTextfield_en {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Shoutbox */
+    select.tempswitch {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+/* ============================================================
+   MOBILE: < 480px
+   ============================================================ */
+
+@media screen and (max-width: 480px) {
+    div#header {
+        min-height: 58px;
+        padding: 6px 10px 6px 52px;
+    }
+
+    div#clanname img {
+        max-height: 40px;
+    }
+
+    .box .headline {
+        font-size: 12px;
+        height: auto;
+        min-height: 38px;
+        line-height: 1.3;
+        padding: 8px 12px;
+    }
+
+    .mainNavigation h2.headline {
+        height: auto;
+        min-height: 38px;
+        padding: 8px 12px;
+        line-height: 1.3;
+    }
+
+    div#brackets {
+        font-size: 10px;
+    }
+
+    /* Code blocks */
+    .code, .codeHead {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Gallery */
+    #galleriebox div.gallerie {
+        float: none;
+        display: inline-block;
+        margin: 3px;
+    }
+
+    /* Comments layout */
+    td.commentsLeft {
+        width: 100%;
+        display: block;
+    }
+
+    td.commentsRight {
+        display: block;
+        width: 100%;
+    }
+
+    /* Calendar */
+    td.calDay, td.calToday {
+        height: 40px;
+        padding: 2px;
+        font-size: 10px;
+    }
+
+    /* Back to Top kleiner auf sehr kleinen Geräten */
+    #backToTop {
+        width: 36px;
+        height: 36px;
+        line-height: 34px;
+        font-size: 20px;
+        bottom: 16px;
+        right: 12px;
+    }
+}
+
+/* ============================================================
+   LARGE DESKTOP: > 1400px
+   ============================================================ */
+
+@media screen and (min-width: 1400px) {
+    div#wrapper {
+        max-width: 1600px;
+    }
+
+    div.sideContent {
+        flex: 0 0 240px;
+        width: 240px;
+    }
+}
+
+/* ============================================================
+   PRINT STYLES
+   ============================================================ */
+
+@media print {
+    .mobile-nav-toggle,
+    .mobile-nav-overlay,
+    div.sideContent-left,
+    div.sideContent-right,
+    div#footer,
+    #backToTop,
+    div#brackets div#search {
+        display: none !important;
+    }
+
+    div#content {
+        flex-direction: column;
+    }
+
+    div#wrapper {
+        max-width: 100%;
+        padding: 0;
+    }
+
+    body {
+        background: #fff;
+        color: #000;
+    }
+}
+

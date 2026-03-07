@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
     <title>[title]</title>
     <meta http-equiv="title" content="[title]"/>
     <meta http-equiv="pragma" content="No-Cache"/>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
     <link rel="stylesheet" type="text/css" href="[dir]/_css/bootstrap[min].css" media="screen"/>
     <link rel="stylesheet" type="text/css" href="[dir]/_css/bootstrap-theme[min].css" media="screen"/>
     <link rel="stylesheet" type="text/css" href="[dir]/_css/jquery-ui[min].css" media="screen"/>
@@ -14,6 +15,7 @@
     <link rel="stylesheet" type="text/css" href="[dir]/_css/lightbox[min].css" media="screen"/>
     <link rel="stylesheet" type="text/css" href="[dir]/_css/stylesheet[min].css"/>
     <link rel="stylesheet" type="text/css" href="[dir]/_css/map.css">
+    <link rel="stylesheet" type="text/css" href="[dir]/_css/responsive.css"/>
     <link rel="stylesheet" type="text/css" href="[dir]/_css/icons.php" media="screen"/>
     <link rel="alternate" type="application/rss+xml" href="../rss.xml" title="[rss] RSS-Feed"/>
     <link rel="icon" type="image/png" href="[dir]/favicon.png"/>
@@ -34,6 +36,34 @@
 <body>
 <a name="toplink"></a>
 <!-- Template Start -->
+<!-- Mobile Navigation Overlay -->
+<div id="mobileNavOverlay" class="mobile-nav-overlay">
+    <div class="mobile-nav-inner">
+        <button id="mobileNavClose" class="mobile-nav-close" aria-label="Navigation schließen">&times;</button>
+        <div class="mobile-nav-logo">
+            <img src="[dir]/images/clanname.png" alt="[title]"/>
+        </div>
+        <nav class="mobile-main-nav">
+            <ul>
+                [nav_main]
+            </ul>
+        </nav>
+        <hr/>
+        <div class="mobile-user-area">
+            [login]
+            <div style="overflow:hidden">
+                <div class="leftFloat">[avatar]</div>
+                <div class="leftFloat">
+                    [nav_user]
+                    [nav_trial]
+                    [nav_member]
+                    [nav_admin]
+                </div>
+                <div class="clearFix"></div>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Wrapper Start -->
 <div id="wrapper">
     <!-- dsgvo Start -->
@@ -41,14 +71,20 @@
     <!-- dsgvo End -->
     <!-- Header Start -->
     <div id="header">
-        <div id="clanlogo_left" class="deselect"><img src="[dir]/images/clanlogo_left.png"/></div>
-        <div id="clanname" class="deselect"><img src="[dir]/images/clanname.png"/></div>
-        <div id="clanlogo_right" class="deselect"><img src="[dir]/images/clanlogo_right.png"/></div>
+        <!-- Mobile Hamburger Button -->
+        <button id="mobileNavToggle" class="mobile-nav-toggle" aria-label="Navigation öffnen" aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div id="clanlogo_left" class="deselect"><img src="[dir]/images/clanlogo_left.png" alt=""/></div>
+        <div id="clanname" class="deselect"><img src="[dir]/images/clanname.png" alt="[title]"/></div>
+        <div id="clanlogo_right" class="deselect"><img src="[dir]/images/clanlogo_right.png" alt=""/></div>
     </div>
     <!-- Header End -->
     <div id="content">
         <!-- Left content Start -->
-        <div class="sideContent">
+        <div class="sideContent sideContent-left" id="sideLeft">
             <!-- Main Navigation Start -->
             <div class="mainNavigation corner">
                 <h2 class="headline deselect">
@@ -163,7 +199,7 @@
         </div>
         <!-- Middle content End -->
         <!-- Right content Start -->
-        <div class="sideContent">
+        <div class="sideContent sideContent-right" id="sideRight">
             <!-- User area Start -->
             <dsgvo_lock>
                 <div class="box corner">
@@ -324,6 +360,54 @@
     </div>
 </div>
 <!-- Footer Ende -->
+<!-- Mobile Navigation Script -->
+<script type="text/javascript">
+(function(){
+    var toggle = document.getElementById('mobileNavToggle');
+    var overlay = document.getElementById('mobileNavOverlay');
+    var close = document.getElementById('mobileNavClose');
+    var body = document.body;
+    if(toggle && overlay){
+        toggle.addEventListener('click', function(){
+            var expanded = this.getAttribute('aria-expanded') === 'true';
+            this.setAttribute('aria-expanded', !expanded);
+            overlay.classList.toggle('is-open');
+            body.classList.toggle('nav-open');
+        });
+    }
+    if(close && overlay){
+        close.addEventListener('click', function(){
+            overlay.classList.remove('is-open');
+            body.classList.remove('nav-open');
+            if(toggle) toggle.setAttribute('aria-expanded', 'false');
+        });
+    }
+    // Close on overlay background click
+    if(overlay){
+        overlay.addEventListener('click', function(e){
+            if(e.target === overlay){
+                overlay.classList.remove('is-open');
+                body.classList.remove('nav-open');
+                if(toggle) toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+    // Back to top button
+    var backBtn = document.createElement('a');
+    backBtn.id = 'backToTop';
+    backBtn.href = '#toplink';
+    backBtn.title = 'Nach oben';
+    backBtn.innerHTML = '&#8679;';
+    document.body.appendChild(backBtn);
+    window.addEventListener('scroll', function(){
+        if(window.scrollY > 300){
+            backBtn.classList.add('visible');
+        } else {
+            backBtn.classList.remove('visible');
+        }
+    });
+})();
+</script>
 <!-- Template Ende -->
 </body>
 </html>
