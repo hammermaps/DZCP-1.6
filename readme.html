@@ -125,6 +125,7 @@
             </ul>
         </li>
         <li><a href="#v1612fixes">6. DZCP v1.6.1.2 Bugfixes, Updates, Neuerungen (06.03.2026)</a></li>
+        <li><a href="#v1613fixes">7. DZCP v1.6.1.3 Bugfixes, Updates, Neuerungen (07.03.2026)</a></li>
     </ul>
 </section>
 <section>
@@ -472,6 +473,38 @@
         <li>JavaScript modernisiert: const/let statt var, Arrow Functions und addEventListener statt on*-Eigenschaften (inc/_templates_/version1.6/_js/dzcp.js)</li>
         <li>Session &amp; Cookie-Verschl&uuml;sselung wieder aktiviert (wurde seit 1.6.0.2 deaktiviert)</li>
         <li>Versionsnummer auf 1.6.1.2 aktualisiert (06.03.2026)</li>
+    </ul>
+</section>
+<section>
+    <h3><a name="v1613fixes">7. DZCP v1.6.1.3 Bugfixes, Updates, Neuerungen (07.03.2026)</a></h3>
+    <a href="https://github.com/hammermaps/DZCP-1.6/" target="_blank">Projekt on GitHub</a>
+    <h4>Neuerungen</h4>
+    <ul>
+        <li>Monolog-basiertes Logging-System eingef&uuml;hrt: mehrere Kan&auml;le (error, debug, access, security), Konfiguration und Integration in die Applikation</li>
+        <li>Templates responsiv gemacht: mobile Navigation, <code>responsive.css</code> und Viewport-Meta-Tag f&uuml;r das Template <code>version1.6</code> hinzugef&uuml;gt</li>
+        <li>Validierungsfunktionen f&uuml;r Installer und Updater eingef&uuml;hrt</li>
+        <li>Exception-Handling f&uuml;r phpFastCache- und PHPMailer-Operationen hinzugef&uuml;gt</li>
+    </ul>
+    <h4>Updates, Verbesserungen</h4>
+    <ul>
+        <li>Header-Layout &uuml;berarbeitet: Clan-Banner in eigenen <code>#clanlogo_banner</code>-Container verschoben, responsive Styling verbessert</li>
+        <li><code>buffer.php</code> &uuml;berarbeitet: Ladenpr&uuml;fungen verbessert und GUMP korrekt instanziiert</li>
+        <li><code>index.php</code> f&uuml;r verbesserte Modulverarbeitung refaktoriert</li>
+        <li>Abh&auml;ngigkeiten in <code>composer.json</code> aktualisiert</li>
+        <li><code>bbcode.php</code> &uuml;berarbeitet: GUMP-Sprachbehandlung verbessert, <code>CacheManager</code>-Nutzung in dbc entfernt, Steam-API-Methoden f&uuml;r Kompatibilit&auml;t aktualisiert</li>
+        <li>userAgent-Zugriff in <code>bbcode.php</code> von direktem Property-Zugriff auf Methodenaufruf umgestellt</li>
+        <li>CSRF-Token-Ausgabe mit <code>htmlspecialchars()</code> gesichert</li>
+        <li>GUMP-Sprachdateien und nicht verwendetes Test-Skript entfernt</li>
+        <li><code>mb_convert_encoding()</code> f&uuml;r verbesserte Zeichencodierung und Charset-Kompatibilit&auml;t angepasst</li>
+        <li>Fehlerreporting aktiviert, Logging-Konfigurationen verbessert</li>
+        <li>Cache mit Fehlerbehandlung refaktoriert</li>
+        <li><code>sum()</code>-Funktion-Aufrufe in <code>vote.php</code>, <code>fvote.php</code> und weiteren Dateien &uuml;berarbeitet</li>
+        <li>Veraltetes <code>gmaps_koord</code> durch <code>geolocation</code> ersetzt</li>
+        <li>Auto-Migration f&uuml;r fehlende Datenbankspalten verbessert</li>
+        <li>Explizites Integer-Casting f&uuml;r CURL-Timeout hinzugef&uuml;gt</li>
+        <li>GUMP-Import aus <code>tiny_mce_gzip.php</code> entfernt</li>
+        <li>Installer-Verzeichniswarnung schlie&szlig;t 'dev' Edition korrekt aus</li>
+        <li>Versionsnummer auf 1.6.1.3 aktualisiert (07.03.2026)</li>
     </ul>
 </section>
 <footer><a href="https://www.dzcp.de/" target="_blank">Powered by DZCP - deV!L`z Clanportal</a></footer>
