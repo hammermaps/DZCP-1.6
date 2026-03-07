@@ -1589,7 +1589,7 @@ function updateCounter()
 {
     global $db, $reload, $today, $datum, $userip, $CrawlerDetect;
     $userip_escaped = _real_escape_string($userip);
-    $agent_escaped = _real_escape_string($CrawlerDetect->userAgent);
+    $agent_escaped = _real_escape_string($CrawlerDetect->getUserAgent());
     $ipcheck = db("SELECT `id`,`ip`,`datum` FROM `" . $db['c_ips'] . "` WHERE `ip` = '" . $userip_escaped . "' AND FROM_UNIXTIME(datum,'%d.%m.%Y') = '" . date("d.m.Y") . "'");
     db("DELETE FROM `" . $db['c_ips'] . "` WHERE `datum`+" . $reload . " <= " . time() . " OR FROM_UNIXTIME(datum,'%d.%m.%Y') != '" . date("d.m.Y") . "'");
     $count = db("SELECT id,visitors,today FROM " . $db['counter'] . " WHERE today = '" . $today . "'");
