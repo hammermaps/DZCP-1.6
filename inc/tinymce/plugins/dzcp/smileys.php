@@ -12,7 +12,6 @@ $ajaxJob = true;
 ## INCLUDES ##
 include(basePath . '/vendor/autoload.php');
 
-use GUMP\GUMP;
 
 $gump = GUMP::get_instance();
 $_GET = $gump->sanitize($_GET);

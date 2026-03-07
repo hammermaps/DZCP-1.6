@@ -32,7 +32,7 @@ if ((settings('last_conjob', false) + 90) <= time()) {
     //Update longitudes & latitude for membermap for PHP
     if (api_enabled) {
         //Update
-        $mme_qry = db('SELECT `id`, `city`, `country` FROM `' . $db['users'] . '` WHERE `gmaps_koord` IS NULL OR `gmaps_koord` = "" ORDER BY id;');
+        $mme_qry = db('SELECT `id`, `city`, `country` FROM `' . $db['users'] . '` WHERE `geolocation` IS NULL OR `geolocation` = "" ORDER BY id;');
         while ($mme_get = _fetch($mme_qry)) {
             $geo = null;
             if (!empty($mme_get['city']) && !empty($mme_get['country'])) {
@@ -45,7 +45,7 @@ if ((settings('last_conjob', false) + 90) <= time()) {
 
             if (!is_null($geo) && !$geo['error'] && array_key_exists('lat', $geo['results']) && array_key_exists('lng', $geo['results']) &&
                 !empty($geo['results']['lat']) && $geo['results']['lat'] != 0 && !empty($geo['results']['lng']) && $geo['results']['lng'] != 0) {
-                db("UPDATE `" . $db['users'] . "` SET `gmaps_koord` = '" . $geo['results']['lat'] . "," . $geo['results']['lng'] . "' WHERE `id` = " . $mme_get['id'] . ";");
+                db("UPDATE `" . $db['users'] . "` SET `geolocation` = '" . $geo['results']['lat'] . "," . $geo['results']['lng'] . "' WHERE `id` = " . $mme_get['id'] . ";");
             }
         }
         unset($mme_qry, $mme_get, $geo);

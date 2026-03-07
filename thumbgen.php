@@ -11,7 +11,6 @@ include(basePath . '/vendor/autoload.php');
 include(basePath . "/inc/debugger.php");
 include(basePath . "/inc/config.php");
 
-use GUMP\GUMP;
 use Phpfastcache\CacheManager;
 
 $gump = GUMP::get_instance();

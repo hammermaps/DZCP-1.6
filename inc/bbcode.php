@@ -740,7 +740,7 @@ function get_external_contents(string $url, $post = false, bool $nogzip = false,
 
         $opts = array();
         $opts['http']['method'] = "GET";
-        $opts['http']['timeout'] = $timeout * 2;
+        $opts['http']['timeout'] = (int)($timeout * 2);
 
         $gzip = false;
 
@@ -757,7 +757,10 @@ function get_external_contents(string $url, $post = false, bool $nogzip = false,
         $content = substr($content, -1, 40000);
 
         if ($gzip) {
-            foreach ($http_response_header as $c => $h) {
+            $response_headers = function_exists('http_get_last_response_headers')
+                ? http_get_last_response_headers()
+                : (isset($http_response_header) ? $http_response_header : []);
+            foreach ($response_headers as $c => $h) {
                 if (stristr($h, 'content-encoding') && stristr($h, 'gzip')) {
                     $content = gzinflate(substr($content, 10, -8));
                 }
@@ -1431,7 +1434,7 @@ function wrap(string $str, int $width = 75, string $break = "\n", bool $cut = tr
 }
 
 //-> Funktion um Dateien aus einem Verzeichnis auszulesen
-function get_files(string $dir = null, bool $only_dir = false, bool $only_files = false, array $file_ext = array(), $preg_match = false, array $blacklist = array(), $blacklist_word = false)
+function get_files(?string $dir = null, bool $only_dir = false, bool $only_files = false, array $file_ext = array(), $preg_match = false, array $blacklist = array(), $blacklist_word = false)
 {
     $cache_hash = md5($dir . $only_dir . $only_files . print_r($file_ext, true) . $preg_match . print_r($blacklist, true) . $blacklist_word);
     if (!dbc_index::issetIndex('files') || !dbc_index::getIndexKey('files', $cache_hash) || !dbc_index::MemSetIndex()) {
@@ -1506,7 +1509,7 @@ function get_files(string $dir = null, bool $only_dir = false, bool $only_files 
 }
 
 //-> Gibt einen Teil eines nummerischen Arrays wieder
-function limited_array(array $array = array(), int $begin, int $max)
+function limited_array(int $begin, int $max, array $array = array())
 {
     $array_exp = array();
     $range = range($begin = ($begin - 1), ($begin + $max - 1));
@@ -1564,7 +1567,7 @@ function cnt($count, $where = "", $what = "id")
 }
 
 //-> Funktion um diverse Dinge aus Tabellen zusammenzaehlen zu lassen
-function sum($db, $where = "", $what)
+function sum($db, $what, $where = "")
 {
     $cnt_sql = db("SELECT SUM(" . $what . ") AS `num` FROM " . $db . $where . ";");
     if (_rows($cnt_sql)) {
@@ -2608,38 +2611,38 @@ function sgames($game = '')
 
             $games .= '<option value="' . $protocol . '">';
             switch ($protocol):
-                case 'bf1942';
-                case 'bf2142';
-                case 'bf2';
-                case 'bfvietnam';
-                case 'bfbc2';
+                case 'bf1942':
+                case 'bf2142':
+                case 'bf2':
+                case 'bfvietnam':
+                case 'bfbc2':
                     $protocol = strtr($protocol, array('bfbc2' => 'Battlefield Bad Company 2', 'bfv' => 'Battlefield V', 'bf' => 'Battlefield '));
                     break;
-                case 'swat4';
+                case 'swat4':
                     $protocol = strtoupper($protocol);
                     break;
-                case 'aarmy';
+                case 'aarmy':
                     $protocol = 'Americas Army';
                     break;
-                case 'arma';
+                case 'arma':
                     $protocol = 'Armed Assault';
                     break;
-                case 'wet';
+                case 'wet':
                     $protocol = 'Wolfenstein: Enemy Territory';
                     break;
-                case 'mta';
+                case 'mta':
                     $protocol = 'Multi-Theft-Auto';
                     break;
-                case 'cnc';
+                case 'cnc':
                     $protocol = 'Command &amp; Conquer';
                     break;
-                case 'sof2';
+                case 'sof2':
                     $protocol = 'Soldiers of Fortune 2';
                     break;
-                case 'ut';
+                case 'ut':
                     $protocol = 'Unreal Tournament';
                     break;
-                default;
+                default:
                     $protocol = ucfirst(str_replace('_', ' ', $protocol));
                     $protocol = (strlen($protocol) < 4) ? strtoupper($protocol) : $protocol;
                     break;

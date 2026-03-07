@@ -54,8 +54,8 @@ switch ($action):
                     "datum" => date("d.m.Y", $get['datum'])));
             }
 
-            $getp = sum($db['clankasse'], ' WHERE `pm` = 0', 'betrag');
-            $getc = sum($db['clankasse'], ' WHERE `pm` = 1', 'betrag');
+            $getp = sum($db['clankasse'], 'betrag', ' WHERE `pm` = 0');
+            $getc = sum($db['clankasse'], 'betrag', ' WHERE `pm` = 1');
             $ges = $getp - $getc;
             $ges = @round($ges, 2);
             $ges = str_replace(".", ",", $ges);

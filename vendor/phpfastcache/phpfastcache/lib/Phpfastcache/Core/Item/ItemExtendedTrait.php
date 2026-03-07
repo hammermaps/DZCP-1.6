@@ -336,6 +336,7 @@ trait ItemExtendedTrait
      * Implements \JsonSerializable interface
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->get();

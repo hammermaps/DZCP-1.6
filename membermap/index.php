@@ -23,7 +23,7 @@ if (!($level == 0 || $level == 1)) {
 }
 
 //Update
-$mme_qry = db('SELECT `id`, `city`, `country` FROM `' . $db['users'] . '` WHERE `gmaps_koord` IS NULL OR `gmaps_koord` = "" ORDER BY id;');
+$mme_qry = db('SELECT `id`, `city`, `country` FROM `' . $db['users'] . '` WHERE `geolocation` IS NULL OR `geolocation` = "" ORDER BY id;');
 while ($mme_get = _fetch($mme_qry)) {
     $geo = null;
     if (!empty($mme_get['city']) && !empty($mme_get['country'])) {
@@ -36,14 +36,14 @@ while ($mme_get = _fetch($mme_qry)) {
 
     if (!is_null($geo) && !$geo['error'] && array_key_exists('lat', $geo['results']) && array_key_exists('lng', $geo['results']) &&
         !empty($geo['results']['lat']) && $geo['results']['lat'] != 0 && !empty($geo['results']['lng']) && $geo['results']['lng'] != 0) {
-        db("UPDATE `" . $db['users'] . "` SET `gmaps_koord` = '" . $geo['results']['lat'] . "," . $geo['results']['lng'] . "' WHERE `id` = " . $mme_get['id'] . ";");
+        db("UPDATE `" . $db['users'] . "` SET `geolocation` = '" . $geo['results']['lat'] . "," . $geo['results']['lng'] . "' WHERE `id` = " . $mme_get['id'] . ";");
     }
 }
 unset($mme_qry, $mme_get, $geo);
 
 //Users
-$mm_qry = db('SELECT u.`id`, u.`nick`, u.`city`, u.`gmaps_koord` FROM ' . $db['users'] .
-    ' u WHERE u.`gmaps_koord` != "" AND u.`level` > ' . $level . ' ORDER BY u.gmaps_koord, u.id');
+$mm_qry = db('SELECT u.`id`, u.`nick`, u.`city`, u.`geolocation` FROM ' . $db['users'] .
+    ' u WHERE u.`geolocation` != "" AND u.`geolocation` IS NOT NULL AND u.`level` > ' . $level . ' ORDER BY u.geolocation, u.id');
 
 $mm_coords = '';
 $mm_infos = "'<tr>";
@@ -60,14 +60,14 @@ $userListCity = '';
 $entrys = _rows($mm_qry);
 
 while ($mm_get = _fetch($mm_qry)) {
-    if ($mm_lastCoord != $mm_get['gmaps_koord']) {
+    if ($mm_lastCoord != $mm_get['geolocation']) {
         if ($i > 0) {
             $mm_coords .= ',';
             $mm_infos .= "</tr>','<tr>";
         }
 
         $mm_infos .= '<td><b style="font-size:13px">&nbsp;' . h($mm_get['city']) . '</td></tr><tr>';
-        $mm_coords .= 'new google.maps.LatLng(' . $mm_get['gmaps_koord'] . ')';
+        $mm_coords .= 'new google.maps.LatLng(' . $mm_get['geolocation'] . ')';
         $realCount++;
     } else {
         if ($markerCount > 0) {
@@ -82,11 +82,11 @@ while ($mm_get = _fetch($mm_qry)) {
         ':</b> ' . getrank($mm_get['id']) . '<br />' . userpic($mm_get['id']);
     $mm_infos .= '<td><div id="memberMapInner">' . $userInfos . '</div></td>';
 
-    $mm_lastCoord = $mm_get['gmaps_koord'];
+    $mm_lastCoord = $mm_get['geolocation'];
     $i++;
 }
 
-$mm_qry = db('SELECT user.`id`, user.`nick`, user.`city` FROM ' . $db['users'] . ' as user WHERE user.`gmaps_koord` != "" AND user.`level` > ' . $level . ' ORDER BY user.gmaps_koord, user.id LIMIT ' . ($page - 1) * config('m_membermap') . ',' . config('m_membermap'));
+$mm_qry = db('SELECT user.`id`, user.`nick`, user.`city` FROM ' . $db['users'] . ' as user WHERE user.`geolocation` != "" AND user.`geolocation` IS NOT NULL AND user.`level` > ' . $level . ' ORDER BY user.geolocation, user.id LIMIT ' . ($page - 1) * config('m_membermap') . ',' . config('m_membermap'));
 while ($mm_user_get = _fetch($mm_qry)) {
     $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
     $color++;
@@ -108,3 +108,4 @@ $index = show($dir . "/membermap", array('mm_coords' => $mm_coords,
 ## INDEX OUTPUT ##
 $title = $pagetitle . " - " . $where . "";
 page($index, $title, $where);
+

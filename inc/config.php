@@ -368,6 +368,20 @@ if ($db['host'] != '' && $db['user'] != '' && $db['pass'] != '' && $db['db'] != 
     if ($mysql->connect_error) {
         die("<b>Fehler beim Zugriff auf die Datenbank!");
     }
+
+    // ── Auto-Migration: fehlende Spalten nachträglich hinzufügen ─────────
+    $migrations = [
+        // [ Tabelle, Spaltenname, Spaltendefinition ]
+        // gmaps_koord wurde durch geolocation (TEXT) ersetzt
+        [$db['users'], 'geolocation', "TEXT NULL DEFAULT NULL AFTER `city`"],
+    ];
+    foreach ($migrations as [$mig_table, $mig_col, $mig_def]) {
+        $mig_check = $mysql->query("SHOW COLUMNS FROM `{$mig_table}` LIKE '{$mig_col}';");
+        if ($mig_check && $mig_check->num_rows === 0) {
+            $mysql->query("ALTER TABLE `{$mig_table}` ADD `{$mig_col}` {$mig_def};");
+        }
+    }
+    unset($migrations, $mig_table, $mig_col, $mig_def, $mig_check);
 }
 
 // Start session if no headers were sent
