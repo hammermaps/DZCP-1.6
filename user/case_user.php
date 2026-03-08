@@ -29,7 +29,7 @@ if (defined('_UserMenu')) {
             $email = empty($get['email']) ? "-" : "<img src=\"../inc/images/mailto.gif\" alt=\"\" align=\"texttop\"> <a href=\"mailto:" . eMailAddr(re($get['email'])) . "\" target=\"_blank\">" . eMailAddr(re($get['email'])) . "</a>";
             $pn = show(_pn_write, array("id" => $_GET['id'], "nick" => h($get['nick'])));
             $xboxu = empty($get['xboxid']) ? "-" : show(_xboxicon, array("id" => str_replace(" ", "%20", h($get['xboxid'])), "img" => "1", "css" => ""));
-            $xboxuser = empty($get['xboxid']) ? _noxboxavatar : show(_xboxpic, array("id" => str_replace(" ", "%20", h($get['xboxid']), "img" => "1", "css" => ""));
+            $xboxuser = empty($get['xboxid']) ? _noxboxavatar : show(_xboxpic, array("id" => str_replace(" ", "%20", h($get['xboxid'])), "img" => "1", "css" => ""));
             $psnu = empty($get['psnid']) ? "-" : show(_psnicon, array("id" => str_replace(" ", "%20", h($get['psnid'])), "img" => "1", "css" => ""));
             $originu = empty($get['originid']) ? '-' : show(_originicon, array("id" => str_replace(" ", "%20", h($get['originid'])), "img" => "1", "css" => ""));
             $battlenetu = empty($get['battlenetid']) ? '-' : show(_battleneticon, array("id" => str_replace(" ", "%20", h($get['battlenetid'])), "img" => "1", "css" => ""));
