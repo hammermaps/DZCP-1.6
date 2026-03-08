@@ -61,7 +61,7 @@ switch ($action):
             "head" => _news_send));
 
         break;
-    case 'do';
+    case 'do':
         if ($_GET['what'] == "sendnews") {
             if (HasDSGVO()) {
                 if (!array_key_exists('sec_sendnews', $_SESSION) || (!$userid && (empty($_POST['nick']))) || (!$userid && empty($_POST['email']) || $_POST['email'] == "E-Mail") ||

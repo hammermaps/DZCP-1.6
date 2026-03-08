@@ -135,7 +135,7 @@ switch ($action):
         $show = cnt($db['awards']) != 0 ? $show : show(_no_entrys_yet, array("colspan" => "10"));
         $index = show($dir . "/main", array("head" => _awards_head, "stats" => $stats, "legende" => $legende, "show" => $show));
         break;
-    case 'showall';
+    case 'showall':
         $qry = db("SELECT * FROM `" . $db['squads'] . "` WHERE `id` = " . (int)($_GET['id']) . ";");
         while ($get = _fetch($qry)) {
             if (isset($_GET['showsquad'])) {

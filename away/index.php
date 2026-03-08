@@ -82,7 +82,7 @@ switch ($action):
                 "nav" => $nav));
         }
         break;
-    case 'new';
+    case 'new':
         $where = $where . ' - ' . _away_new;
         if (!$chkMe || $chkMe < 2) {
             $index = error(_error_wrong_permissions, 1);
@@ -158,7 +158,7 @@ switch ($action):
             }
         }
         break;
-    case 'info';
+    case 'info':
         $where = $where . ' - ' . _info;
         if (!$chkMe || $chkMe < 2) {
             $index = error(_error_wrong_permissions, 1);
@@ -194,7 +194,7 @@ switch ($action):
                     date("H:i", $get['date']) . _uhr));
         }
         break;
-    case 'del';
+    case 'del':
         if (!$chkMe || $chkMe < 2) {
             $index = error(_error_wrong_permissions, 1);
         } else {
@@ -202,7 +202,7 @@ switch ($action):
             $index = info(_away_successful_del, "../away/");
         }
         break;
-    case 'edit';
+    case 'edit':
         if (!$chkMe || $chkMe < 2) {
             $index = error(_error_wrong_permissions, 1);
         } else {

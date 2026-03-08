@@ -40,7 +40,7 @@ switch ($action):
         $index = show($dir . "/sponsors", array("head" => _sponsor_head,
             "show" => $show));
         break;
-    case 'link';
+    case 'link':
         $get = db("SELECT link FROM " . $db['sponsoren'] . "
                    WHERE id = '" . (int)($_GET['id']) . "'", false, true);
 

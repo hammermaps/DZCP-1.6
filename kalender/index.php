@@ -149,7 +149,7 @@ switch ($action):
             "sonntag" => _sonntag,
             "head" => _kalender_head));
         break;
-    case 'show';
+    case 'show':
         $qry = db("SELECT * FROM " . $db['events'] . "
              WHERE DATE_FORMAT(FROM_UNIXTIME(datum), '%d.%m.%Y') = '" . date("d.m.Y", (int)($_GET['time'])) . "'
              ORDER BY datum");
@@ -174,7 +174,7 @@ switch ($action):
         $index = show($dir . "/event", array("head" => $head,
             "events" => $events));
         break;
-    case 'admin';
+    case 'admin':
         header("Location: ../admin/?admin=kalender&do=edit&id=" . $_GET['id']);
         break;
 endswitch;

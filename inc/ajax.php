@@ -72,22 +72,22 @@ function steamIMG($steamID = '')
 
 ## SECTIONS ##
 switch (isset($_GET['i']) ? $_GET['i'] : ''):
-    case 'kalender';
+    case 'kalender':
         echo kalender($_GET['month'], $_GET['year']);
         break;
-    case 'teams';
+    case 'teams':
         echo team($_GET['tID']);
         break;
-    case 'server';
+    case 'server':
         echo '<table class="hperc" cellspacing="0">' . server($_GET['serverID']) . '</table>';
         break;
-    case 'shoutbox';
+    case 'shoutbox':
         echo '<table class="hperc" cellspacing="1">' . shout(true) . '</table>';
         break;
-    case 'teamspeak';
+    case 'teamspeak':
         echo '<table class="hperc" cellspacing="0">' . teamspeak(true) . '</table>';
         break;
-    case 'steam';
+    case 'steam':
         echo steamIMG(trim($_GET['steamid']));
         break;
 endswitch;

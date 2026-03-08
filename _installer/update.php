@@ -82,7 +82,7 @@ switch ($action):
 
         include(basePath . '/_installer/html/welcome_u.php');
         break;
-    case 'prepare';
+    case 'prepare':
         if ($do == "set_chmods" && $_POST['check'] != "dont") {
             // GUMP-Validierung FTP-Daten
             $ftpError = updater_validate($_POST, [
@@ -261,7 +261,7 @@ switch ($action):
           </table>';
         }
         break;
-    case 'autoupdate';
+    case 'autoupdate':
         if (isset($_GET['agb']) && $_GET['agb']) {
             header("Location: update.php?agb=false");
         } else {
@@ -283,7 +283,7 @@ switch ($action):
             include(basePath . '/_installer/html/autoupdate.php');
         }
         break;
-    case 'require';
+    case 'require':
         if (isset($_GET['agb']) && $_GET['agb']) {
             header("Location: update.php?agb=false");
         } else {
@@ -337,7 +337,7 @@ switch ($action):
           </table>';
         }
         break;
-    case 'database';
+    case 'database':
         if ($do == "update") {
             // GUMP-Validierung: version-Feld muss vorhanden und ein erlaubter Wert sein
             $validVersions = ['ab 1.5.4 bis 1.5.5.4', '1.6.0.x', '1.6.0.4', '1.6.1,x'];
@@ -424,7 +424,7 @@ switch ($action):
             include basePath . '/_installer/html/update.php';
         }
         break;
-    case 'done';
+    case 'done':
         include basePath . '/_installer/html/done_u.php';
         break;
 endswitch;

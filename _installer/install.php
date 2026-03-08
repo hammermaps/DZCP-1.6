@@ -83,7 +83,7 @@ switch ($action):
 
         include(basePath . '/_installer/html/welcome.php');
         break;
-    case 'prepare';
+    case 'prepare':
         if ($do == "set_chmods" && $_POST['check'] != "dont") {
             // GUMP-Validierung FTP-Daten
             $ftpError = installer_validate($_POST, [
@@ -263,7 +263,7 @@ switch ($action):
           </table>';
         }
         break;
-    case 'autoupdate';
+    case 'autoupdate':
         if (isset($_GET['agb']) && $_GET['agb']) {
             header("Location: install.php?agb=false");
         } else {
@@ -286,7 +286,7 @@ switch ($action):
             include(basePath . '/_installer/html/autoupdate.php');
         }
         break;
-    case 'require';
+    case 'require':
         if (isset($_GET['agb']) && $_GET['agb']) {
             header("Location: install.php?agb=false");
         } else {
@@ -556,7 +556,7 @@ switch ($action):
             include(basePath . '/_installer/html/mysql_data.php');
         }
         break;
-    case 'database';
+    case 'database':
         if ($do == "install") {
             // GUMP-Validierung Admin-Account
             $adminError = installer_validate($_POST, [
@@ -594,7 +594,7 @@ switch ($action):
             include(basePath . '/_installer/html/installation_admin.php');
         }
         break;
-    case 'done';
+    case 'done':
         include(basePath . '/_installer/html/done.php');
         break;
 endswitch;
