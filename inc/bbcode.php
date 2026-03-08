@@ -6,8 +6,8 @@
 
 //Filter 404
 $filter404 = strtolower(GetServerVars("REQUEST_URI"));
-if (strpos($filter404, 'index.php/') !== false ||
-    strpos($filter404, 'ajax.php/') !== false) {
+if (str_contains($filter404, 'index.php/') ||
+    str_contains($filter404, 'ajax.php/')) {
     header("HTTP/1.0 404 Not Found");
     exit();
 }
@@ -50,16 +50,14 @@ if (isset($_GET['dsgvo'])) {
         case 1:
             $_SESSION['DSGVO'] = true;
             $_SESSION['do_show_dsgvo'] = true;
-            header("Location: " . GetServerVars('HTTP_REFERER'));
-            exit();
             break;
         default:
             $_SESSION['DSGVO'] = false;
             $_SESSION['do_show_dsgvo'] = true;
             $_SESSION['user_has_dsgvo_lock'] = false;
-            header("Location: " . GetServerVars('HTTP_REFERER'));
-            exit();
     }
+    header("Location: " . GetServerVars('HTTP_REFERER'));
+    exit();
 }
 
 // Cache
@@ -365,12 +363,13 @@ function visitorIp()
 }
 
 /**
- * @param $ip
+ * Prüft ob eine IP valide ist
+ * @param string $ip
  * @return bool
  */
-function is_validate_ip(string $ip)
+function is_validate_ip(string $ip): bool
 {
-    if (strpos($ip, '0.0.0.0') !== false)
+    if (str_contains($ip, '0.0.0.0'))
         return false;
 
     return (filter_var($ip, FILTER_VALIDATE_IP) == true);
@@ -379,10 +378,10 @@ function is_validate_ip(string $ip)
 /**
  * Pruft eine IP gegen eine IP-Range
  * @param string $ip
- * @param string|array $range
+ * @param array|string $range
  * @return boolean
  */
-function validateIpV4Range(string $ip, $range)
+function validateIpV4Range(string $ip, array|string $range): bool
 {
     if (!is_array($range)) {
         $counter = 0;
@@ -429,7 +428,7 @@ function validateIpV4Range(string $ip, $range)
  * Funktion um notige Erweiterungen zu prufen
  * @return boolean
  **/
-function fsockopen_support()
+function fsockopen_support(): bool
 {
     if (fsockopen_support_bypass) return true;
 
@@ -445,7 +444,7 @@ function fsockopen_support()
  * @param string $function Name der zu prüfenden PHP-Funktion
  * @return bool TRUE wenn die Funktion deaktiviert/nicht vorhanden ist, FALSE wenn verfügbar
  */
-function disable_functions(string $function = '')
+function disable_functions(string $function = ''): bool
 {
     if (!function_exists($function)) return true;
     $disable_functions = ini_get('disable_functions');
@@ -3758,24 +3757,26 @@ if ($functions_files = get_files(basePath . '/inc/additional-functions/', false,
  */
 class javascript
 {
-    private static $data_array = [];
+    private static array $data_array = [];
 
-    public static function set($key = '', $var = '')
+    public static function set($key = '', $var = ''): self
     {
         self::$data_array[$key] = $var;
+        return new self();
     }
 
-    public static function remove($key = '')
+    public static function remove($key = ''): self
     {
         unset(self::$data_array[$key]);
+        return new self();
     }
 
-    public static function get($key = '')
+    public static function get($key = ''): false|array|string
     {
         return mb_convert_encoding(self::$data_array[$key] ?? '', 'ISO-8859-1', 'UTF-8');
     }
 
-    public static function encode()
+    public static function encode(): false|string
     {
         return json_encode(self::$data_array);
     }
@@ -3792,7 +3793,7 @@ include_once(basePath . '/inc/menu-functions/navi.php');
  * @param string $wysiwyg
  * @param string $index_templ
  */
-function page(string $index = '', string $title = '', string $where = '', string $wysiwyg = '', string $index_templ = 'index')
+function page(string $index = '', string $title = '', string $where = '', string $wysiwyg = '', string $index_templ = 'index'): void
 {
     global $db, $userid, $userip, $tmpdir, $chkMe, $mysql, $isSpider;
     global $designpath, $time_start;
@@ -3803,8 +3804,8 @@ function page(string $index = '', string $title = '', string $where = '', string
     DzcpLogger::app()->debug('Seitenaufruf', [
         'where'   => $where,
         'title'   => $title,
-        'user_id' => isset($userid) ? $userid : 0,
-        'ip'      => isset($userip) ? $userip : '',
+        'user_id' => $userid ?? 0,
+        'ip'      => $userip ?? '',
         'time_ms' => $time,
         'method'  => GetServerVars('REQUEST_METHOD'),
         'uri'     => GetServerVars('REQUEST_URI'),
