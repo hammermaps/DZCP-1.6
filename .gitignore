@@ -11,6 +11,7 @@ membermap/test.json
 membermap/test.php
 vendor/brightnucleus/config/composer.lock
 vendor/brightnucleus/exceptions/composer.lock
+vendor/nette/
 rss.xml
 banner/sponsors/
 banner/partners/
