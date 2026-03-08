@@ -13,11 +13,11 @@ if (!defined('basePath'))
 ob_start();
 ob_implicit_flush(false);
 
-if (version_compare(phpversion(), '7.0', '<')) {
-    die('Bitte verwende PHP-Version 7.0 oder h&ouml;her.<p>Please use PHP-Version 7.0 or higher.');
+if (version_compare(phpversion(), '8.0', '<')) {
+    die('Bitte verwende PHP-Version 8.0 oder h&ouml;her.<p>Please use PHP-Version 8.0 or higher.');
 }
 
-include(basePath . '/vendor/autoload.php');
+require_once(basePath . '/vendor/autoload.php');
 
 function getmicrotime()
 {
@@ -42,6 +42,12 @@ foreach ($_POST as $key => $var) {
 $_POST = $filter;
 unset($filter, $key, $var);
 $_GET = $gump->sanitize($_GET);
+
+// ── Kern-Includes automatisch laden ──────────────────────────────────────────
+// Damit jede index.php nur noch buffer.php einbinden muss
+require_once(basePath . '/inc/debugger.php');
+require_once(basePath . '/inc/config.php');
+require_once(basePath . '/inc/bbcode.php');
 
 function gz_output($output = '')
 {

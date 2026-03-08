@@ -1,4 +1,7 @@
 <?php
+
+use Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException;
+
 /**
  * DZCP - deV!L`z ClanPortal 1.6 Final
  * http://www.dzcp.de
@@ -83,7 +86,7 @@ class api
             } else {
                 $this->api_version = $CachedString->get();
             }
-        } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
+        } catch (PhpfastcacheInvalidArgumentException $e) {
         }
     }
 
@@ -129,7 +132,7 @@ class api
                 } else {
                     $this->api_output = unserialize($CachedString->get());
                 }
-            } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
+            } catch (PhpfastcacheInvalidArgumentException $e) {
             }
         } else { // No Cache
             $this->call();
@@ -178,7 +181,7 @@ class api
                 } else {
                     $this->api_output = unserialize($CachedString->get());
                 }
-            } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
+            } catch (PhpfastcacheInvalidArgumentException $e) {
             }
         } else { // No Cache
             $this->call();
@@ -228,7 +231,7 @@ class api
                 } else {
                     $this->api_output = unserialize($CachedString->get());
                 }
-            } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
+            } catch (PhpfastcacheInvalidArgumentException $e) {
             }
         } else { // No Cache
             $this->call();
@@ -275,7 +278,7 @@ class api
                 } else {
                     $this->api_output = unserialize($CachedString->get());
                 }
-            } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
+            } catch (PhpfastcacheInvalidArgumentException $e) {
             }
         } else { // No Cache
             $this->call();
@@ -289,9 +292,9 @@ class api
      * @param string $version1
      * @param string $operator
      * @param string $version2
-     * @return mixed
+     * @return int|bool
      */
-    public static function versionCompare(string $version1, string $operator, string $version2)
+    public static function versionCompare(string $version1, string $operator, string $version2): int|bool
     {
         $_fv = (int)(trim(str_replace('.', '', $version1)));
         $_sv = (int)(trim(str_replace('.', '', $version2)));

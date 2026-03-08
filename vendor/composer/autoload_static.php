@@ -11,7 +11,7 @@ class ComposerStaticInit3ae559e2dbc63b5d16fbfdfeb86b5b35
     );
 
     public static $prefixLengthsPsr4 = array (
-        'P' => 
+        'P' =>
         array (
             'Psr\\SimpleCache\\' => 16,
             'Psr\\Log\\' => 8,
@@ -20,54 +20,54 @@ class ComposerStaticInit3ae559e2dbc63b5d16fbfdfeb86b5b35
             'Phpfastcache\\' => 13,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
-        'M' => 
+        'M' =>
         array (
             'Monolog\\' => 8,
         ),
-        'J' => 
+        'J' =>
         array (
             'Jaybizzle\\CrawlerDetect\\' => 24,
         ),
-        'G' => 
+        'G' =>
         array (
             'GUMP\\' => 5,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'Psr\\SimpleCache\\' => 
+        'Psr\\SimpleCache\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/simple-cache/src',
         ),
-        'Psr\\Log\\' => 
+        'Psr\\Log\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/log/src',
         ),
-        'Psr\\Cache\\' => 
+        'Psr\\Cache\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/cache/src',
         ),
-        'Phpfastcache\\Tests\\' => 
+        'Phpfastcache\\Tests\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpfastcache/phpfastcache/tests/lib',
         ),
-        'Phpfastcache\\' => 
+        'Phpfastcache\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache',
         ),
-        'PHPMailer\\PHPMailer\\' => 
+        'PHPMailer\\PHPMailer\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
-        'Monolog\\' => 
+        'Monolog\\' =>
         array (
             0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
         ),
-        'Jaybizzle\\CrawlerDetect\\' => 
+        'Jaybizzle\\CrawlerDetect\\' =>
         array (
             0 => __DIR__ . '/..' . '/jaybizzle/crawler-detect/src',
         ),
-        'GUMP\\' => 
+        'GUMP\\' =>
         array (
             0 => __DIR__ . '/..' . '/wixel/gump/src',
         ),
@@ -75,6 +75,11 @@ class ComposerStaticInit3ae559e2dbc63b5d16fbfdfeb86b5b35
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'DebugConsole' => __DIR__ . '/../..' . '/inc/debugger.php',
+        'SteamAPI' => __DIR__ . '/../..' . '/inc/steamapi.php',
+        'api' => __DIR__ . '/../..' . '/inc/api.php',
+        'cookie' => __DIR__ . '/../..' . '/inc/cookie.php',
+        'dbc_index' => __DIR__ . '/../..' . '/inc/dbc.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

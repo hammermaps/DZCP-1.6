@@ -4,9 +4,7 @@
  * http://www.dzcp.de
  */
 
-include("../inc/config.php");
-include("../inc/debugger.php");
-include("../inc/bbcode.php");
+include("../inc/buffer.php");
 ?>
 <html>
 <head>

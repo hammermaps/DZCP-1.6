@@ -4,12 +4,12 @@
  * http://www.dzcp.de
  */
 
-ob_start();
-define('basePath', dirname(__FILE__));
+if (!defined('basePath'))
+    define('basePath', dirname(__FILE__));
+
 $thumbgen = true;
-include(basePath . '/vendor/autoload.php');
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
+
+require_once(basePath . '/inc/buffer.php');
 
 use Phpfastcache\CacheManager;
 

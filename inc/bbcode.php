@@ -14,13 +14,12 @@ if (strpos($filter404, 'index.php/') !== false ||
 unset($filter404);
 
 ## INCLUDES/REQUIRES ##
+// Klassen (dbc_index, api, cookie, SteamAPI, DebugConsole) werden via
+// Composer classmap geladen (vendor/autoload.php in buffer.php)
 require_once(basePath . '/inc/_version.php');
-require_once(basePath . "/inc/cookie.php");
+require_once(basePath . '/inc/logger.php');
 require_once(basePath . '/inc/server_query/_functions.php');
-require_once(basePath . "/inc/teamspeak_query.php");
-require_once(basePath . '/inc/steamapi.php');
-require_once(basePath . '/inc/dbc.php');
-require_once(basePath . '/inc/api.php');
+require_once(basePath . '/inc/teamspeak_query.php');
 
 //Libs
 use Phpfastcache\CacheManager;
@@ -671,8 +670,9 @@ function getCountryName(string $land)
     return '';
 }
 
-//->Daten uber file_get_contents oder curl abrufen
-function get_external_contents(string $url, $post = false, bool $nogzip = false, int $timeout = file_get_contents_timeout)
+ * @param float $timeout
+ */
+function get_external_contents(string $url, $post = false, bool $nogzip = false, $timeout = file_get_contents_timeout)
 {
     if (!fsockopen_support() && (!extension_loaded('curl') || !use_curl_support))
         return false;
@@ -2082,10 +2082,10 @@ function checkpwd(string $user, string $pwd)
  * Infomeldung ausgeben
  * @param string $msg
  * @param string $url
- * @param int $timeout
+ * @param float $timeout
  * @return bool|mixed|null|string|string[]
  */
-function info(string $msg, string $url, int $timeout = 5)
+function info(string $msg, string $url, $timeout = 5)
 {
     if (config('direct_refresh')) {
         header('Location: ' . str_replace('&amp;', '&', $url));

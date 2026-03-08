@@ -7,4 +7,9 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
+    'DebugConsole' => $baseDir . '/inc/debugger.php',
+    'SteamAPI' => $baseDir . '/inc/steamapi.php',
+    'api' => $baseDir . '/inc/api.php',
+    'cookie' => $baseDir . '/inc/cookie.php',
+    'dbc_index' => $baseDir . '/inc/dbc.php',
 );
