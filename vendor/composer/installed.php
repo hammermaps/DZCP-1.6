@@ -3,7 +3,7 @@
         'name' => 'dzcp/core',
         'pretty_version' => 'dev-development',
         'version' => 'dev-development',
-        'reference' => '6ea55bd0eac804b36737d31ee9b8abbd0ef1dad1',
+        'reference' => '82392ef56f493ec9ee647f378bc6259078da1343',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'dzcp/core' => array(
             'pretty_version' => 'dev-development',
             'version' => 'dev-development',
-            'reference' => '6ea55bd0eac804b36737d31ee9b8abbd0ef1dad1',
+            'reference' => '82392ef56f493ec9ee647f378bc6259078da1343',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
