@@ -670,6 +670,7 @@ function getCountryName(string $land)
     return '';
 }
 
+/**
  * @param float $timeout
  */
 function get_external_contents(string $url, $post = false, bool $nogzip = false, $timeout = file_get_contents_timeout)
@@ -732,7 +733,6 @@ function get_external_contents(string $url, $post = false, bool $nogzip = false,
             }
         }
 
-        @curl_close($curl);
         unset($curl);
     } else {
         if ($url_p['scheme'] == 'https') //HTTPS not Supported!
@@ -759,7 +759,7 @@ function get_external_contents(string $url, $post = false, bool $nogzip = false,
         if ($gzip) {
             $response_headers = function_exists('http_get_last_response_headers')
                 ? http_get_last_response_headers()
-                : (isset($http_response_header) ? $http_response_header : []);
+                : [];
             foreach ($response_headers as $c => $h) {
                 if (stristr($h, 'content-encoding') && stristr($h, 'gzip')) {
                     $content = gzinflate(substr($content, 10, -8));
