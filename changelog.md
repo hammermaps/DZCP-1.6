@@ -4,6 +4,20 @@ All notable changes to this project are documented here.
 
 ---
 
+## [1.6.1.4] - 08.03.2026
+### Fixed
+- Syntax errors in `ajax.php` and `index.php`: corrected case statement terminators for improved code execution
+- Syntax error in `case_user.php`: corrected array parameters in `show()` function for Xbox user display
+
+### Changed
+- `bbcode.php` refactored: use `str_contains()` for string checks, improve function return types, enhance code documentation
+- PHP version requirement updated to 8.4 in `composer.json`
+- Detailed PHPDoc comments added for various functions in `bbcode.php`
+- Removed unused `curl_close()` call in `get_external_contents()` and improved response header handling
+- Refactored includes in multiple files to use `require_once` for better consistency and performance
+
+---
+
 ## [1.6.1.3] - 07.03.2026
 ### Added
 - Monolog-based logging system introduced with multiple channels (error, debug, access, security), configuration, and integration throughout the application

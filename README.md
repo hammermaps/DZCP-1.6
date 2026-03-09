@@ -6,10 +6,25 @@
 <img src="https://dzcp.de/dzcp.png"/>
 </p>
 
-<h2>Aktuelle Version: 1.6.1.3 (07.03.2026)</h2>
+<h2>Aktuelle Version: 1.6.1.4 (08.03.2026)</h2>
 
 <h2>live Demo:</h2>
 http://demo.dzcp.de/news/
+
+---
+
+## Changelog 1.6.1.4 (08.03.2026)
+
+### Bugfixes
+- Syntaxfehler in `ajax.php` und `index.php` behoben: Case-Statement-Terminatoren korrigiert
+- Syntaxfehler in `case_user.php` behoben: Array-Parameter in `show()`-Funktion für Xbox-Benutzeranzeige korrigiert
+
+### Updates, Verbesserungen
+- `bbcode.php` refaktoriert: `str_contains()` für String-Prüfungen verwendet, Rückgabetypen verbessert
+- PHP-Versionsanforderung auf 8.4 in `composer.json` aktualisiert
+- PHPDoc-Kommentare für diverse Funktionen in `bbcode.php` ergänzt
+- Ungenutzten `curl_close()`-Aufruf in `get_external_contents()` entfernt, Response-Header-Verarbeitung verbessert
+- Includes in mehreren Dateien auf `require_once` umgestellt für bessere Konsistenz und Performance
 
 ---
 
