@@ -1837,6 +1837,10 @@ $language_text['_config_c_gallerypics'] = 'Пользователь: Галер�
 $language_text['_config_c_upicsize_what'] = 'Допустимый размер изображений в КБ (фотографии новостей, изображения профиля пользователя и т. Д.)';
 $language_text['_config_c_regcode'] = 'Рег.: Защитный код';
 $language_text['_config_c_regcode_what'] = 'Задать код безопасности при регистрации';
+$language_text['_config_c_antispam_type'] = 'Антиспам: Тип';
+$language_text['_config_c_antispam_type_what'] = 'Выбирает тип генератора антиспама (графический код или математическое задание)';
+$language_text['_antispam_image'] = 'Графический код (по умолчанию)';
+$language_text['_antispam_math'] = 'Математическое задание';
 $language_text['_pos_add_new'] = '<a href="?admin=positions&amp;do=new">Добавить новый ранг</a>';
 $language_text['_pos_new_head'] = 'Добавить новый ранг';
 $language_text['_pos_edit_head'] = 'Изменить ранг';

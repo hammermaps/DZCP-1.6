@@ -80,6 +80,7 @@ switch ($do) {
                                                `gmaps_who`          = '" . ((int)$_POST['gmaps_who']) . "',
                                                `language`           = '" . up($_POST['language']) . "',
                                                `regcode`            = '" . ((int)$_POST['regcode']) . "',
+                                               `antispam_type`      = '" . ((int)$_POST['antispam_type']) . "',
                                                `forum_vote`         = '" . ((int)$_POST['forum_vote']) . "',
                                                `reg_forum`          = '" . ((int)$_POST['reg_forum']) . "',
                                                `reg_artikel`        = '" . ((int)$_POST['reg_artikel']) . "',
@@ -144,6 +145,8 @@ switch ($do) {
 
         $selyes = $gets['regcode'] ? 'selected="selected"' : '';
         $selno = !$gets['regcode'] ? 'selected="selected"' : '';
+        $sel_antispam_image = !$gets['antispam_type'] ? 'selected="selected"' : '';
+        $sel_antispam_math  = $gets['antispam_type']  ? 'selected="selected"' : '';
         $selr_forum = $gets['reg_forum'] ? 'selected="selected"' : '';
         $selr_nc = $gets['reg_newscomments'] ? 'selected="selected"' : '';
         $selr_dl = $gets['reg_dl'] ? 'selected="selected"' : '';
@@ -243,6 +246,12 @@ switch ($do) {
             "c_regcode" => _config_c_regcode,
             "regcode_what" => _config_c_regcode_what,
             "show_regcode" => _show,
+            "c_antispam_type" => _config_c_antispam_type,
+            "antispam_type_what" => _config_c_antispam_type_what,
+            "antispam_image" => _antispam_image,
+            "antispam_math" => _antispam_math,
+            "sel_antispam_image" => $sel_antispam_image,
+            "sel_antispam_math" => $sel_antispam_math,
             "c_mailfrom" => _config_mailfrom,
             "mailfrom_info" => _config_mailfrom_info,
             "mailfrom" => re($gets['mailfrom']),
