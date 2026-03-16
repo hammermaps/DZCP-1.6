@@ -70,6 +70,9 @@ if (!dbc_index::issetIndex('settings')) {
     unset($get_settings);
 }
 
+// Antispam-Typ in der Session speichern, damit antispam.php keinen DB-Zugriff benötigt
+$_SESSION['antispam_type'] = (int)settings('antispam_type');
+
 //-> Configtabelle auslesen * Use function config('xxxxxx');
 if (!dbc_index::issetIndex('config')) {
     $get_config = db("SELECT * FROM `" . $db['config'] . "`;", false, true);
