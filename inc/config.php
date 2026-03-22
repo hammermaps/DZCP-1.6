@@ -46,7 +46,7 @@ define('steam_infos_cache', true); //Sollen die Profil Daten zwischen gespeicher
 define('steam_only_proxy', false); //Sollen soll nur der Steam Proxy Server verwendet werden
 
 // DZCP.de API Autoupdates
-define('api_enabled', true); //Sollem die funktionen der DZCP.de API verwendet werden? ( Keine Versionsabfrage, Keine Geolocation abfragen für die Memebermap usw. )
+define('api_enabled', false); //Sollem die funktionen der DZCP.de API verwendet werden? ( Keine Versionsabfrage, Keine Geolocation abfragen für die Memebermap usw. )
 define('api_autoupdate', false); //Soll die DZCP.de API automatisch aktualisiert werden ( Nur in der Administration )
 define('api_autoupdate_interval', (24 * 60 * 60)); //Wann soll die DZCP.de API automatisch aktualisiert werden ( alle 24 Std. )
 define('api_autoupdate_dsgvo', false); //Soll die EU-DSGVO automatisch aktualisiert werden ( Nur in der Administration )
@@ -373,6 +373,10 @@ if ($db['host'] != '' && $db['user'] != '' && $db['pass'] != '' && $db['db'] != 
     if ($mysql->connect_error) {
         die("<b>Fehler beim Zugriff auf die Datenbank!");
     }
+
+    // ── Character-Set auf UTF-8MB4 einstellen ─────────────────────────────
+    $mysql->set_charset("utf8mb4");
+    $mysql->query("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
 
     // ── Auto-Migration: fehlende Spalten nachträglich hinzufügen ─────────
     $migrations = [
