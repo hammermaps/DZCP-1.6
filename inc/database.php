@@ -218,6 +218,53 @@ class NetteResultWrapper
 }
 
 /**
+ * Determine whether a SQL query is a write operation.
+ *
+ * Write queries (INSERT, UPDATE, DELETE, REPLACE, ALTER, CREATE, DROP,
+ * TRUNCATE, RENAME, SET, CALL, …) must be executed through the existing
+ * mysqli connection so that $mysql->insert_id, $mysql->affected_rows,
+ * active transactions, and connection-level session variables remain
+ * consistent with the rest of the application.
+ *
+ * SELECT queries (and SHOW / EXPLAIN / DESCRIBE / WITH) are read-only and
+ * may be executed through the Nette / PDO connection safely.
+ *
+ * Note: Multi-statement queries (separated by ';') are not supported by
+ * mysqli::query() anyway, so they are not expected here. If such a query
+ * is encountered it is routed through mysqli as a write to be safe.
+ *
+ * @param string $query SQL query to inspect
+ * @return bool TRUE when the query modifies data or schema
+ */
+function isWriteQuery(string $query): bool
+{
+    // Read-only statement keywords – defined as a static array so it is
+    // allocated only once across all function calls.
+    // Everything else (USE, CALL, SET, DDL, DML, …) is treated as a write
+    // and routed through mysqli to preserve connection state.
+    static $readKeywords = ['SELECT', 'SHOW', 'EXPLAIN', 'DESCRIBE', 'DESC', 'WITH'];
+
+    // Strip SQL comments before inspecting the first keyword so that
+    // leading comments cannot mask the real statement type.
+    // Falls back to the original string when preg_replace fails.
+    $stripped = preg_replace([
+        '/\/\*.*?\*\//s',  // /* block comments */
+        '/--[^\n]*/m',     // -- line comments
+        '/#[^\n]*/m',      // # MySQL hash comments
+    ], '', $query);
+
+    $trimmed = ltrim(is_string($stripped) ? $stripped : $query);
+
+    // Match the first keyword (up to the first whitespace or end-of-string)
+    if (preg_match('/^([A-Za-z]+)/i', $trimmed, $m)) {
+        return !in_array(strtoupper($m[1]), $readKeywords, true);
+    }
+
+    // Unknown format – treat as write to be safe
+    return true;
+}
+
+/**
  * Helper function to extract table name from query
  * Used for table() method calls in Nette Database
  *

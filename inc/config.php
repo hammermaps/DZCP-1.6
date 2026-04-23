@@ -487,9 +487,13 @@ function db($query = '', $rows = false, $fetch = false)
         DzcpLogger::sql()->debug('SQL Query', ['query' => $query]);
     }
 
-    // Try to use Nette Database first
+    // Use Nette Database only for read (SELECT) queries.
+    // Write queries (INSERT, UPDATE, DELETE, ALTER, …) must go through the
+    // shared mysqli connection so that $mysql->insert_id, affected_rows,
+    // active transactions, and connection-level session variables stay
+    // consistent for all callers.
     $netteDb = getNetteDb();
-    if ($netteDb !== null && !$updater) {
+    if ($netteDb !== null && !$updater && !isWriteQuery($query)) {
         try {
             $result = executeNetteQuery($query);
 
@@ -515,7 +519,7 @@ function db($query = '', $rows = false, $fetch = false)
         }
     }
 
-    // Fallback to legacy mysqli
+    // Legacy mysqli – used for all write queries and as fallback for reads
     if ($updater) {
         $qry = $mysql->query($query);
     } else {
@@ -564,9 +568,11 @@ function db_stmt($query, $params = array('si', 'hallo', '4'), $rows = false, $fe
         DzcpLogger::sql()->debug('SQL Prepared Query', ['query' => $query, 'params' => array_slice($params, 1)]);
     }
 
-    // Try to use Nette Database first
+    // Use Nette Database only for read (SELECT) queries.
+    // Write queries must go through mysqli to keep insert_id / transactions
+    // consistent across the rest of the application.
     $netteDb = getNetteDb();
-    if ($netteDb !== null) {
+    if ($netteDb !== null && !isWriteQuery($query)) {
         try {
             // Convert mysqli parameter format to PDO format
             $types = $params[0] ?? '';
@@ -606,7 +612,7 @@ function db_stmt($query, $params = array('si', 'hallo', '4'), $rows = false, $fe
         }
     }
 
-    // Fallback to legacy mysqli prepared statement
+    // Legacy mysqli prepared statement – used for all write queries and as fallback for reads
     if (!$statement = $mysql->prepare($query)) {
         DzcpLogger::sql()->critical('SQL Prepared-Statement Fehler (prepare)', [
             'query' => $query,
