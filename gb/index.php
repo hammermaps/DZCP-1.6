@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $where = _site_gb;
@@ -150,7 +147,7 @@ switch ($action):
             "entry" => $entry,
             "seiten" => $seiten));
         break;
-    case 'do';
+    case 'do':
         if (isset($_GET['what']) && $_GET['what'] == "addgb" && HasDSGVO()) {
             if ($userid >= 1) {
                 $toCheck = empty($_POST['eintrag']);
@@ -246,8 +243,7 @@ switch ($action):
                         "hphead" => _hp,
                         "postemail" => h($get['email']),
                         "posthp" => h($get['hp']),
-                        "postnick" => h($get['nick']));
-                }
+                        "postnick" => h($get['nick'])));                }
 
                 $index = show($dir . "/add", array("titel" => _eintragen_titel,
                     "nickhead" => _nick,
@@ -294,7 +290,7 @@ switch ($action):
             }
         }
         break;
-    case 'admin';
+    case 'admin':
         if (!permission("gb")) {
             $index = error(_error_wrong_permissions, 1);
         } else {
@@ -367,7 +363,7 @@ switch ($action):
             }
         }
         break;
-    case 'preview';
+    case 'preview':
         header("Content-type: text/html; charset=utf-8");
         $editby = "";
         if (isset($_GET['edit']) && !empty($_GET['edit'])) {

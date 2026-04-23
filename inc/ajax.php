@@ -4,27 +4,13 @@
  * http://www.dzcp.de
  */
 
-## OUTPUT BUFFER START #
-define('basePath', dirname(dirname(__FILE__) . '../'));
-ob_start();
-ob_implicit_flush(false);
-if (version_compare(phpversion(), '7.0', '<')) {
-    die('Bitte verwende PHP-Version 7.0 oder h&ouml;her.<p>Please use PHP-Version 7.0 or higher.');
-}
+if (!defined('basePath'))
+    define('basePath', dirname(dirname(__FILE__) . '../'));
 
 $ajaxJob = true;
 
 ## INCLUDES ##
-include(basePath . '/vendor/autoload.php');
-
-
-$gump = GUMP::get_instance();
-$_GET = $gump->sanitize($_GET);
-$_POST = $gump->sanitize($_POST);
-
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
+require_once(basePath . '/inc/buffer.php');
 
 ## FUNCTIONS ##
 require_once(basePath . "/inc/menu-functions/server.php");
@@ -86,22 +72,22 @@ function steamIMG($steamID = '')
 
 ## SECTIONS ##
 switch (isset($_GET['i']) ? $_GET['i'] : ''):
-    case 'kalender';
+    case 'kalender':
         echo kalender($_GET['month'], $_GET['year']);
         break;
-    case 'teams';
+    case 'teams':
         echo team($_GET['tID']);
         break;
-    case 'server';
+    case 'server':
         echo '<table class="hperc" cellspacing="0">' . server($_GET['serverID']) . '</table>';
         break;
-    case 'shoutbox';
+    case 'shoutbox':
         echo '<table class="hperc" cellspacing="1">' . shout(true) . '</table>';
         break;
-    case 'teamspeak';
+    case 'teamspeak':
         echo '<table class="hperc" cellspacing="0">' . teamspeak(true) . '</table>';
         break;
-    case 'steam';
+    case 'steam':
         echo steamIMG(trim($_GET['steamid']));
         break;
 endswitch;

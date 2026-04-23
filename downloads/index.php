@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $where = _site_dl;
@@ -81,7 +78,7 @@ switch ($action):
         $index = show($dir . "/downloads", array("kats" => $kats,
             "head" => _downloads_head));
         break;
-    case 'download';
+    case 'download':
         if (settings("reg_dl") && !$chkMe)
             $index = error(_error_unregistered);
         else {
@@ -188,7 +185,7 @@ switch ($action):
                 $index = error(_id_dont_exist, 1);
         }
         break;
-    case 'getfile';
+    case 'getfile':
         if (settings("reg_dl") && !$chkMe)
             $index = error(_error_unregistered, 1);
         else {

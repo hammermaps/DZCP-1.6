@@ -4,24 +4,13 @@
  * http://www.dzcp.de
  */
 
-## OUTPUT BUFFER START #
-define('basePath', dirname(dirname(__FILE__) . '../'));
-ob_start();
-ob_implicit_flush(false);
-if (version_compare(phpversion(), '7.0', '<')) {
-    die('Bitte verwende PHP-Version 7.0 oder h&ouml;her.<p>Please use PHP-Version 7.0 or higher.');
-}
+if (!defined('basePath'))
+    define('basePath', dirname(dirname(__FILE__) . '../'));
 
 $ajaxJob = true;
 
 ## INCLUDES ##
-include(basePath . '/vendor/autoload.php');
-
-$gump = GUMP::get_instance();
-
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
+require_once(basePath . '/inc/buffer.php');
 
 
 if ((settings('last_conjob', false) + 90) <= time()) {

@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $where = _site_gallery;
@@ -55,7 +52,7 @@ switch ($action):
 
         $index = show($dir . "/gallery", array("show" => $show, "head" => _gallery_head));
         break;
-    case 'show';
+    case 'show':
         $get = db("SELECT * FROM " . $db['gallery'] . " WHERE id = '" . (int)($_GET['id']) . "'", false, true);
         if (!permission('galleryintern') && $get['intern']) {
             $index = error(_error_no_access);

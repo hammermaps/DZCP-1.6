@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $dir = "links";
@@ -42,7 +39,7 @@ switch ($action):
 
         $index = show($dir . "/links", array("head" => _links_head, "show" => $show));
         break;
-    case 'link';
+    case 'link':
         db("UPDATE " . $db['links'] . " SET `hits` = hits+1 WHERE `id` = '" . (int)($_GET['id']) . "'");
         $get = db("SELECT `url` FROM " . $db['links'] . " WHERE `id` = '" . (int)($_GET['id']) . "'", false, true);
         header("Location: " . $get['url']);

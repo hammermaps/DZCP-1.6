@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $dir = "search";
@@ -291,7 +288,7 @@ switch ($action):
             "intitle" => _search_type_title,
         ));
         break;
-    case 'site';
+    case 'site':
         if (!empty($_GET['searchword']) && $_GET['searchword'] != _search_word) {
             //Suche in News
             $qry = db("SELECT `id`,`titel` FROM `" . $db['news'] . "` WHERE (`titel` LIKE '%" . up($_GET['searchword']) . "%' AND `titel` != '')"

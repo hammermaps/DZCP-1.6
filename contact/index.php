@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $where = _site_contact;
@@ -35,7 +32,7 @@ switch ($action):
                 "steam" => _steamid));
         }
         break;
-    case 'fightus';
+    case 'fightus':
         if (HasDSGVO()) {
             $qry = db("SELECT id,name,game FROM " . $db['squads'] . "
                    WHERE status = 1
@@ -87,7 +84,7 @@ switch ($action):
                 "steam" => _steamid));
         }
         break;
-    case 'joinus';
+    case 'joinus':
         if (HasDSGVO()) {
             $qrysquads = db("SELECT id,name,game FROM " . $db['squads'] . "
                         WHERE status = 1 AND team_joinus = 1
@@ -125,7 +122,7 @@ switch ($action):
                 "steam" => _steamid));
         }
         break;
-    case 'do';
+    case 'do':
         if (HasDSGVO()) {
             if ($_GET['what'] == "contact") {
                 if ($_POST['secure'] != $_SESSION['sec_contact'] || empty($_SESSION['sec_contact']))

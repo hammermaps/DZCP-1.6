@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d3d2da087e1a09a03a3a81132514170d",
+    "content-hash": "9fb041f5debcb9ea89af1479170729fc",
     "packages": [
         {
             "name": "jaybizzle/crawler-detect",
@@ -247,12 +247,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/database.git",
-                "reference": "2a35cd509e5c474f825b445ffbab81e316d44431"
+                "reference": "a8d19d05a62b2f177766a1a0b35fe569695cede9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/database/zipball/2a35cd509e5c474f825b445ffbab81e316d44431",
-                "reference": "2a35cd509e5c474f825b445ffbab81e316d44431",
+                "url": "https://api.github.com/repos/nette/database/zipball/a8d19d05a62b2f177766a1a0b35fe569695cede9",
+                "reference": "a8d19d05a62b2f177766a1a0b35fe569695cede9",
                 "shasum": ""
             },
             "require": {
@@ -319,7 +319,7 @@
                 "issues": "https://github.com/nette/database/issues",
                 "source": "https://github.com/nette/database/tree/v3.2"
             },
-            "time": "2026-03-04T08:28:54+00:00"
+            "time": "2026-04-22T05:48:11+00:00"
         },
         {
             "name": "nette/utils",
@@ -327,12 +327,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/utils.git",
-                "reference": "09f3c310ac056457c6bd73c45b71d517a08a1b51"
+                "reference": "dd5725782de7b9d225d9375c51d211097ace82aa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/utils/zipball/09f3c310ac056457c6bd73c45b71d517a08a1b51",
-                "reference": "09f3c310ac056457c6bd73c45b71d517a08a1b51",
+                "url": "https://api.github.com/repos/nette/utils/zipball/dd5725782de7b9d225d9375c51d211097ace82aa",
+                "reference": "dd5725782de7b9d225d9375c51d211097ace82aa",
                 "shasum": ""
             },
             "require": {
@@ -411,7 +411,7 @@
                 "issues": "https://github.com/nette/utils/issues",
                 "source": "https://github.com/nette/utils/tree/master"
             },
-            "time": "2026-02-23T01:47:36+00:00"
+            "time": "2026-03-09T01:14:17+00:00"
         },
         {
             "name": "phpfastcache/phpfastcache",
@@ -838,13 +838,14 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=8.0",
+        "php": ">=8.4",
         "ext-mbstring": "*",
         "ext-json": "*",
         "ext-intl": "*",
         "ext-bcmath": "*",
         "ext-iconv": "*",
-        "ext-mysqli": "*"
+        "ext-mysqli": "*",
+        "ext-zlib": "*"
     },
     "platform-dev": {},
     "plugin-api-version": "2.9.0"

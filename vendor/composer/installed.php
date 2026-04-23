@@ -3,7 +3,7 @@
         'name' => 'dzcp/core',
         'pretty_version' => 'dev-claude/refactor-database-function-usage',
         'version' => 'dev-claude/refactor-database-function-usage',
-        'reference' => '9719ecb6b6305ae4598f30de892e825d9b3417cf',
+        'reference' => '92c893b2838e708b3696993dcedbbf999f8af48a',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'dzcp/core' => array(
             'pretty_version' => 'dev-claude/refactor-database-function-usage',
             'version' => 'dev-claude/refactor-database-function-usage',
-            'reference' => '9719ecb6b6305ae4598f30de892e825d9b3417cf',
+            'reference' => '92c893b2838e708b3696993dcedbbf999f8af48a',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -51,7 +51,7 @@
         'nette/database' => array(
             'pretty_version' => 'v3.2.x-dev',
             'version' => '3.2.9999999.9999999-dev',
-            'reference' => '2a35cd509e5c474f825b445ffbab81e316d44431',
+            'reference' => 'a8d19d05a62b2f177766a1a0b35fe569695cede9',
             'type' => 'library',
             'install_path' => __DIR__ . '/../nette/database',
             'aliases' => array(),
@@ -60,7 +60,7 @@
         'nette/utils' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '09f3c310ac056457c6bd73c45b71d517a08a1b51',
+            'reference' => 'dd5725782de7b9d225d9375c51d211097ace82aa',
             'type' => 'library',
             'install_path' => __DIR__ . '/../nette/utils',
             'aliases' => array(

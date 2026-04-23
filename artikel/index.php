@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $where = _site_artikel;
@@ -58,7 +55,7 @@ switch ($action):
             "order_kat" => orderby('kat'),
             "archiv" => _news_archiv));
         break;
-    case 'show';
+    case 'show':
         $qry = db("SELECT * FROM `" . $db['artikel'] . "` WHERE `id` = " . (int)($_GET['id']) . (permission("artikel") ? "" : " AND `public` = 1") . ";");
         if (_rows($qry) == 0) {
             $index = error(_id_dont_exist, 1);
@@ -349,7 +346,7 @@ switch ($action):
             }
         }
         break;
-    case 'preview';
+    case 'preview':
         header("Content-type: text/html; charset=utf-8");
         $rel = "";
         $links1 = "";
@@ -405,7 +402,7 @@ switch ($action):
 
         exit();
         break;
-    case 'compreview';
+    case 'compreview':
         if ($do == 'edit') {
             $get = db("SELECT `reg`,`datum`,`reg` FROM `" . $db['acomments'] . "` WHERE `id` = " . (int)($_GET['cid']) . ";", false, true);
 

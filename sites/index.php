@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $dir = "sites";
@@ -41,7 +38,7 @@ switch ($action):
             }
         } else $index = error(_sites_not_available, 1);
         break;
-    case 'preview';
+    case 'preview':
         header("Content-type: text/html; charset=utf-8");
         if ($_POST['html'])
             $inhalt = bbcode_html(re($_POST['inhalt'], true), true);

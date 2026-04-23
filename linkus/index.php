@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $dir = "linkus";
@@ -54,7 +51,7 @@ switch ($action):
         $index = show($dir . "/linkus", array("head" => _linkus_head,
             "show" => $show));
         break;
-    case 'link';
+    case 'link':
         $get = db("SELECT `url` FROM " . $db['linkus'] . " WHERE `id` = '" . (int)($_GET['id']) . "'", false, true);
         header("Location: " . $get['url']);
         break;

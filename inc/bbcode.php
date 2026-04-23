@@ -6,21 +6,20 @@
 
 //Filter 404
 $filter404 = strtolower(GetServerVars("REQUEST_URI"));
-if (strpos($filter404, 'index.php/') !== false ||
-    strpos($filter404, 'ajax.php/') !== false) {
+if (str_contains($filter404, 'index.php/') ||
+    str_contains($filter404, 'ajax.php/')) {
     header("HTTP/1.0 404 Not Found");
     exit();
 }
 unset($filter404);
 
 ## INCLUDES/REQUIRES ##
+// Klassen (dbc_index, api, cookie, SteamAPI, DebugConsole) werden via
+// Composer classmap geladen (vendor/autoload.php in buffer.php)
 require_once(basePath . '/inc/_version.php');
-require_once(basePath . "/inc/cookie.php");
+require_once(basePath . '/inc/logger.php');
 require_once(basePath . '/inc/server_query/_functions.php');
-require_once(basePath . "/inc/teamspeak_query.php");
-require_once(basePath . '/inc/steamapi.php');
-require_once(basePath . '/inc/dbc.php');
-require_once(basePath . '/inc/api.php');
+require_once(basePath . '/inc/teamspeak_query.php');
 
 //Libs
 use Phpfastcache\CacheManager;
@@ -51,16 +50,14 @@ if (isset($_GET['dsgvo'])) {
         case 1:
             $_SESSION['DSGVO'] = true;
             $_SESSION['do_show_dsgvo'] = true;
-            header("Location: " . GetServerVars('HTTP_REFERER'));
-            exit();
             break;
         default:
             $_SESSION['DSGVO'] = false;
             $_SESSION['do_show_dsgvo'] = true;
             $_SESSION['user_has_dsgvo_lock'] = false;
-            header("Location: " . GetServerVars('HTTP_REFERER'));
-            exit();
     }
+    header("Location: " . GetServerVars('HTTP_REFERER'));
+    exit();
 }
 
 // Cache
@@ -72,6 +69,9 @@ if (!dbc_index::issetIndex('settings')) {
     dbc_index::setIndex('settings', $get_settings);
     unset($get_settings);
 }
+
+// Antispam-Typ in der Session speichern, damit antispam.php keinen DB-Zugriff benötigt
+$_SESSION['antispam_type'] = (int)settings('antispam_type');
 
 //-> Configtabelle auslesen * Use function config('xxxxxx');
 if (!dbc_index::issetIndex('config')) {
@@ -279,6 +279,12 @@ function HasDSGVO()
     return false;
 }
 
+/**
+ * Prüft, ob die aktuelle Verbindung über HTTPS (SSL/TLS) erfolgt.
+ * Berücksichtigt auch Reverse-Proxy-Header (X-Forwarded-Proto, X-Forwarded-SSL).
+ *
+ * @return bool TRUE wenn HTTPS aktiv, FALSE bei HTTP
+ */
 function isSecure()
 {
     if (GetServerVars('HTTPS') && GetServerVars('HTTPS') == 'on') {
@@ -291,6 +297,12 @@ function isSecure()
     return false;
 }
 
+/**
+ * Prüft ob der Server HTTPS-Unterstützung besitzt (Server-seitig).
+ * Prüft HTTPS-Serverkonfiguration anhand des HTTPS-Flags oder Port 443.
+ *
+ * @return bool TRUE wenn HTTPS verfügbar, FALSE sonst
+ */
 function hasSecure()
 {
     if (isset($_SERVER['HTTPS'])) {
@@ -354,12 +366,13 @@ function visitorIp()
 }
 
 /**
- * @param $ip
+ * Prüft ob eine IP valide ist
+ * @param string $ip
  * @return bool
  */
-function is_validate_ip(string $ip)
+function is_validate_ip(string $ip): bool
 {
-    if (strpos($ip, '0.0.0.0') !== false)
+    if (str_contains($ip, '0.0.0.0'))
         return false;
 
     return (filter_var($ip, FILTER_VALIDATE_IP) == true);
@@ -368,10 +381,10 @@ function is_validate_ip(string $ip)
 /**
  * Pruft eine IP gegen eine IP-Range
  * @param string $ip
- * @param string|array $range
+ * @param array|string $range
  * @return boolean
  */
-function validateIpV4Range(string $ip, $range)
+function validateIpV4Range(string $ip, array|string $range): bool
 {
     if (!is_array($range)) {
         $counter = 0;
@@ -418,7 +431,7 @@ function validateIpV4Range(string $ip, $range)
  * Funktion um notige Erweiterungen zu prufen
  * @return boolean
  **/
-function fsockopen_support()
+function fsockopen_support(): bool
 {
     if (fsockopen_support_bypass) return true;
 
@@ -428,7 +441,13 @@ function fsockopen_support()
     return true;
 }
 
-function disable_functions(string $function = '')
+/**
+ * Prüft ob eine PHP-Funktion serverseitig deaktiviert oder nicht verfügbar ist.
+ *
+ * @param string $function Name der zu prüfenden PHP-Funktion
+ * @return bool TRUE wenn die Funktion deaktiviert/nicht vorhanden ist, FALSE wenn verfügbar
+ */
+function disable_functions(string $function = ''): bool
 {
     if (!function_exists($function)) return true;
     $disable_functions = ini_get('disable_functions');
@@ -442,6 +461,13 @@ function disable_functions(string $function = '')
     return false;
 }
 
+/**
+ * Liest die ID des aktuell eingeloggten Users aus der Session aus.
+ * Verwendet dbc_index als Cache, um wiederholte DB-Abfragen zu vermeiden.
+ * Gibt 0 zurück wenn kein User eingeloggt oder DSGVO nicht akzeptiert wurde.
+ *
+ * @return int User-ID des eingeloggten Users, 0 bei nicht eingeloggt
+ */
 //-> Auslesen der UserID
 function userid()
 {
@@ -462,6 +488,14 @@ function userid()
     return 0;
 }
 
+/**
+ * Wechselt das aktive Template basierend auf dem GET-Parameter 'tmpl_set'.
+ * Liest verfügbare Templates aus dem Verzeichnis, prüft Berechtigungen anhand
+ * der template.xml und setzt das Template in Session und Cookie.
+ * Leitet anschließend zur vorherigen Seite weiter (HTTP Redirect).
+ *
+ * @return void
+ */
 function sysTemplateswitch()
 {
     global $chkMe;
@@ -504,6 +538,13 @@ function sysTemplateswitch()
     unset($xml, $templ);
 }
 
+/**
+ * Liest eine Server- oder Umgebungsvariable aus $_SERVER oder $_ENV aus.
+ * Konvertiert den Wert nach UTF-8. Gibt bei HTTP_REFERER einen Fallback zurück.
+ *
+ * @param string $var Name der Server/ENV-Variable (z.B. 'REMOTE_ADDR', 'HTTP_HOST')
+ * @return string|false Wert der Variable als UTF-8-String, FALSE wenn nicht vorhanden
+ */
 function GetServerVars(string $var)
 {
     if (array_key_exists($var, $_SERVER) && !empty($_SERVER[$var])) {
@@ -546,6 +587,15 @@ unset($files);
 
 $designpath = '../inc/_templates_/' . $tmpdir;
 
+/**
+ * Lädt die Sprachdatei sowie globale und DSGVO-Sprachdefinitionen.
+ * Setzt HTTP-Header (Content-Type, Security-Header), initialisiert GUMP
+ * mit der passenden Sprache und bindet zusätzliche Sprachdateien ein.
+ * Alle Sprach-Konstanten werden über define() global verfügbar gemacht.
+ *
+ * @param string $lng Sprachname (z.B. 'deutsch', 'english', 'russian')
+ * @return void
+ */
 //-> Languagefiles einlesen
 function lang(string $lng)
 {
@@ -606,11 +656,15 @@ function lang(string $lng)
 }
 
 /**
- * @param $csv_string
- * @param string $delimiter
- * @param bool $skip_empty_lines
- * @param bool $trim_fields
- * @return array|false[][]|string[][]|string[][][]
+ * Parst einen CSV-String in ein zweidimensionales Array.
+ * Unterstützt benutzerdefinierte Trennzeichen, Leerzeilen-Übersprung
+ * und automatisches Trimmen der Felder. Behandelt Anführungszeichen korrekt.
+ *
+ * @param string $csv_string       Der zu parsende CSV-Rohtext
+ * @param string $delimiter        Trennzeichen zwischen Feldern (Standard: ',')
+ * @param bool   $skip_empty_lines Leere Zeilen überspringen (Standard: true)
+ * @param bool   $trim_fields      Felder von Leerzeichen bereinigen (Standard: true)
+ * @return array Zweidimensionales Array mit den CSV-Daten [Zeile][Spalte]
  */
 function parse_csv($csv_string, $delimiter = ",", $skip_empty_lines = true, $trim_fields = true)
 {
@@ -637,8 +691,11 @@ function parse_csv($csv_string, $delimiter = ",", $skip_empty_lines = true, $tri
 }
 
 /**
- * @param string $land
- * @return false|mixed|string|string[]
+ * Gibt den ausgeschriebenen Ländernamen zu einem ISO-3166-Ländercode zurück.
+ * Lädt die Länderliste als CSV von einem externen Server und cached sie 7 Tage.
+ *
+ * @param string $land ISO-3166 Ländercode (z.B. 'de', 'us', 'fr')
+ * @return string Ausgeschriebener Ländername (z.B. 'Germany'), leer wenn nicht gefunden
  */
 function getCountryName(string $land)
 {
@@ -671,8 +728,19 @@ function getCountryName(string $land)
     return '';
 }
 
-//->Daten uber file_get_contents oder curl abrufen
-function get_external_contents(string $url, $post = false, bool $nogzip = false, int $timeout = file_get_contents_timeout)
+/**
+ * Lädt den Inhalt einer externen URL via cURL oder file_get_contents.
+ * Unterstützt POST-Requests, automatische gzip-Dekomprimierung und Timeout.
+ * Prüft vorab ob der Ziel-Port erreichbar ist (ping_port).
+ * HTTPS wird bei file_get_contents automatisch zu HTTP degradiert (kein SSL-Support).
+ *
+ * @param string     $url     Ziel-URL (http:// oder https://)
+ * @param mixed      $post    POST-Daten als Array oder false für GET-Request
+ * @param bool       $nogzip  gzip-Dekomprimierung deaktivieren (Standard: false)
+ * @param float|int  $timeout Verbindungs-Timeout in Sekunden (Standard: file_get_contents_timeout)
+ * @return string|false Inhalt der URL als String, FALSE bei Fehler oder nicht erreichbar
+ */
+function get_external_contents(string $url, $post = false, bool $nogzip = false, $timeout = file_get_contents_timeout)
 {
     if (!fsockopen_support() && (!extension_loaded('curl') || !use_curl_support))
         return false;
@@ -732,7 +800,6 @@ function get_external_contents(string $url, $post = false, bool $nogzip = false,
             }
         }
 
-        @curl_close($curl);
         unset($curl);
     } else {
         if ($url_p['scheme'] == 'https') //HTTPS not Supported!
@@ -759,7 +826,7 @@ function get_external_contents(string $url, $post = false, bool $nogzip = false,
         if ($gzip) {
             $response_headers = function_exists('http_get_last_response_headers')
                 ? http_get_last_response_headers()
-                : (isset($http_response_header) ? $http_response_header : []);
+                : [];
             foreach ($response_headers as $c => $h) {
                 if (stristr($h, 'content-encoding') && stristr($h, 'gzip')) {
                     $content = gzinflate(substr($content, 10, -8));
@@ -772,6 +839,13 @@ function get_external_contents(string $url, $post = false, bool $nogzip = false,
 }
 
 //-> Sprachdateien auflisten
+/**
+ * Gibt alle verfügbaren Sprachauswahl-Icons als HTML-String zurück.
+ * Durchsucht das Sprachdatei-Verzeichnis nach PHP-Dateien und erstellt
+ * für jede Sprache einen Flag-Link, sofern ein passendes GIF-Flaggenbild vorhanden ist.
+ *
+ * @return string HTML-String mit Bild-Links zur Sprachumschaltung
+ */
 function languages()
 {
     $lang = "";
@@ -792,6 +866,14 @@ if ($userid >= 1 && $ajaxJob != true && HasDSGVO()) {
 }
 
 //-> Settings auslesen
+/**
+ * Liest einen oder mehrere Werte aus der Settings-Tabelle der Datenbank.
+ * Nutzt standardmäßig den dbc_index-Cache für bessere Performance.
+ *
+ * @param string|array $what     Feldname als String oder Array mit mehreren Feldnamen
+ * @param bool         $use_dbc  Cache (dbc_index) verwenden (Standard: true)
+ * @return mixed Einzelwert als String/int oder Array mit Schlüssel=>Wert-Paaren
+ */
 function settings($what, bool $use_dbc = true)
 {
     global $db;
@@ -820,6 +902,14 @@ function settings($what, bool $use_dbc = true)
     }
 }
 
+/**
+ * Liest einen oder mehrere Werte aus der Config-Tabelle der Datenbank.
+ * Nutzt standardmäßig den dbc_index-Cache für bessere Performance.
+ *
+ * @param string|array $what     Feldname als String oder Array mit mehreren Feldnamen
+ * @param bool         $use_dbc  Cache (dbc_index) verwenden (Standard: true)
+ * @return mixed Einzelwert als String/int oder Array mit Schlüssel=>Wert-Paaren, 0 bei Fehler
+ */
 //-> Config auslesen
 function config($what, bool $use_dbc = true)
 {
@@ -854,6 +944,13 @@ function config($what, bool $use_dbc = true)
     return 0;
 }
 
+/**
+ * Prüft ob ein User Root-Administrator ist.
+ * Vergleicht die User-ID mit der konfigurierten $rootAdmins-Liste.
+ *
+ * @param int $userid User-ID (0 = aktuell eingeloggter User)
+ * @return bool TRUE wenn Root-Admin, FALSE sonst
+ */
 //-> Prueft ob der User ein Rootadmin ist
 function rootAdmin(int $userid = 0)
 {
@@ -863,6 +960,14 @@ function rootAdmin(int $userid = 0)
     return in_array($userid, $rootAdmins);
 }
 
+/**
+ * Wandelt [php]...[/php] BBCode-Tags in farbig hervorgehobenen PHP-Quellcode um.
+ * Fügt eine Zeilennummerierung hinzu und gibt den Code in einer formatierten
+ * HTML-Tabelle mit CSS-Klassen aus.
+ *
+ * @param string $txt Eingabetext mit optionalen [php]...[/php] BBCode-Tags
+ * @return string Text mit ersetzten PHP-Code-Blöcken als HTML
+ */
 //-> PHP-Code farbig anzeigen
 function highlight_text(string $txt)
 {
@@ -922,6 +1027,13 @@ function highlight_text(string $txt)
     return $txt;
 }
 
+/**
+ * Escapt alle Sonderzeichen in einem String für die sichere Verwendung in regulären Ausdrücken.
+ * Entfernt vorher HTML-Tags sowie Zeilenumbrüche.
+ *
+ * @param string $txt Eingabetext der escapet werden soll
+ * @return string Text mit escapteten Regex-Sonderzeichen, ohne HTML und Zeilenumbrüche
+ */
 function regexChars(string $txt)
 {
     $txt = strip_tags($txt);
@@ -949,6 +1061,12 @@ function regexChars(string $txt)
     return str_replace("\n", '', $txt);
 }
 
+/**
+ * Lädt alle Glossar-Einträge aus der Datenbank in den dbc_index-Cache.
+ * Wird intern von glossar() aufgerufen, wenn der Cache noch nicht befüllt ist.
+ *
+ * @return bool TRUE bei Erfolg, FALSE wenn Glossar deaktiviert
+ */
 //-> Glossarfunktion
 $use_glossar = true; //Global
 function glossar_load_index()
@@ -969,8 +1087,12 @@ function glossar_load_index()
 }
 
 /**
- * @param $txt
- * @return mixed
+ * Verlinkt Glossar-Begriffe im Text mit Tooltip und Link zur Glossar-Seite.
+ * Lädt den Glossar-Index aus dem Cache (oder DB) und ersetzt gefundene Wörter
+ * durch anklickbare Links mit onmouseover-Info. Im AjaxJob-Modus inaktiv.
+ *
+ * @param string $txt Eingabetext in dem Glossar-Begriffe verlinkt werden sollen
+ * @return string Text mit verlinkten Glossar-Begriffen als HTML
  */
 function glossar(string $txt)
 {
@@ -1012,11 +1134,27 @@ function glossar(string $txt)
     return str_replace('[', '&#91;', $txt);
 }
 
+/**
+ * Callback für preg_replace_callback: Wandelt BBCode-Tags in Kleinbuchstaben um.
+ * Wird intern von replace() genutzt, um BBCode case-insensitiv zu verarbeiten.
+ *
+ * @param array $founds Treffer-Array aus preg_replace_callback ([0]=Gesamt, [1]=Tag, [2]=Inhalt, [3]=Schlusstag)
+ * @return string BBCode-Tag mit Kleinbuchstaben-Tags und getrimmtem Inhalt
+ */
 function bbcodetolow(array $founds)
 {
     return "[" . strtolower($founds[1]) . "]" . trim($founds[2]) . "[/" . strtolower($founds[3]) . "]";
 }
 
+/**
+ * Verarbeitet BBCode-Grundtags (url, img, b, i, u, color) und wandelt sie in HTML um.
+ * Unterstützt optional YouTube-Video-Tags und TinyMCE-spezifische Bildkonvertierung.
+ *
+ * @param string $txt        Eingabetext mit BBCode
+ * @param bool   $type       TinyMCE-Modus: konvertiert mce_src-Attribute in src (Standard: false)
+ * @param bool   $no_vid_tag Video-Tags (YouTube) deaktivieren (Standard: false)
+ * @return string Text mit umgewandelten BBCode-Tags als HTML
+ */
 //-> Replaces
 function replace(string $txt, bool $type = false, bool $no_vid_tag = false)
 {
@@ -1065,6 +1203,13 @@ function replace(string $txt, bool $type = false, bool $no_vid_tag = false)
     return preg_replace("#(\w){1,1}(&nbsp;)#Uis", "$1 ", $txt);
 }
 
+/**
+ * Filtert konfigurierte verbotene Wörter aus einem Text und ersetzt sie durch Sternchen.
+ * Die Wortliste wird aus den Settings geladen (Komma-separiert).
+ *
+ * @param string $txt Eingabetext der gefiltert werden soll
+ * @return string Text mit durch Sternchen ersetzten Badwords
+ */
 //-> Badword Filter
 function BadwordFilter($txt)
 {
@@ -1075,6 +1220,14 @@ function BadwordFilter($txt)
     return $txt;
 }
 
+/**
+ * Hebt Suchwörter im Text farbig hervor (für Suchergebnisse).
+ * Gibt ein Array mit dem modifizierten Text und einer CSS-Klasse zurück.
+ *
+ * @param string $text  Originaltext in dem hervorgehoben werden soll
+ * @param string $word  Suchwort(e) das/die hervorgehoben werden soll(en)
+ * @return array ['text' => string (Text mit <span>-Markierungen), 'class' => string (CSS-Klasse)]
+ */
 //-> Funktion um Bestimmte Textstellen zu markieren
 function hl($text, $word)
 {
@@ -1099,6 +1252,13 @@ function hl($text, $word)
     return $ret;
 }
 
+/**
+ * Wandelt eine E-Mail-Adresse in HTML-Entities (Unicode-Zeichencodes) um.
+ * Schützt die Adresse vor einfachem E-Mail-Harvesting durch Bots.
+ *
+ * @param string $email E-Mail-Adresse die kodiert werden soll
+ * @return string E-Mail als HTML-Entity-String (z.B. "&#109;&#97;&#105;&#108;...")
+ */
 //-> Emailadressen in Unicode umwandeln
 function eMailAddr(string $email)
 {
@@ -1111,6 +1271,12 @@ function eMailAddr(string $email)
     return $output;
 }
 
+/**
+ * Ersetzt Leerzeichen durch '+' (URL-konform nach W3C) und konvertiert Sonderzeichen.
+ *
+ * @param string $string Eingabestring
+ * @return string String mit '+' statt Leerzeichen und konvertierten Sonderzeichen
+ */
 //-> Leerzeichen mit + ersetzen (w3c)
 function convSpace(string $string)
 {
@@ -1118,6 +1284,13 @@ function convSpace(string $string)
     return str_replace(" ", "+", $string);
 }
 
+/**
+ * Konvertiert einen Text für die sichere Speicherung in der Datenbank (BBCode-Vorbereitung).
+ * Escapt Anführungszeichen, eckige Klammern und HTML-Entities; entfernt Backslashes.
+ *
+ * @param string $txt Eingabetext der konvertiert werden soll
+ * @return string Escapteter String für DB-Speicherung
+ */
 //-> BBCode
 function re_bbcode(string $txt)
 {
@@ -1132,6 +1305,14 @@ function re_bbcode(string $txt)
 
 /* START # from wordpress under GBU GPL license
    URL autolink function */
+
+/**
+ * Callback für preg_replace_callback: Wandelt http/https URLs in anklickbare Links um.
+ * Entfernt abschließende Satzzeichen (.,;:) vom URL-Ende und hängt sie nach dem Link an.
+ *
+ * @param array $matches Treffer-Array aus dem regulären Ausdruck
+ * @return string HTML-Anker-Tag oder Original-Match bei leerer URL
+ */
 function _make_url_clickable_cb(array $matches)
 {
     $ret = '';
@@ -1148,6 +1329,13 @@ function _make_url_clickable_cb(array $matches)
     return $matches[1] . "<a href=\"$url\" rel=\"nofollow\">$url</a>" . $ret;
 }
 
+/**
+ * Callback für preg_replace_callback: Wandelt www./ftp. URLs in anklickbare Links um.
+ * Ergänzt automatisch 'http://' als Protokoll-Präfix.
+ *
+ * @param array $matches Treffer-Array aus dem regulären Ausdruck
+ * @return string HTML-Anker-Tag oder Original-Match bei leerer URL
+ */
 function _make_web_ftp_clickable_cb(array $matches)
 {
     $ret = '';
@@ -1166,12 +1354,25 @@ function _make_web_ftp_clickable_cb(array $matches)
     return $matches[1] . "<a href=\"$dest\" rel=\"nofollow\">$dest</a>" . $ret;
 }
 
+/**
+ * Callback für preg_replace_callback: Wandelt E-Mail-Adressen in mailto-Links um.
+ *
+ * @param array $matches Treffer-Array ([1]=Prefix, [2]=User, [3]=Domain)
+ * @return string HTML mailto-Anker-Tag
+ */
 function _make_email_clickable_cb(array $matches)
 {
     $email = $matches[2] . '@' . $matches[3];
     return $matches[1] . "<a href=\"mailto:$email\">$email</a>";
 }
 
+/**
+ * Macht alle URLs, www/ftp-Adressen und E-Mail-Adressen in einem Text anklickbar.
+ * Basiert auf dem WordPress make_clickable()-Algorithmus (GPL-lizenziert).
+ *
+ * @param string $ret Eingabetext mit rohen URLs/E-Mails
+ * @return string Text mit HTML-Anker-Tags für alle gefundenen Links
+ */
 function make_clickable(string $ret)
 {
     $ret = ' ' . $ret;
@@ -1187,6 +1388,18 @@ function make_clickable(string $ret)
 
 /* END # from wordpress under GBU GPL license */
 
+/**
+ * Hauptfunktion zur vollständigen BBCode-Verarbeitung für die HTML-Ausgabe.
+ * Führt BBCode-Konvertierung, Badword-Filter, Smiley-Ersetzung, Glossar-Verlinkung
+ * und optionale URL-Verlinkung durch. Bereinigt unsicheres HTML (strip_tags).
+ *
+ * @param string $txt     Eingabetext mit BBCode
+ * @param bool   $tinymce TinyMCE-Modus aktiv (Standard: false)
+ * @param bool   $no_vid  Video/YouTube-Tags und Glossar deaktivieren (Standard: false)
+ * @param bool   $ts      TeamSpeak-Modus: strip_tags deaktivieren (Standard: false)
+ * @param bool   $nolink  URL-Verlinkung deaktivieren (Standard: false)
+ * @return string Verarbeiteter HTML-String für die Ausgabe
+ */
 //Diverse BB-Codefunktionen
 function bbcode(string $txt, bool $tinymce = false, bool $no_vid = false, bool $ts = false, bool $nolink = false)
 {
@@ -1215,6 +1428,13 @@ function bbcode(string $txt, bool $tinymce = false, bool $no_vid = false, bool $
     return str_replace('<p></p>', '<p>&nbsp;</p>', $txt);
 }
 
+/**
+ * Wandelt Newlines in <br>-Tags um und fügt einen CSS-Reset für <p>-Abstände ein.
+ * Geeignet für Newsletter/E-Mail-Inhalte mit Zeilenumbrüchen.
+ *
+ * @param string $txt Eingabetext mit Newlines
+ * @return string HTML mit <br>-Tags und eingebettetem style-Tag
+ */
 function bbcode_nletter(string $txt)
 {
     $txt = stripslashes($txt);
@@ -1222,6 +1442,13 @@ function bbcode_nletter(string $txt)
     return '<style type="text/css">p { margin: 0px; padding: 0px; }</style>' . $txt;
 }
 
+/**
+ * Konvertiert HTML-formatierten Text in reinen Plaintext für E-Mail-Versand (AltBody).
+ * Entfernt HTML-Tags, konvertiert <p>- und <br>-Tags in Zeilenumbrüche.
+ *
+ * @param string $txt HTML-Eingabetext
+ * @return string Reiner Text ohne HTML-Tags
+ */
 function bbcode_nletter_plain(string $txt)
 {
     $txt = preg_replace("#\<\/p\>#Uis", "\r\n", $txt);
@@ -1233,6 +1460,15 @@ function bbcode_nletter_plain(string $txt)
     return strip_tags($txt);
 }
 
+/**
+ * Verarbeitet BBCode in HTML-Inhalt (z.B. aus TinyMCE gespeicherte Inhalte).
+ * Dekodiert HTML-Entities, wendet BBCode-Konvertierung, Badword-Filter,
+ * Smiley-Ersetzung und Glossar-Verlinkung an.
+ *
+ * @param string $txt     Eingabetext (HTML mit BBCode-Elementen)
+ * @param bool   $tinymce TinyMCE-Modus aktiv (Standard: false)
+ * @return string Verarbeiteter HTML-String
+ */
 function bbcode_html(string $txt, bool $tinymce = false)
 {
     $txt = str_replace("&lt;", "<", $txt);
@@ -1247,6 +1483,14 @@ function bbcode_html(string $txt, bool $tinymce = false)
     return str_replace("&#34;", "\"", $txt);
 }
 
+/**
+ * Verarbeitet BBCode für E-Mail-Versand.
+ * Konvertiert BBCode zu HTML, ersetzt relative Pfade (../) durch absolute URLs
+ * und dekodiert BBCode-Klammer-Entities wieder zurück.
+ *
+ * @param string $txt BBCode-Eingabetext
+ * @return string HTML-String mit absoluten URLs, geeignet für E-Mail-Body
+ */
 function bbcode_email(string $txt)
 {
     $txt = bbcode($txt);
@@ -1256,6 +1500,14 @@ function bbcode_email(string $txt)
     return str_replace("&#93;", "]", $txt);
 }
 
+/**
+ * Setzt einen Text in ein formatiertes HTML-Zitatfeld mit Autorenangabe.
+ * Bereinigt Sonderzeichen (Curly Quotes, Zeilenumbrüche) und escapt BBCode-Zeichen.
+ *
+ * @param string $nick  Name des zitierten Autors
+ * @param string $zitat Der zu zitierende Text
+ * @return string HTML-Div mit Zitat-Formatierung und "Hat geschrieben:"-Zeile
+ */
 //-> Textteil in Zitat-Tags setzen
 function zitat(string $nick, string $zitat)
 {
@@ -1270,6 +1522,15 @@ function zitat(string $nick, string $zitat)
     return '<div class="quote"><b>' . $nick . ' ' . _wrote . ':</b><br />' . re_bbcode($zitat) . '</div><br /><br /><br />';
 }
 
+/**
+ * Konvertiert einen Datenbankwert für die sichere HTML-Ausgabe.
+ * Entfernt Backslashes, konvertiert Sonderzeichen zu HTML-Entities
+ * und dekodiert HTML-Entities (ISO-8859-1 kompatibel).
+ *
+ * @param mixed $txt                 Eingabewert aus der Datenbank
+ * @param bool  $only_stripslashes   Nur stripslashes anwenden, keine weitere Konvertierung (Standard: false)
+ * @return string Für HTML-Ausgabe aufbereiteter String
+ */
 //-> convert string for output
 function re($txt, bool $only_stripslashes = false)
 {
@@ -1280,12 +1541,27 @@ function re($txt, bool $only_stripslashes = false)
     return strval(trim(stripslashes(spChars(html_entity_decode(mb_convert_encoding($txt, 'ISO-8859-1', 'UTF-8'), ENT_COMPAT, $charset), true))));
 }
 
+/**
+ * Sicher escaptete HTML-Ausgabe eines Datenbankwertes.
+ * Kombiniert re() mit htmlspecialchars() für maximale XSS-Sicherheit.
+ *
+ * @param mixed $txt                Eingabewert aus der Datenbank
+ * @param bool  $only_stripslashes  Nur stripslashes in re() anwenden (Standard: false)
+ * @return string HTML-sicher escapteter String (ENT_QUOTES, UTF-8)
+ */
 //-> HTML-escape for safe output in HTML context (re() + htmlspecialchars)
 function h($txt, bool $only_stripslashes = false)
 {
     return htmlspecialchars(re($txt, $only_stripslashes), ENT_QUOTES, 'UTF-8');
 }
 
+/**
+ * Ersetzt Smiley-Codes (z.B. :smile:, :D, :P, ;)) durch entsprechende GIF-Bilder.
+ * Liest verfügbare Smileys dynamisch aus dem Smiley-Verzeichnis.
+ *
+ * @param string $txt Eingabetext mit Smiley-Codes
+ * @return string Text mit <img>-Tags statt Smiley-Codes
+ */
 //-> Smileys ausgeben
 function smileys(string $txt)
 {
@@ -1320,6 +1596,20 @@ function smileys(string $txt)
     return str_replace(" ^^", " <img src=\"../inc/images/smileys/^^.gif\" alt=\"\" />", $txt);
 }
 
+/**
+ * Kürzt einen Text auf eine maximale Zeichenanzahl und berücksichtigt dabei HTML-Tags.
+ * Schließt offene HTML-Tags automatisch, verhindert das Abschneiden von HTML-Entities
+ * und fügt optional einen Endstring (z.B. "...") an.
+ *
+ * @param string $text          Eingabetext (kann HTML enthalten)
+ * @param int    $length        Maximale Ausgabelänge in Zeichen (0 = leer zurückgeben)
+ * @param bool   $dots          Auslassungspunkte "..." am Ende anfügen (Standard: true)
+ * @param bool   $html          HTML-Tags bei Längenberechnung ignorieren (Standard: true)
+ * @param string $ending        Eigener Endstring statt "..." (Standard: '')
+ * @param bool   $exact         Wörter mitten durchschneiden erlauben (Standard: false)
+ * @param bool   $considerHtml  HTML-Tags beim Kürzen berücksichtigen und schließen (Standard: true)
+ * @return string Gekürzter Text mit geschlossenen HTML-Tags und optionalem Endstring
+ */
 function cut(string $text, int $length = 0, bool $dots = true, bool $html = true, string $ending = '', bool $exact = false, bool $considerHtml = true)
 {
     if ($length === 0)
@@ -1428,11 +1718,34 @@ function cut(string $text, int $length = 0, bool $dots = true, bool $html = true
     return $truncate;
 }
 
+/**
+ * Bricht einen String an Wortgrenzen um und erhält dabei HTML-Entities korrekt.
+ *
+ * @param string $str   Eingabestring der umgebrochen werden soll
+ * @param int    $width Maximale Zeichenbreite pro Zeile (Standard: 75)
+ * @param string $break Zeilenumbruch-Zeichen (Standard: "\n")
+ * @param bool   $cut   Wörter hart umbrechen wenn länger als $width (Standard: true)
+ * @return string Umgebrochener String mit erhaltenen HTML-Entities
+ */
 function wrap(string $str, int $width = 75, string $break = "\n", bool $cut = true)
 {
     return strtr(str_replace(htmlentities($break), $break, htmlentities(wordwrap(html_entity_decode($str), $width, $break, $cut), ENT_QUOTES)), array_flip(get_html_translation_table(HTML_SPECIALCHARS, ENT_COMPAT)));
 }
 
+/**
+ * Liest Dateien und/oder Verzeichnisse aus einem Ordner aus.
+ * Unterstützt Filter nach Dateiendung, Blacklist, Regex-Match und Verzeichnis-/Datei-Modus.
+ * Ergebnisse werden im dbc_index-Cache gespeichert.
+ *
+ * @param string|null $dir            Absoluter Pfad des Verzeichnisses
+ * @param bool        $only_dir       Nur Unterverzeichnisse zurückgeben (Standard: false)
+ * @param bool        $only_files     Nur Dateien zurückgeben (Standard: false)
+ * @param array       $file_ext       Erlaubte Dateiendungen z.B. ['php','html'] (Standard: alle)
+ * @param mixed       $preg_match     Regex-Pattern als Filter oder false (Standard: false)
+ * @param array       $blacklist      Dateinamen die ausgeschlossen werden sollen (Standard: [])
+ * @param mixed       $blacklist_word Wort das im Dateinamen nicht vorkommen darf (Standard: false)
+ * @return array|false Array mit Datei-/Verzeichnisnamen, FALSE bei Fehler oder leerem Ergebnis
+ */
 //-> Funktion um Dateien aus einem Verzeichnis auszulesen
 function get_files(?string $dir = null, bool $only_dir = false, bool $only_files = false, array $file_ext = array(), $preg_match = false, array $blacklist = array(), $blacklist_word = false)
 {
@@ -1508,6 +1821,14 @@ function get_files(?string $dir = null, bool $only_dir = false, bool $only_files
     }
 }
 
+/**
+ * Gibt einen definierten Ausschnitt eines numerischen Arrays zurück (Pagination-Hilfe).
+ *
+ * @param int   $begin  Start-Index (1-basiert)
+ * @param int   $max    Anzahl der zurückzugebenden Elemente
+ * @param array $array  Quellarry (Standard: [])
+ * @return array Teil-Array mit den Elementen im angegebenen Bereich
+ */
 //-> Gibt einen Teil eines nummerischen Arrays wieder
 function limited_array(int $begin, int $max, array $array = array())
 {
@@ -1521,6 +1842,13 @@ function limited_array(int $begin, int $max, array $array = array())
     return $array_exp;
 }
 
+/**
+ * Prüft ob ein Wert in einem Array vorhanden ist (Wertvergleich, nicht Schlüssel).
+ *
+ * @param mixed $var    Gesuchter Wert
+ * @param array $search Zu durchsuchendes Array
+ * @return bool TRUE wenn Wert gefunden, FALSE sonst
+ */
 function array_var_exists($var, $search)
 {
     foreach ($search as $key => $var_) {
@@ -1529,6 +1857,12 @@ function array_var_exists($var, $search)
     return false;
 }
 
+/**
+ * Konvertiert deutsche Sonderzeichen (Umlaute, ß, €) in HTML-Entities.
+ *
+ * @param string $txt Eingabetext mit Sonderzeichen
+ * @return string Text mit HTML-Entities statt Sonderzeichen
+ */
 //-> Funktion um Sonderzeichen zu konvertieren
 function spChars(string $txt)
 {
@@ -1542,6 +1876,15 @@ function spChars(string $txt)
     return str_replace("€", "&euro;", $txt);
 }
 
+/**
+ * Bereitet einen Wert für die sichere Speicherung in der Datenbank auf.
+ * Konvertiert zu HTML-Entities, konvertiert Sonderzeichen und encodiert nach UTF-8.
+ * Optional wird der String mit _real_escape_string() für SQL escapet.
+ *
+ * @param mixed $txt    Eingabewert der für die DB aufbereitet werden soll
+ * @param bool  $escape SQL-Escape mit _real_escape_string() anwenden (Standard: true)
+ * @return string Für DB-Speicherung vorbereiteter String
+ */
 //-> Funktion um sauber in die DB einzutragen
 function up($txt, bool $escape = true)
 {
@@ -1554,6 +1897,14 @@ function up($txt, bool $escape = true)
     return $escape ? _real_escape_string($txt) : $txt;
 }
 
+/**
+ * Zählt Datensätze in einer Datenbanktabelle (COUNT).
+ *
+ * @param string $count Tabellenname (mit optionalem DB-Präfix)
+ * @param string $where WHERE-Klausel inkl. "WHERE" (Standard: '')
+ * @param string $what  Zu zählendes Feld (Standard: 'id')
+ * @return int Anzahl der gefundenen Datensätze, 0 bei keinem Ergebnis
+ */
 //-> Funktion um diverse Dinge aus Tabellen auszaehlen zu lassen
 function cnt($count, $where = "", $what = "id")
 {
@@ -1566,6 +1917,14 @@ function cnt($count, $where = "", $what = "id")
     return 0;
 }
 
+/**
+ * Summiert Werte eines Feldes in einer Datenbanktabelle (SUM).
+ *
+ * @param string $db    Tabellenname (mit optionalem DB-Präfix)
+ * @param string $what  Zu summierendes Feld
+ * @param string $where WHERE-Klausel inkl. "WHERE" (Standard: '')
+ * @return int|float Summe der Feldwerte, 0 bei keinem Ergebnis
+ */
 //-> Funktion um diverse Dinge aus Tabellen zusammenzaehlen zu lassen
 function sum($db, $what, $where = "")
 {
@@ -1578,6 +1937,13 @@ function sum($db, $what, $where = "")
     return 0;
 }
 
+/**
+ * Erstellt einen Sortier-URL für eine Tabellenspalte (Toggle ASC/DESC).
+ * Liest die aktuelle URL-Query-String und tauscht die Sortierrichtung um.
+ *
+ * @param string $sort Feldname nach dem sortiert werden soll
+ * @return string URL mit gesetzten orderby- und order-Parametern
+ */
 function orderby($sort)
 {
     $split = explode("&", GetServerVars('QUERY_STRING'));
@@ -1598,6 +1964,16 @@ function orderby($sort)
     return $url . "orderby=" . $sort . "&order=ASC";
 }
 
+/**
+ * Erstellt eine sichere SQL ORDER BY Klausel aus GET-Parametern.
+ * Validiert Feld- und Richtungsangaben gegen Whitelist-Arrays.
+ *
+ * @param array  $sort_by       Whitelist erlaubter Sortierfelder
+ * @param string $default_order Standard SQL-ORDER wenn keine/ungültige Parameter (Standard: '')
+ * @param string $join          Tabel-Alias-Präfix für das Sortierfeld (Standard: '')
+ * @param array  $order_by      Erlaubte Sortierrichtungen (Standard: ['ASC','DESC'])
+ * @return string SQL ORDER BY Klausel oder $default_order bei ungültigen Parametern
+ */
 function orderby_sql(array $sort_by = array(), $default_order = '', $join = '', array $order_by = array('ASC', 'DESC'))
 {
     if (!isset($_GET['order']) || empty($_GET['order']) || !in_array($_GET['order'], $order_by)) return $default_order;
@@ -1609,6 +1985,12 @@ function orderby_sql(array $sort_by = array(), $default_order = '', $join = '', 
     return 'ORDER BY ' . $join . $orderby_real . " " . $order_real;
 }
 
+/**
+ * Gibt die aktuellen Sortier-Parameter (orderby & order) als URL-Anhang zurück.
+ * Wird für die Seitennavigation genutzt, um Sortierung beizubehalten.
+ *
+ * @return string URL-Parameter-String (z.B. "&orderby=name&order=ASC") oder leer
+ */
 function orderby_nav()
 {
     $orderby = isset($_GET['orderby']) ? "&orderby" . $_GET['orderby'] : "";
@@ -1616,6 +1998,12 @@ function orderby_nav()
     return $orderby;
 }
 
+/**
+ * Hebt ein Wort in einem Text durch einen roten <span> hervor.
+ *
+ * @param string $word Das hervorzuhebende Wort (wird auch als Eingabetext verwendet)
+ * @return string Text mit <span class="fontRed"> um das gefundene Wort
+ */
 //-> Funktion um ein Datenbankinhalt zu highlighten
 function highlight(string $word)
 {
@@ -1625,6 +2013,13 @@ function highlight(string $word)
         return str_replace($word, '<span class="fontRed">' . $word . '</span>', $word);
 }
 
+/**
+ * Aktualisiert den Seitenbesucher-Counter für den heutigen Tag.
+ * Speichert Besucher-IPs mit Timestamp und verhindert Mehrfachzählung
+ * innerhalb der konfigurierten Reload-Sperrzeit. Ignoriert Spider/Bots.
+ *
+ * @return void
+ */
 //-> Counter updaten
 function updateCounter()
 {
@@ -1672,6 +2067,11 @@ function updateCounter()
     }
 }
 
+/**
+ * Aktualisiert den Rekord der gleichzeitig online gewesenen Besucher für den heutigen Tag.
+ *
+ * @return void
+ */
 //-> Updatet die Maximalen User die gleichzeitig online sind
 function update_maxonline()
 {
@@ -1684,6 +2084,13 @@ function update_maxonline()
         db("UPDATE `" . $db['counter'] . "` SET `maxonline` = " . ((int)$count) . " WHERE `today` = '" . $today . "';");
 }
 
+/**
+ * Erfasst den aktuellen Besucher in der Online-Tabelle und gibt die Anzahl der
+ * aktuell aktiven Besucher zurück. Löscht veraltete Einträge (Timeout).
+ *
+ * @param string $where Aktueller Seitenbereich (für "Wer ist wo online") (Standard: '')
+ * @return int|bool Anzahl der aktiven Besucher, TRUE bei Spider/Bot-Erkennung
+ */
 //-> Prueft, wieviele Besucher gerade online sind
 function online_guests(string $where = '')
 {
@@ -1702,6 +2109,12 @@ function online_guests(string $where = '')
     return true;
 }
 
+/**
+ * Gibt die Anzahl der aktuell eingeloggten registrierten User zurück.
+ * Zählt User deren letzter Aktivitäts-Timestamp innerhalb des Online-Timeout liegt.
+ *
+ * @return int Anzahl der eingeloggten registrierten User
+ */
 //-> Prueft, wieviele registrierte User gerade online sind
 function online_reg()
 {
@@ -2082,10 +2495,10 @@ function checkpwd(string $user, string $pwd)
  * Infomeldung ausgeben
  * @param string $msg
  * @param string $url
- * @param int $timeout
+ * @param float $timeout
  * @return bool|mixed|null|string|string[]
  */
-function info(string $msg, string $url, int $timeout = 5)
+function info(string $msg, string $url, $timeout = 5)
 {
     if (config('direct_refresh')) {
         header('Location: ' . str_replace('&amp;', '&', $url));
@@ -2292,6 +2705,13 @@ function cleanautor(int $uid, string $class = "", string $nick = "", string $ema
         "class" => $class, "nick" => re(cut(dbc_index::getIndexKey('user_' . (int)($uid), 'nick'), $cut, false, false))));
 }
 
+/**
+ * Gibt Länderflagge und Nickname eines Users als reinen Text (für rawflag) zurück.
+ * Wird z.B. für TeamSpeak oder nicht-HTML-Kontexte verwendet.
+ *
+ * @param int $uid User-ID
+ * @return string Flaggen-HTML + Nickname, oder Leer-Flagge + User-ID bei nicht gefundenen Usern
+ */
 function rawautor(int $uid)
 {
     global $db;
@@ -2447,6 +2867,12 @@ function sendMail(string $mailto, string $subject, string $content)
     }
 }
 
+/**
+ * Gibt den ISO-639-1 Sprachkurzcode der aktuellen Session-Sprache zurück.
+ * Wird für PHPMailer-Sprachdateien und GUMP-Validierung verwendet.
+ *
+ * @return string Sprachkurzcode (z.B. 'de', 'en', 'es', 'ru')
+ */
 function language_short_tag()
 {
     switch ($_SESSION['language']) {
@@ -2461,6 +2887,13 @@ function language_short_tag()
     }
 }
 
+/**
+ * Prüft auf neue ungelesene private Nachrichten und sendet E-Mail-Benachrichtigungen.
+ * Versendet nur wenn der Empfänger die E-Mail-Benachrichtigung aktiviert hat (pnmail=1)
+ * und die Nachricht noch nicht per E-Mail versendet wurde (sendmail=0).
+ *
+ * @return void
+ */
 function check_msg_emal()
 {
     global $db, $httphost;
@@ -2885,6 +3318,12 @@ function cal(int $i)
     return $tag_nr;
 }
 
+/**
+ * Entfernt führende Nullen bei Monatsangaben (außer bei "10").
+ *
+ * @param int $i Monatszahl mit möglicher führender Null (z.B. 01, 09)
+ * @return int|string Monat ohne führende Null (z.B. 1, 9), oder unverändert bei 10
+ */
 //-> Entfernt fuehrende Nullen bei Monatsangaben
 function nonum(int $i)
 {
@@ -3321,24 +3760,26 @@ if ($functions_files = get_files(basePath . '/inc/additional-functions/', false,
  */
 class javascript
 {
-    private static $data_array = [];
+    private static array $data_array = [];
 
-    public static function set($key = '', $var = '')
+    public static function set($key = '', $var = ''): self
     {
         self::$data_array[$key] = $var;
+        return new self();
     }
 
-    public static function remove($key = '')
+    public static function remove($key = ''): self
     {
         unset(self::$data_array[$key]);
+        return new self();
     }
 
-    public static function get($key = '')
+    public static function get($key = ''): false|array|string
     {
         return mb_convert_encoding(self::$data_array[$key] ?? '', 'ISO-8859-1', 'UTF-8');
     }
 
-    public static function encode()
+    public static function encode(): false|string
     {
         return json_encode(self::$data_array);
     }
@@ -3355,7 +3796,7 @@ include_once(basePath . '/inc/menu-functions/navi.php');
  * @param string $wysiwyg
  * @param string $index_templ
  */
-function page(string $index = '', string $title = '', string $where = '', string $wysiwyg = '', string $index_templ = 'index')
+function page(string $index = '', string $title = '', string $where = '', string $wysiwyg = '', string $index_templ = 'index'): void
 {
     global $db, $userid, $userip, $tmpdir, $chkMe, $mysql, $isSpider;
     global $designpath, $time_start;
@@ -3366,8 +3807,8 @@ function page(string $index = '', string $title = '', string $where = '', string
     DzcpLogger::app()->debug('Seitenaufruf', [
         'where'   => $where,
         'title'   => $title,
-        'user_id' => isset($userid) ? $userid : 0,
-        'ip'      => isset($userip) ? $userip : '',
+        'user_id' => $userid ?? 0,
+        'ip'      => $userip ?? '',
         'time_ms' => $time,
         'method'  => GetServerVars('REQUEST_METHOD'),
         'uri'     => GetServerVars('REQUEST_URI'),

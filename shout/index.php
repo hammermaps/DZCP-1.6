@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $dir = "shout";
@@ -57,7 +54,7 @@ switch ($action):
             exit();
         }
         break;
-    case 'admin';
+    case 'admin':
         if (!permission("shoutbox")) {
             $index = error(_error_wrong_permissions, 1);
         } else {
@@ -69,7 +66,7 @@ switch ($action):
             }
         }
         break;
-    case 'archiv';
+    case 'archiv':
         $where = _site_shoutbox;
         $title = $pagetitle . " - " . $where . "";
 
