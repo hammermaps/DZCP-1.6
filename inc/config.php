@@ -387,6 +387,10 @@ if ($db['host'] != '' && $db['user'] != '' && $db['pass'] != '' && $db['db'] != 
         }
     }
     unset($migrations, $mig_table, $mig_col, $mig_def, $mig_check);
+
+    // ── Initialize Nette Database (new database abstraction layer) ───────
+    require_once(basePath . '/inc/database.php');
+    initNetteDatabase($db);
 }
 
 // Start session if no headers were sent
@@ -416,27 +420,69 @@ if (!headers_sent()) {
 // ── Monolog Logger initialisieren ────────────────────────────────────────────
 DzcpLogger::init($config_logging);
 
-//MySQLi-Funktionen
+//MySQLi-Funktionen (Legacy - wird durch Nette\Database ersetzt)
+/**
+ * Get number of rows from query result
+ * @deprecated Use Nette\Database\Explorer methods instead
+ * @param mixed $rows
+ * @return int
+ */
 function _rows($rows)
 {
     if ($rows === true || $rows === false || $rows === null) return 0;
     if (is_array($rows)) return array_key_exists('_stmt_rows_', $rows) ? $rows['_stmt_rows_'] : 0;
+    if ($rows instanceof NetteResultWrapper) return $rows->getNumRows();
     return $rows->num_rows;
 }
 
+/**
+ * Fetch a single row from query result
+ * @deprecated Use Nette\Database\Explorer methods instead
+ * @param mixed $fetch
+ * @return array|null
+ */
 function _fetch($fetch)
 {
     if ($fetch === true || $fetch === false || $fetch === null) return null;
     if (is_array($fetch)) return array_key_exists('_stmt_rows_', $fetch) ? $fetch[0] : null;
+    if ($fetch instanceof NetteResultWrapper) return $fetch->fetch_assoc();
     return $fetch->fetch_assoc();
 }
 
+/**
+ * Escape string for SQL injection prevention
+ * @deprecated Use Nette\Database\Explorer with parameters instead
+ * @param string $string
+ * @return string
+ */
 function _real_escape_string($string = '')
 {
     global $mysql;
+
+    // Try to use Nette Database for escaping if available
+    $netteDb = getNetteDb();
+    if ($netteDb !== null && !empty($string)) {
+        try {
+            // Use PDO quote and remove quotes
+            $connection = $netteDb->getConnection();
+            $quoted = $connection->getPdo()->quote($string);
+            return substr($quoted, 1, -1); // Remove surrounding quotes
+        } catch (Exception $e) {
+            // Fall back to mysqli
+        }
+    }
+
     return !empty($string) ? $mysql->real_escape_string($string) : '';
 }
 
+/**
+ * Execute SQL query
+ * @deprecated Use Nette\Database\Explorer methods instead
+ * @param string $query
+ * @param bool $rows
+ * @param bool $fetch
+ * @return mixed
+ */
 function db($query = '', $rows = false, $fetch = false)
 {
     global $mysql, $updater, $db;
@@ -446,6 +492,39 @@ function db($query = '', $rows = false, $fetch = false)
         DzcpLogger::sql()->debug('SQL Query', ['query' => $query]);
     }
 
+    // Use Nette Database only for read (SELECT) queries.
+    // Write queries (INSERT, UPDATE, DELETE, ALTER, …) must go through the
+    // shared mysqli connection so that $mysql->insert_id, affected_rows,
+    // active transactions, and connection-level session variables stay
+    // consistent for all callers.
+    $netteDb = getNetteDb();
+    if ($netteDb !== null && !$updater && !isWriteQuery($query)) {
+        try {
+            $result = executeNetteQuery($query);
+
+            if ($result === null) {
+                throw new Exception('Query execution failed');
+            }
+
+            if ($rows && !$fetch)
+                return _rows($result);
+            else if ($fetch && $rows)
+                return $result->fetch_array(MYSQLI_NUM);
+            else if ($fetch && !$rows)
+                return _fetch($result);
+
+            return $result;
+
+        } catch (Exception $e) {
+            DzcpLogger::sql()->error('Nette Database error, falling back to mysqli', [
+                'query' => $query,
+                'error' => $e->getMessage()
+            ]);
+            // Fall through to mysqli fallback
+        }
+    }
+
+    // Legacy mysqli – used for all write queries and as fallback for reads
     if ($updater) {
         $qry = $mysql->query($query);
     } else {
@@ -479,6 +558,7 @@ function db($query = '', $rows = false, $fetch = false)
  *  d     corresponding variable has type double
  *  s     corresponding variable has type string
  *  b     corresponding variable is a blob and will be sent in packets
+ * @deprecated Use Nette\Database\Explorer with parameters instead
  * @param $query
  * @param array $params
  * @param bool $rows
@@ -493,6 +573,51 @@ function db_stmt($query, $params = array('si', 'hallo', '4'), $rows = false, $fe
         DzcpLogger::sql()->debug('SQL Prepared Query', ['query' => $query, 'params' => array_slice($params, 1)]);
     }
 
+    // Use Nette Database only for read (SELECT) queries.
+    // Write queries must go through mysqli to keep insert_id / transactions
+    // consistent across the rest of the application.
+    $netteDb = getNetteDb();
+    if ($netteDb !== null && !isWriteQuery($query)) {
+        try {
+            // Convert mysqli parameter format to PDO format
+            $types = $params[0] ?? '';
+            $values = array_slice($params, 1);
+
+            // Replace ? with named parameters for Nette
+            $paramCount = strlen($types);
+            $netteQuery = $query;
+
+            // Execute using Nette with positional parameters
+            $result = $netteDb->query($netteQuery, ...$values);
+
+            // Convert to array format for compatibility
+            $results = [];
+            $results['_stmt_rows_'] = 0;
+
+            if ($result instanceof Nette\Database\ResultSet) {
+                foreach ($result as $row) {
+                    $results[] = $row->toArray();
+                    $results['_stmt_rows_']++;
+                }
+            }
+
+            if ($rows && !$fetch)
+                return _rows($results);
+            else if ($fetch && !$rows)
+                return _fetch($results);
+
+            return $results;
+
+        } catch (Exception $e) {
+            DzcpLogger::sql()->error('Nette prepared statement error, falling back to mysqli', [
+                'query' => $query,
+                'error' => $e->getMessage()
+            ]);
+            // Fall through to mysqli fallback
+        }
+    }
+
+    // Legacy mysqli prepared statement – used for all write queries and as fallback for reads
     if (!$statement = $mysql->prepare($query)) {
         DzcpLogger::sql()->critical('SQL Prepared-Statement Fehler (prepare)', [
             'query' => $query,

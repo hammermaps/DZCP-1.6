@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'dzcp/core',
-        'pretty_version' => 'dev-development',
-        'version' => 'dev-development',
-        'reference' => '82392ef56f493ec9ee647f378bc6259078da1343',
+        'pretty_version' => 'dev-claude/refactor-database-function-usage',
+        'version' => 'dev-claude/refactor-database-function-usage',
+        'reference' => '92c893b2838e708b3696993dcedbbf999f8af48a',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'dzcp/core' => array(
-            'pretty_version' => 'dev-development',
-            'version' => 'dev-development',
-            'reference' => '82392ef56f493ec9ee647f378bc6259078da1343',
+            'pretty_version' => 'dev-claude/refactor-database-function-usage',
+            'version' => 'dev-claude/refactor-database-function-usage',
+            'reference' => '92c893b2838e708b3696993dcedbbf999f8af48a',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -36,6 +36,35 @@
             'install_path' => __DIR__ . '/../monolog/monolog',
             'aliases' => array(
                 0 => '3.x-dev',
+            ),
+            'dev_requirement' => false,
+        ),
+        'nette/caching' => array(
+            'pretty_version' => 'v3.4.x-dev',
+            'version' => '3.4.9999999.9999999-dev',
+            'reference' => 'a120ece7cdcd261636ae94a25de3e060dfc229a0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../nette/caching',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'nette/database' => array(
+            'pretty_version' => 'v3.2.x-dev',
+            'version' => '3.2.9999999.9999999-dev',
+            'reference' => 'a8d19d05a62b2f177766a1a0b35fe569695cede9',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../nette/database',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'nette/utils' => array(
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'reference' => 'dd5725782de7b9d225d9375c51d211097ace82aa',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../nette/utils',
+            'aliases' => array(
+                0 => '4.1.x-dev',
             ),
             'dev_requirement' => false,
         ),
