@@ -106,9 +106,6 @@ class api
     public function getNews(bool $use_cache = true, int $ttl = 120)
     {
         global $cache;
-        if (show_api_debug)
-            DebugConsole::insert_info('api.php', 'Call getNews()');
-
         $this->api_output = [];
         $this->api_output['news'] = '';
         $this->api_output['error'] = true;
@@ -151,9 +148,6 @@ class api
     public function getAddonVersions(array $addons, bool $use_cache = true, int $ttl = 30)
     {
         global $cache;
-        if (show_api_debug)
-            DebugConsole::insert_info('api.php', 'Call getAddonVersions()');
-
         $this->api_compress = true;
 
         $this->api_output = [];
@@ -200,9 +194,6 @@ class api
     public function getDzcpVersion(bool $use_cache = true, int $ttl = 60, bool $reload = false)
     {
         global $cache;
-        if (show_api_debug)
-            DebugConsole::insert_info('api.php', 'Call getDzcpVersion()');
-
         $this->api_output = [];
         $this->api_output['version'] = _version;
         $this->api_output['release'] = _release;
@@ -250,9 +241,6 @@ class api
     public function getGeoLocation(string $address, bool $use_cache = true, int $ttl = 30)
     {
         global $cache;
-        if (show_api_debug)
-            DebugConsole::insert_info('api.php', 'Call getGeoLocation()');
-
         $this->api_output = [];
         $this->api_output['results'] = [];
         $this->api_output['status'] = 'ZERO_RESULTS';
@@ -312,9 +300,6 @@ class api
 
     private function varying()
     {
-        if (show_api_debug)
-            DebugConsole::insert_info('api.php', 'Call varying');
-
         //Uncompress
         if (array_key_exists('compress', $this->api_output['results'])) {
             unset($this->api_output['results']['compress']);
@@ -340,9 +325,6 @@ class api
         $this->api_input += ['language' => $this->api_language];
         $this->api_input += ['compress' => $this->api_compress];
 
-        if (show_api_debug)
-            DebugConsole::insert_info('api.php', 'apiInput: <pre>' . var_export($this->api_input, true) . '</pre>');
-
         //Call to Server
         $this->api_output_stream = get_external_contents('https://' . $this->api_server, $this->api_input, false, $timeout);
 
@@ -355,8 +337,6 @@ class api
         }
 
         $this->api_output = json_decode($this->api_output_stream, true);
-
-        DebugConsole::insert_info('api.php', 'apiOutput: <pre>' . var_export($this->api_output, true) . '</pre>');
 
         if (json_last_error()) {
             $this->api_output['results'] = [];

@@ -59,11 +59,6 @@ require_once(basePath . '/_installer/conf/conf.php');
 require_once(basePath . '/_installer/conf/mysql.php');
 
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
-DebugConsole::initCon();
-
-if (debug_dzcp_handler)
-    set_error_handler('dzcp_error_handler');
 
 include(basePath . '/_installer/html/header.php');
 
@@ -601,4 +596,4 @@ endswitch;
 include(basePath . '/_installer/html/footer.php');
 $installer_out = ob_get_contents();
 ob_end_clean();
-echo DebugConsole::show_logs() . $installer_out;
+echo $installer_out;

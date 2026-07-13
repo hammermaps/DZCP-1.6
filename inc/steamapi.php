@@ -52,7 +52,7 @@ class SteamAPI
     public static function getUserInfos(string $custom_profile_url = '')
     {
         if (empty($custom_profile_url)) {
-            DebugConsole::insert_warning('SteamAPI::getUserInfos()', 'There was no specified Steam Profile-URL');
+            DzcpLogger::app()->warning('Steam-Profil-URL fehlt');
             return false;
         }
 
@@ -149,14 +149,13 @@ class SteamAPI
                     self::$api_data = $proxy['data'];
                     return is_array(self::$api_data);
                 } else {
-                    DebugConsole::insert_error('SteamAPI::get_steamcommunity()', 'No connection to the community interface!');
-                    DebugConsole::insert_warning('SteamAPI::get_steamcommunity()', 'URL: ' . self::$api_host . '/' . $interface . '/' . $method . '/' . $version . '/?' . http_build_query(self::$send_data_api));
+                    DzcpLogger::app()->error('Steam Community API nicht erreichbar');
                     return false;
                 }
             }
 
             if (strpos($xml_stream, 'Unauthorized') !== false) {
-                DebugConsole::insert_error('SteamAPI::get_api()', 'The Steam Web API key is invalid');
+                DzcpLogger::security()->error('Steam Web API-Schlüssel wurde abgelehnt');
                 return false;
             }
 
@@ -210,8 +209,7 @@ class SteamAPI
                     self::$community_data[str_replace('_', '', $zone_tag)] = $proxy['data'];
                     return is_array(self::$community_data[str_replace('_', '', $zone_tag)]);
                 } else {
-                    DebugConsole::insert_error('SteamAPI::get_steamcommunity()', 'No connection to the community interface!');
-                    DebugConsole::insert_warning('SteamAPI::get_steamcommunity()', 'URL: ' . self::$api_com . '/id/' . self::$profile_url . '/' . $zone_url . '?xml=1');
+                    DzcpLogger::app()->error('Steam Community-Profil nicht erreichbar');
                     return false;
                 }
             }
@@ -221,8 +219,7 @@ class SteamAPI
             if (array_key_exists('error', $xml)) {
                 $xml_stream = steam_only_proxy ? false : get_external_contents(re(self::$api_com . '/profiles/' . self::$profile_url . '/?xml=1', true));
                 if (empty($xml_stream) || !$xml_stream) {
-                    DebugConsole::insert_error('SteamAPI::get_steamcommunity()', 'No connection to the community interface!');
-                    DebugConsole::insert_warning('SteamAPI::get_steamcommunity()', 'URL: ' . self::$api_com . '/id/' . self::$profile_url . '/' . $zone_url . '?xml=1');
+                    DzcpLogger::app()->error('Steam Community-Profil nicht erreichbar');
                     return false;
                 }
             }

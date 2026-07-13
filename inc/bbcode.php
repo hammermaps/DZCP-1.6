@@ -14,7 +14,7 @@ if (str_contains($filter404, 'index.php/') ||
 unset($filter404);
 
 ## INCLUDES/REQUIRES ##
-// Klassen (dbc_index, api, cookie, SteamAPI, DebugConsole) werden via
+// Klassen (dbc_index, api, cookie, SteamAPI) werden via
 // Composer classmap geladen (vendor/autoload.php in buffer.php)
 require_once(basePath . '/inc/_version.php');
 require_once(basePath . '/inc/logger.php');
@@ -2862,7 +2862,7 @@ function sendMail(string $mailto, string $subject, string $content)
         $mail->setLanguage(language_short_tag(), basePath . '/vendor/phpmailer/phpmailer/language');
         return $mail->send();
     } catch (\PHPMailer\PHPMailer\Exception $e) {
-        DebugConsole::insert_error('sendMail()', $e->getMessage());
+        DzcpLogger::error()->error('E-Mail konnte nicht gesendet werden', ['exception' => $e]);
         return false;
     }
 }
@@ -3938,8 +3938,7 @@ function page(string $index = '', string $title = '', string $where = '', string
         if (HasDSGVO())
             cookie::save(); //Save Cookie
 
-        if (debug_save_to_file) DebugConsole::save_log(); //Debug save to file
-        $output = view_error_reporting ? DebugConsole::show_logs() . $index : $index; //Debug Console + Index Out
+        $output = $index;
 
         if (!array_key_exists('do_show_dsgvo', $_SESSION)) {
             $_SESSION['do_show_dsgvo'] = true;

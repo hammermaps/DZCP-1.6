@@ -21,9 +21,6 @@ final class dbc_index
     {
         global $cache, $config_cache;
         if (self::MemSetIndex()) {
-            if (show_dbc_debug)
-                DebugConsole::insert_info('dbc_index::setIndex()', 'Set index: "' . $index_key . '" to cache');
-
             if ($config_cache['dbc']) {
                 $data_cache = null;
                 try {
@@ -42,9 +39,6 @@ final class dbc_index
             }
         }
 
-        if (show_dbc_debug)
-            DebugConsole::insert_info('dbc_index::setIndex()', 'Set index: "' . $index_key . '"');
-
         self::$index[$index_key] = $data;
     }
 
@@ -56,9 +50,6 @@ final class dbc_index
     {
         if (!self::issetIndex($index_key))
             return false;
-
-        if (show_dbc_debug)
-            DebugConsole::insert_info('dbc_index::getIndex()', 'Get full index: "' . $index_key . '"');
 
         return self::$index[$index_key];
     }
@@ -100,9 +91,6 @@ final class dbc_index
             }
 
             if (!is_null($data) && !is_null($data->get())) {
-                if (show_dbc_debug)
-                    DebugConsole::insert_loaded('dbc_index::issetIndex()', 'Load index: "' . $index_key . '" from cache');
-
                 DzcpLogger::cache()->debug('dbc_index: Cache-Hit', ['key' => $index_key]);
                 self::$index[$index_key] = unserialize($data->get());
                 return true;

@@ -10,8 +10,6 @@
 
 define('view_error_reporting', true); // Zeigt alle Fehler und Notices etc.
 define('debug_all_sql_querys', false);
-define('debug_save_to_file', true);
-define('debug_dzcp_handler', true);
 define('fsockopen_support_bypass', false); //Umgeht die fsockopen pruefung
 define('use_curl_support', true); //Soll CURL verwendet werden
 define('use_min_css_js_files', false); //Sollen die Komprimierten versionen von css und js verwendet werden?
@@ -138,6 +136,10 @@ $config_logging = [
     'log_bubble'                => false, // Handler-Bubbling (false = nach erstem Handler stopp)
 ];
 
+require_once(basePath . '/inc/logger.php');
+DzcpLogger::init($config_logging);
+DzcpErrorHandler::configure($config_logging, view_error_reporting);
+
 /*
  * Cache Configuration
  */
@@ -161,7 +163,8 @@ try {
         "tpl" => false  //use template caching * only use with memory cache
     );
 } catch (PhpfastcacheInvalidConfigurationException|ReflectionException $e) {
-    exit('Fehler in der Cache-Konfiguration: ' . $e->getMessage());
+    DzcpLogger::error()->critical('Cache-Konfiguration fehlgeschlagen', ['exception' => $e]);
+    throw new RuntimeException('Fehler in der Cache-Konfiguration', 0, $e);
 }
 
 //-> Legt die UserID des Rootadmins fest
@@ -178,28 +181,6 @@ else if (!use_default_timezone) date_default_timezone_set(default_timezone);
 else date_default_timezone_set("Europe/Berlin");
 if (!isset($thumbgen)) $thumbgen = false;
 
-if (!$thumbgen) {
-    if (view_error_reporting) {
-        error_reporting(E_ALL);
-
-        if (function_exists('ini_set'))
-            ini_set('display_errors', 1);
-
-        DebugConsole::initCon();
-
-        if (debug_dzcp_handler)
-            set_error_handler('dzcp_error_handler');
-    } else {
-        if (function_exists('ini_set'))
-            ini_set('display_errors', 0);
-
-        error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED);
-
-        if (debug_dzcp_handler)
-            set_error_handler('dzcp_error_handler');
-    }
-}
-
 ## REQUIRES ##
 //DZCP-Install default variable
 if (!isset($installer)) $installer = false;
@@ -213,8 +194,6 @@ if (!isset($sql_host) || !isset($sql_user) || !isset($sql_pass) || !isset($sql_d
 
 if (file_exists(basePath . "/inc/mysql.php"))
     require_once(basePath . "/inc/mysql.php");
-
-require_once(basePath . "/inc/logger.php");
 
 if (!isset($installation)) $installation = false;
 if (!isset($updater)) $updater = false;
@@ -371,7 +350,13 @@ if ($db['host'] != '' && $db['user'] != '' && $db['pass'] != '' && $db['db'] != 
     $db_host = (mysqli_persistconns ? 'p:' : '') . $db['host'];
     $mysql = new mysqli($db_host, $db['user'], $db['pass'], $db['db']);
     if ($mysql->connect_error) {
-        die("<b>Fehler beim Zugriff auf die Datenbank!");
+        DzcpLogger::error()->critical('Datenbankverbindung fehlgeschlagen', [
+            'host' => $db['host'],
+            'database' => $db['db'],
+            'errno' => $mysql->connect_errno,
+            'error' => $mysql->connect_error,
+        ]);
+        throw new RuntimeException('Fehler beim Zugriff auf die Datenbank');
     }
 
     // ── Character-Set auf UTF-8MB4 einstellen ─────────────────────────────
@@ -417,9 +402,6 @@ if (!headers_sent()) {
     exit("Die Session konnte nicht gestartet werden! ( headers has already sent )<p> STOP!");
 }
 
-// ── Monolog Logger initialisieren ────────────────────────────────────────────
-DzcpLogger::init($config_logging);
-
 //MySQLi-Funktionen
 function _rows($rows)
 {
@@ -446,7 +428,6 @@ function db($query = '', $rows = false, $fetch = false)
     global $mysql, $updater, $db;
 
     if (debug_all_sql_querys) {
-        DebugConsole::wire_log('debug', 9, 'SQL_Query', $query);
         DzcpLogger::sql()->debug('SQL Query', ['query' => $query]);
     }
 
@@ -459,7 +440,6 @@ function db($query = '', $rows = false, $fetch = false)
                 'errno'    => $mysql->errno,
                 'error'    => $mysql->error,
             ]);
-            DebugConsole::sql_error_handler($query);
             $language_text = [];
             include_once(basePath . '/inc/lang/languages/english.php');
             $get = _fetch($mysql->query("SELECT `clanname` FROM `" . $db['settings'] . "`;"));

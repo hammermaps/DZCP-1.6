@@ -1,0 +1,41 @@
+/**
+ * This file is part of the Tracy (https://tracy.nette.org)
+ */
+
+@layer base, components;
+
+@layer base {
+
+:root,
+:host {
+	--tracy-space: 16px;
+}
+
+@media (max-width: 600px) {
+	:root,
+	:host {
+		--tracy-space: 8px;
+	}
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+input {
+	padding: 1px;
+}
+
+textarea {
+	padding: 2px;
+}
+
+}

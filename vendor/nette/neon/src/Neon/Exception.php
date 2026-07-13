@@ -1,0 +1,25 @@
+<?php declare(strict_types=1);
+
+/**
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
+ */
+
+namespace Nette\Neon;
+
+
+/**
+ * The exception that indicates error of NEON processing.
+ */
+class Exception extends \Exception
+{
+	public readonly ?Position $position;
+
+
+	public function __construct(string $message, ?Position $position = null, ?\Throwable $previous = null)
+	{
+		$message .= $position ? ' ' . $position : '';
+		$this->position = $position;
+		parent::__construct($message, 0, $previous);
+	}
+}

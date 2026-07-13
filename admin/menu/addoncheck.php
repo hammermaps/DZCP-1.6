@@ -124,5 +124,5 @@ $show = show($dir . '/addon_check', [
 ]);
 
 if ($addons['error']) {
-    DebugConsole::insert_warning('index::admin::addoncheck', $addons['error_msg']);
+    DzcpLogger::app()->warning('Addon-Prüfung fehlgeschlagen', ['error' => $addons['error_msg']]);
 }

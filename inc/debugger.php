@@ -1,281 +1,172 @@
 <?php
+
+declare(strict_types=1);
+
+use Tracy\Debugger;
+
 /**
- * DZCP - deV!L`z ClanPortal 1.6 Final
- * http://www.dzcp.de
+ * Central PHP error bridge for DZCP.
+ *
+ * It is registered before the application configuration is loaded, then
+ * activated once Monolog is available. Tracy remains responsible for the
+ * developer error screen and fatal-error rendering; Monolog is the sole
+ * application log destination.
  */
-
-#########################################
-//-> Debug Console Settings Start
-#########################################
-
-define('show_loaded', true);
-define('show_info', true);
-define('show_warning', true);
-define('show_dbc_debug', false);
-define('show_deprecation_debug', true);
-define('show_gameserver_debug', true);
-define('show_api_debug', false);
-
-#############################################
-############### Debug Console ###############
-#############################################
-define("EOL", "\r\n");
-define('DEBUG_LOADER', true);
-
-class DebugConsole
+final class DzcpErrorHandler
 {
-    private static $log_array = array(array());
-    private static $file_data = '';
+    private static bool $booted = false;
+    private static bool $tracyEnabled = false;
+    private static bool $handling = false;
 
-    public static final function initCon()
+    public static function boot(): void
     {
-        self::$log_array = array(array());
-        self::$file_data = '';
-    }
-
-    public static final function insert_log($file, $msg, $back = false, $func = "", $line = 0)
-    {
-        self::$log_array[$file][] = ($line != 0 ? 'Line:"' . $line . '" => ' : "") . ($back ? $msg . $func : $func . $msg);
-    }
-
-    public static final function insert_successful($file, $func)
-    {
-        self::$log_array[$file][] = '<span style="color:#009900">' . $func . '</font>';
-    }
-
-    public static final function insert_error($file, $msg)
-    {
-        self::$log_array[$file][] = '<span style="color:#FF0000">' . $msg . '</font>';
-    }
-
-    public static final function insert_loaded($file, $func)
-    {
-        if (show_loaded) self::$log_array[$file][] = '<span style="color:#009900">' . $func . '</font>';
-    }
-
-    public static final function insert_info($file, $info)
-    {
-        if (show_info) self::$log_array[$file][] = '<span style="color:#9900CC">' . $info . '</font>';
-    }
-
-    public static final function insert_var_debug($info)
-    {
-        self::$log_array['vardebug'][] = '<pre>' . $info . '</pre>';
-    }
-
-    public static final function insert_warning($file, $func)
-    {
-        if (show_warning) self::$log_array[$file][] = '<span style="color:#FFFF00">' . $func . '</font>';
-    }
-
-    public static final function sql_error_handler($query)
-    {
-        global $mysql;
-        $message = '#####################################################################' . EOL .
-            '   Datum   = ' . date("d.m.y H:i", time()) . EOL .
-            '   URL     = http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . $_SERVER['PHP_self'] . EOL . EOL .
-            '   MySQLi-Query failed:' . EOL .
-            '   ConnectErrorNo = ' . mysqli_connect_errno() . EOL .
-            '   ConnectError   = ' . mysqli_connect_error() . EOL . EOL .
-            '   QueryError   = ' . mysqli_error($mysql) . EOL . EOL .
-            '   Query   = ' . $query . EOL .
-            '#####################################################################' . EOL . EOL;
-
-        $fp = fopen(basePath . "/inc/_logs/sql_error_log.log", "a+");
-        fwrite($fp, $message);
-        fclose($fp);
-    }
-
-    public static final function save_log()
-    {
-        foreach (self::$log_array as $file => $msg_array) {
-            foreach ($msg_array as $msg) {
-                self::$file_data .= strip_tags('"' . $file . '" => "' . $msg . '"') . "\n";
-            }
+        if (self::$booted) {
+            return;
         }
-        if (!empty(self::$file_data)) file_put_contents(basePath . '/inc/_logs/debug_' . date("s-i-h") . '_' . date("d_m_Y") . '.log', self::$file_data);
+
+        self::$booted = true;
+        error_reporting(E_ALL);
+        set_error_handler(self::handleError(...));
+        set_exception_handler(self::handleException(...));
+        register_shutdown_function(self::handleShutdown(...));
     }
 
-    public static final function show_logs()
+    /** @param array<string, mixed> $config */
+    public static function configure(array $config, bool $development): void
     {
-        $data = '';
-        $color = 0;
-        $i = 0;
-        foreach (self::$log_array as $file => $msg_array) {
-            if ($file == 'vardebug') {
-                foreach ($msg_array as $msg) {
-                    $set_color = ($color % 2) ? "#CCCCCC" : "#E6E6E6";
-                    $color++;
-                    $data .= '<tr><td colspan="2" width="60%" bgcolor="' . $set_color . '"><b><div align="center">' . $msg . '</div></b></td></tr>';
-                    $i++;
-                }
+        if (self::$tracyEnabled) {
+            return;
+        }
+
+        $logPath = rtrim((string) ($config['log_path'] ?? basePath . '/inc/_logs'), '/');
+        if (!is_dir($logPath) && !@mkdir($logPath, 0775, true) && !is_dir($logPath)) {
+            self::log('error', 'Tracy could not use the configured log directory.', ['path' => $logPath]);
+            return;
+        }
+
+        Debugger::$showBar = false;
+        Debugger::$onFatalError[] = self::handleTracyFatal(...);
+        Debugger::enable(!$development, $logPath);
+        self::$tracyEnabled = true;
+
+        // Tracy installs its own handler. Wrap it so every non-fatal PHP error
+        // is also recorded by Monolog while Tracy keeps its native rendering.
+        set_error_handler(self::handleError(...));
+    }
+
+    public static function handleError(int $severity, string $message, string $file, int $line): bool
+    {
+        self::log(self::levelFor($severity), 'PHP error: ' . $message, [
+            'severity' => self::severityName($severity),
+            'file' => self::relativePath($file),
+            'line' => $line,
+            'suppressed' => error_reporting() === 0,
+        ]);
+
+        if (self::$tracyEnabled) {
+            return Debugger::errorHandler($severity, $message, $file, $line);
+        }
+
+        return false;
+    }
+
+    public static function handleException(Throwable $exception): void
+    {
+        if (self::$tracyEnabled) {
+            Debugger::exceptionHandler($exception);
+            exit(255);
+        }
+
+        self::logThrowable($exception, 'Uncaught exception');
+        exit(255);
+    }
+
+    public static function handleShutdown(): void
+    {
+        $error = error_get_last();
+        if (!is_array($error) || !in_array($error['type'], self::fatalSeverities(), true)) {
+            return;
+        }
+
+        // When Tracy is active, its shutdown handler invokes handleTracyFatal()
+        // and renders the appropriate response after this callback returns.
+        if (!self::$tracyEnabled) {
+            self::log('critical', 'Fatal PHP error: ' . $error['message'], [
+                'severity' => self::severityName($error['type']),
+                'file' => self::relativePath($error['file']),
+                'line' => $error['line'],
+            ]);
+        }
+    }
+
+    public static function handleTracyFatal(Throwable $exception): void
+    {
+        self::logThrowable($exception, 'Unhandled exception or fatal PHP error');
+    }
+
+    private static function logThrowable(Throwable $exception, string $message): void
+    {
+        self::log('critical', $message, [
+            'exception' => $exception,
+            'exception_class' => $exception::class,
+            'file' => self::relativePath($exception->getFile()),
+            'line' => $exception->getLine(),
+        ]);
+    }
+
+    /** @param array<string, mixed> $context */
+    private static function log(string $level, string $message, array $context = []): void
+    {
+        if (self::$handling) {
+            error_log($message);
+            return;
+        }
+
+        self::$handling = true;
+        try {
+            if (class_exists('DzcpLogger') && DzcpLogger::isEnabled()) {
+                DzcpLogger::error()->log($level, $message, $context);
             } else {
-                foreach ($msg_array as $msg) {
-                    $set_color = ($color % 2) ? "#CCCCCC" : "#E6E6E6";
-                    $color++;
-                    $data .= '<tr><td width="40%" bgcolor="' . $set_color . '"><b><div align="center"><span style="color:#000000;font-size:11px">"' . $file . '"</font></div></b></td>
-                <td width="60%" bgcolor="' . $set_color . '"><b><div align="center"><span style="color:#000000;font-size:11px">' . $msg . '"</font></div></b></td></tr>';
-                    $i++;
-                }
+                error_log($message . ' ' . json_encode($context, JSON_UNESCAPED_SLASHES));
             }
+        } catch (Throwable $loggingFailure) {
+            error_log($message);
+        } finally {
+            self::$handling = false;
         }
-
-        if (!$i) return '';
-        return '<style type="text/css"><!-- .boxdebug { color: #000000; font-weight: bold;} -->
-        </style><table bgcolor="#000000" width="100%" border="0" ><tr><td bgcolor="#00FF00"><span class="boxdebug" style="font-size:11px">Debug Log: ( ' . $i . ' Eintr&auml;ge )<a name="log" id="log"></a></span></td>
-        </tr><tr><td><table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td width="40%" bgcolor="#999999"><div align="center" class="boxdebug" style="font-size:11px">File/Code:</div></td>
-        <td width="60%" bgcolor="#999999"><div align="center" class="boxdebug" style="font-size:11px">Action/Msg:</div></td></tr></table><table width="100%" border="0" cellpadding="0" cellspacing="0">
-        ' . $data . '</table></td></tr></table><table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td width="100%" bgcolor="#999999">&nbsp;</td></tr></table>';
     }
 
-    public static final function wire_log($input_level, $input_maxlevel = 9, $input_file_name = '', $input_content = "", $input_customlevel = "")
+    /** @return list<int> */
+    private static function fatalSeverities(): array
     {
-        $file = basePath . "/inc/_logs/" . date("Y-m-d", time(TRUE)) . "_" . $input_file_name . ".log";
-        if ($input_maxlevel > 0) {
-            $string =
-                "#############################" . EOL .
-                "# <" . $input_file_name . ">-Logfile " . date("Y-m-d", time(TRUE)) . " #" . EOL .
-                "# ========================= #" . EOL .
-                "# File created at: " . date("H:i:s", time(TRUE)) . " #" . EOL .
-                "#############################" . EOL . EOL;
-            if (!file_exists($file)) {
-                if (!$fileheader = fopen($file, "w")) {
-                    $status["int"] = 3;
-                    $status["str"] = "LOG_COULD_NOT_OPEN_FILE";
-                    return $status;
-                }
+        return [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE, E_RECOVERABLE_ERROR, E_USER_ERROR];
+    }
 
-                if (!fwrite($fileheader, $string)) {
-                    $status["int"] = 3;
-                    $status["str"] = "LOG_COULD_NOT_WRITE_FILE";
-                    return $status;
-                }
+    private static function levelFor(int $severity): string
+    {
+        return match ($severity) {
+            E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE, E_RECOVERABLE_ERROR, E_USER_ERROR => 'error',
+            E_WARNING, E_CORE_WARNING, E_COMPILE_WARNING, E_USER_WARNING => 'warning',
+            default => 'notice',
+        };
+    }
 
-                if (!fclose($fileheader)) {
-                    $status["int"] = 4;
-                    $status["str"] = "LOG_COULD_NOT_CLOSE_FILE";
-                } else {
-                    $status["int"] = 0;
-                    $status["str"] = "LOG_OK";
-                }
-            }
-        }
+    private static function severityName(int $severity): string
+    {
+        return match ($severity) {
+            E_ERROR => 'E_ERROR', E_WARNING => 'E_WARNING', E_PARSE => 'E_PARSE', E_NOTICE => 'E_NOTICE',
+            E_CORE_ERROR => 'E_CORE_ERROR', E_CORE_WARNING => 'E_CORE_WARNING',
+            E_COMPILE_ERROR => 'E_COMPILE_ERROR', E_COMPILE_WARNING => 'E_COMPILE_WARNING',
+            E_USER_ERROR => 'E_USER_ERROR', E_USER_WARNING => 'E_USER_WARNING', E_USER_NOTICE => 'E_USER_NOTICE',
+            E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR', E_DEPRECATED => 'E_DEPRECATED',
+            E_USER_DEPRECATED => 'E_USER_DEPRECATED', default => 'E_' . $severity,
+        };
+    }
 
-        switch ($input_level) {
-
-            /**** Wert:(OFF) ***********************************************************/
-            case "off":
-                $loglevel_int = 0;
-                $loglevel_str = "";
-                break;
-
-            /**** Wert:ERROR ***********************************************************/
-            case "error":
-                $loglevel_int = 1;
-                $loglevel_str = "ERROR";
-                break;
-
-            /**** Wert:SECURITY ********************************************************/
-            case "security":
-                $loglevel_int = 2;
-                $loglevel_str = "SECURITY";
-                break;
-
-            /**** Wert:WARNING *********************************************************/
-            case "warning":
-                $loglevel_int = 3;
-                $loglevel_str = "WARNING";
-                break;
-
-            /**** Wert:SESSION *********************************************************/
-            case "session":
-                $loglevel_int = 4;
-                $loglevel_str = "SESSION";
-                break;
-
-            /**** Wert:STATUS **********************************************************/
-            case "status":
-                $loglevel_int = 5;
-                $loglevel_str = "STATUS";
-                break;
-
-            /**** Wert:ACCESS **********************************************************/
-            case "access":
-                $loglevel_int = 6;
-                $loglevel_str = "ACCESS";
-                break;
-
-            /**** Wert:CUSTOM1 *********************************************************/
-            case "custom1":
-                $loglevel_int = 7;
-                $loglevel_str = "[C1:" . $input_customlevel . "]";
-                break;
-
-            /**** Wert:USTOM2 **********************************************************/
-            case "custom2":
-                $loglevel_int = 8;
-                $loglevel_str = "[C2:" . $input_customlevel . "]";
-                break;
-
-            /**** Wert:DEBUG ***********************************************************/
-            case "debug":
-                $loglevel_int = 9;
-                $loglevel_str = "DEBUG";
-                break;
-
-            /**** Wert:Off *************************************************************/
-            default: // UNKNOWN
-                $loglevel_int = 0;
-                $loglevel_str = "";
-                break;
-        }
-
-        if ($loglevel_int > 0 and $loglevel_int <= $input_maxlevel) {
-            $string = date("H:i:s", time(TRUE)) . " " . $_SERVER["REMOTE_ADDR"] . " [" . $loglevel_str . "]: " . $input_content . EOL;
-
-            if (!$fileheader = fopen($file, "a")) {
-                $status["int"] = 2;
-                $status["str"] = "LOG_COULD_NOT_OPEN_FILE";
-                return $status;
-            }
-
-            if (!fwrite($fileheader, $string)) {
-                $status["int"] = 3;
-                $status["str"] = "LOG_COULD_NOT_WRITE";
-                return $status;
-            }
-
-            if (!fclose($fileheader)) {
-                $status["int"] = 4;
-                $status["str"] = "LOG_COULD_NOT_CLOSE_FILE";
-            } else {
-                $status["int"] = 0;
-                $status["str"] = "LOG_OK";
-            }
-        }
+    private static function relativePath(string $path): string
+    {
+        return defined('basePath') ? ltrim(str_replace(basePath, '', $path), '/') : $path;
     }
 }
 
-function dzcp_error_handler($code, $msg, $file, $line, $context = [])
-{
-    $file = str_replace(basePath, '', $file);
-    switch ($code) {
-        case E_WARNING:
-        case E_USER_WARNING:
-            DebugConsole::insert_log("<b>WARNUNG:' " . $file . " '</b>", $msg, false, "", $line);
-            break;
-        case E_NOTICE:
-        case E_USER_NOTICE:
-            DebugConsole::insert_log("<b>HINWEIS:' " . $file . " '</b>", $msg, false, "", $line);
-            break;
-        case E_DEPRECATED:
-            if (show_deprecation_debug)
-                DebugConsole::insert_log("<b>VERALTET:' " . $file . " '</b>", $msg, false, "", $line);
-            break;
-        default:
-            DebugConsole::insert_log("Unbekannt:' " . $file . " ' [" . $code . "]", $msg, false, "", $line);
-            break;
-    }
-
-    return true;
-}
+DzcpErrorHandler::boot();
