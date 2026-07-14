@@ -4,6 +4,16 @@ All notable changes to this project are documented here.
 
 ---
 
+## [Unreleased]
+### Added
+- Created `ROUTEMAP.md` to track upcoming work and project progress
+- Added summary of database migration documentation to the project roadmap
+
+### Changed
+- Extended `changelog.md` with planned next steps for the Nette\Database integration
+
+---
+
 ## [1.6.1.4] - 08.03.2026
 ### Fixed
 - Syntax errors in `ajax.php` and `index.php`: corrected case statement terminators for improved code execution
