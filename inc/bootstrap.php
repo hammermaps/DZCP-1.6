@@ -37,8 +37,8 @@ $container->set(DatabaseService::class, static function (): DatabaseService {
 });
 
 $container->set(CacheService::class, static function (): CacheService {
-    global $config_cache;
-    return new CacheService(CacheConfig::fromLegacy($config_cache));
+    $config = $GLOBALS['config_cache'] ?? [];
+    return new CacheService(CacheConfig::fromLegacy($config));
 });
 
 $container->set(UserRepository::class, static function (ServiceContainer $c): UserRepository {
@@ -54,5 +54,6 @@ $container->set(AuthService::class, static function (ServiceContainer $c): AuthS
 });
 
 $container->set(PermissionService::class, static function (ServiceContainer $c): PermissionService {
-    return new PermissionService($c->get(AuthService::class));
+    $rootAdmins = isset($GLOBALS['rootAdmins']) ? (array) $GLOBALS['rootAdmins'] : null;
+    return new PermissionService($c->get(AuthService::class), $rootAdmins);
 });

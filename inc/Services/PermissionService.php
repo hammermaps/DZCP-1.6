@@ -11,17 +11,22 @@ namespace DZCP\Services;
 final class PermissionService
 {
     private AuthService $auth;
+    /** @var array<int> */
+    private array $rootAdmins;
 
-    public function __construct(AuthService $auth)
+    /**
+     * @param array<int>|null $rootAdmins
+     */
+    public function __construct(AuthService $auth, ?array $rootAdmins = null)
     {
         $this->auth = $auth;
+        $this->rootAdmins = $rootAdmins ?? (array) ($GLOBALS['rootAdmins'] ?? []);
     }
 
     public function isRootAdmin(int $level): bool
     {
-        global $rootAdmins;
         $userId = $this->auth->currentUserId();
-        return $level >= 999 || ($userId !== null && in_array($userId, (array) $rootAdmins, true));
+        return $level >= 999 || ($userId !== null && in_array($userId, $this->rootAdmins, true));
     }
 
     public function isAdmin(int $level): bool

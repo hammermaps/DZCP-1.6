@@ -83,9 +83,8 @@ final class CacheService
      */
     public function remember(string $key, callable $callback, ?int $ttl = null): mixed
     {
-        $value = $this->get($key);
-        if ($value !== null) {
-            return $value;
+        if ($this->has($key)) {
+            return $this->get($key);
         }
 
         $value = $callback();

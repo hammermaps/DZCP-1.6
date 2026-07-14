@@ -42,7 +42,6 @@ class ComposerStaticInit3ae559e2dbc63b5d16fbfdfeb86b5b35
             'DZCP\\Models\\' => 12,
             'DZCP\\Container\\' => 15,
             'DZCP\\Config\\' => 12,
-            'DZCP\\' => 5,
         ),
     );
 
@@ -114,10 +113,6 @@ class ComposerStaticInit3ae559e2dbc63b5d16fbfdfeb86b5b35
         'DZCP\\Config\\' =>
         array (
             0 => __DIR__ . '/../..' . '/inc/Config',
-        ),
-        'DZCP\\' =>
-        array (
-            0 => __DIR__ . '/../..' . '/inc',
         ),
     );
 

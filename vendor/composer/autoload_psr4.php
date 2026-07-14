@@ -23,5 +23,4 @@ return array(
     'DZCP\\Models\\' => array($baseDir . '/inc/Models'),
     'DZCP\\Container\\' => array($baseDir . '/inc/Container'),
     'DZCP\\Config\\' => array($baseDir . '/inc/Config'),
-    'DZCP\\' => array($baseDir . '/inc'),
 );
