@@ -33,6 +33,21 @@
       "inc/api.php",
       "inc/steamapi.php",
       "inc/cookie.php"
-    ]
+    ],
+    "psr-4": {
+      "DZCP\\Services\\": "inc/Services/",
+      "DZCP\\Repository\\": "inc/Repository/",
+      "DZCP\\Models\\": "inc/Models/",
+      "DZCP\\Container\\": "inc/Container/",
+      "DZCP\\Security\\": "inc/Security/",
+      "DZCP\\Utilities\\": "inc/Utilities/",
+      "DZCP\\Config\\": "inc/Config/",
+      "DZCP\\Tests\\": "tests/"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.0",
+    "phpstan/phpstan": "^1.9",
+    "squizlabs/php_codesniffer": "^3.7"
   }
 }

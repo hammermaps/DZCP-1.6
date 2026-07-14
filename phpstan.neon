@@ -1,0 +1,13 @@
+parameters:
+    level: 5
+    paths:
+        - inc
+    scanDirectories:
+        - vendor
+    bootstrapFiles:
+        - vendor/autoload.php
+    ignoreErrors:
+        - '#Function db not found#'
+        - '#Function _fetch not found#'
+        - '#Function _rows not found#'
+        - '#Function getNetteDb not found#'
