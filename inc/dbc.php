@@ -1,11 +1,13 @@
 <?php
+
+use Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException;
+
 /**
  * DZCP - deV!L`z ClanPortal 1.6 Final
  * http://www.dzcp.de
  */
 
 //-> Speichert Rückgaben der MySQL Datenbank zwischen um SQL-Queries einzusparen
-use Phpfastcache\CacheManager;
 
 final class dbc_index
 {
@@ -26,10 +28,17 @@ final class dbc_index
                 $data_cache = null;
                 try {
                     $data_cache = $cache->getItem('dbc_' . $index_key);
-                } catch (\Phpfastcache\Exceptions\phpFastCacheInvalidArgumentException $e) {
+                } catch (PhpfastcacheInvalidArgumentException $e) {
+                    DzcpLogger::cache()->warning('dbc_index: Cache-Exception bei setIndex', [
+                        'key'   => $index_key,
+                        'error' => $e->getMessage(),
+                    ]);
                 }
-                $data_cache->set(serialize($data))->expiresAfter(1.5);
-                $cache->save($data_cache);
+                if (!is_null($data_cache)) {
+                    $data_cache->set(serialize($data))->expiresAfter(2);
+                    $cache->save($data_cache);
+                    DzcpLogger::cache()->debug('dbc_index: Index in Memory-Cache gespeichert', ['key' => $index_key]);
+                }
             }
         }
 
@@ -83,16 +92,23 @@ final class dbc_index
             $data = null;
             try {
                 $data = $cache->getItem('dbc_' . $index_key);
-            } catch (\Phpfastcache\Exceptions\phpFastCacheInvalidArgumentException $e) {
+            } catch (PhpfastcacheInvalidArgumentException $e) {
+                DzcpLogger::cache()->warning('dbc_index: Cache-Exception bei issetIndex', [
+                    'key'   => $index_key,
+                    'error' => $e->getMessage(),
+                ]);
             }
 
-            if (!is_null($data->get())) {
+            if (!is_null($data) && !is_null($data->get())) {
                 if (show_dbc_debug)
                     DebugConsole::insert_loaded('dbc_index::issetIndex()', 'Load index: "' . $index_key . '" from cache');
 
+                DzcpLogger::cache()->debug('dbc_index: Cache-Hit', ['key' => $index_key]);
                 self::$index[$index_key] = unserialize($data->get());
                 return true;
             }
+
+            DzcpLogger::cache()->debug('dbc_index: Cache-Miss', ['key' => $index_key]);
         }
 
         return false;
@@ -104,8 +120,21 @@ final class dbc_index
     public static final function MemSetIndex()
     {
         global $config_cache, $cache;
-        if (!$config_cache['dbc'] || CacheManager::$fallback) {
+
+        if (!$config_cache['dbc'] || !is_object($cache)) {
             return false;
+        }
+
+        try {
+            // PHP 8.1+: setAccessible() hat keinen Effekt mehr, getValue() funktioniert direkt auf alle Properties.
+            // Fallback-Prüfung über Closure-Binding um Deprecation-Warnungen zu vermeiden.
+            $isFallback = (function() { return isset($this->fallback) && $this->fallback === true; })->bindTo($cache, $cache)();
+            if ($isFallback === true) {
+                DzcpLogger::cache()->notice('dbc_index: Cache-Treiber im Fallback-Modus, Memory-Cache deaktiviert');
+                return false;
+            }
+        } catch (\Throwable $e) {
+            // Property existiert nicht oder Binding nicht möglich – ignorieren
         }
 
         switch ($cache->getDriverName()) {

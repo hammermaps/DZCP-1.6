@@ -21,11 +21,11 @@ if (defined('_UserMenu')) {
                 while ($getpos = _fetch($qrypos)) {
                     $check = db("SELECT `id` FROM `" . $db['userpos'] . "` WHERE `posi` = " . $getpos['id'] . " AND `squad` = " . $getsq['id'] . " AND `user` = " . $userid . ";", true);
                     $sel = $check ? 'selected="selected"' : '';
-                    $posi .= show(_select_field_posis, array("value" => $getpos['id'], "sel" => $sel, "what" => re($getpos['position'])));
+                    $posi .= show(_select_field_posis, array("value" => $getpos['id'], "sel" => $sel, "what" => h($getpos['position'])));
                 }
 
                 $check = db("SELECT `id` FROM `" . $db['squaduser'] . "` WHERE `user` = " . $userid . " AND `squad` = " . $getsq['id'] . ";", true) ? 'checked="checked"' : '';
-                $esquads .= show(_checkfield_squads, array("id" => $getsq['id'], "check" => $check, "eposi" => $posi, "noposi" => _user_noposi, "squad" => re($getsq['name'])));
+                $esquads .= show(_checkfield_squads, array("id" => $getsq['id'], "check" => $check, "eposi" => $posi, "noposi" => _user_noposi, "squad" => h($getsq['name'])));
             }
 
             $index = show($dir . "/admin_self", array("squadhead" => _admin_user_squadhead,
@@ -51,8 +51,8 @@ if (defined('_UserMenu')) {
                             $msg = show(_admin_user_get_identy, array("nick" => autor($identy_userid)));
                             $_SESSION['identy_id'] = $userid; //Save Last ID
 
-                            db("UPDATE " . $db['users'] . " SET `online` = 0, `sessid` = '', ".
-                                "`time` = ".$_SESSION['lastvisit']." WHERE `id` = " . $userid . ";"); //Logout
+                            db("UPDATE " . $db['users'] . " SET `online` = 0, `sessid` = '', " .
+                                "`time` = " . $_SESSION['lastvisit'] . " WHERE `id` = " . $userid . ";"); //Logout
                             session_regenerate_id();
 
                             $_SESSION['id'] = $_GET['id'];
@@ -87,7 +87,7 @@ if (defined('_UserMenu')) {
                             // internal boardpermissions
                             db("DELETE FROM " . $db['f_access'] . " WHERE `user` = '" . $edit_userid . "'");
                             if (!empty($_POST['board'])) {
-                                foreach ($_POST['board'] AS $v) {
+                                foreach ($_POST['board'] as $v) {
                                     db("INSERT INTO `" . $db['f_access'] . "` SET `user` = " . $edit_userid . ", `forum` = '" . $v . "';");
                                 }
                             }
@@ -108,7 +108,7 @@ if (defined('_UserMenu')) {
                                 }
                             }
 
-                            $newpwd = !empty($_POST['passwd']) ? "`pwd` = '" . hash('sha256', $_POST['passwd']) . "', `pwd_md5` = 0," : "";
+                            $newpwd = !empty($_POST['passwd']) ? "`pwd` = '" . password_hash($_POST['passwd'], PASSWORD_DEFAULT) . "', `pwd_md5` = 0," : "";
                             $update_level = $_POST['level'] == 'banned' ? 0 : $_POST['level'];
                             $update_banned = $_POST['level'] == 'banned' ? 1 : 0;
                             db("UPDATE `" . $db['users'] . "` SET " . $newpwd .
@@ -240,10 +240,10 @@ if (defined('_UserMenu')) {
 
                             //IP-Check Loop
                             foreach ($ips as $ip) {
-                                if(is_array($ip))
+                                if (is_array($ip))
                                     continue;
 
-                                if(!empty($ip)) {
+                                if (!empty($ip)) {
                                     if (!validateIpV4Range((string)$ip, ['[192].[168].[0-255].[0-255]', '[127].[0].[0-255].[0-255]',
                                         '[10].[0-255].[0-255].[0-255]', '[172].[16-31].[0-255].[0-255]'])) {
                                         db("DELETE FROM `" . $db['acomments'] . "` WHERE `ip` = '" . $ip . "';");
@@ -256,7 +256,8 @@ if (defined('_UserMenu')) {
                                         db("DELETE FROM `" . $db['usergb'] . "` WHERE `ip` = '" . $ip . "';");
                                     }
                                 }
-                            } unset($ips);
+                            }
+                            unset($ips);
 
                             foreach ($picformat as $tmpendung) {
                                 if (file_exists(basePath . "/inc/images/uploads/userpics/" . (int)($getdel['id']) . "." . $tmpendung))
@@ -291,7 +292,7 @@ if (defined('_UserMenu')) {
                                         " AND `squad` = " . $getsq['id'] . " AND `user` = " . (int)($_GET['edit']) . ";", true);
 
                                     $sel = $check ? 'selected="selected"' : '';
-                                    $posi .= show(_select_field_posis, array("value" => $getpos['id'], "sel" => $sel, "what" => re($getpos['position'])));
+                                    $posi .= show(_select_field_posis, array("value" => $getpos['id'], "sel" => $sel, "what" => h($getpos['position'])));
                                 }
 
                                 $checksquser = db("SELECT `squad` FROM `" . $db['squaduser'] . "` WHERE `user` = " . $edit_userid . " AND `squad` = " . $getsq['id'] . ";", true);
@@ -301,7 +302,7 @@ if (defined('_UserMenu')) {
                                     "check" => $check,
                                     "eposi" => $posi,
                                     "noposi" => _user_noposi,
-                                    "squad" => re($getsq['name'])));
+                                    "squad" => h($getsq['name'])));
                             }
 
                             $get_identy = show(_admin_user_get_identitat, array("id" => $edit_userid));
@@ -337,10 +338,10 @@ if (defined('_UserMenu')) {
                                 $dsgvo = _admin_dsgvo_lock;
                             }
 
-                            $index = show($dir . "/admin", array("enick" => re($get['nick']),
+                            $index = show($dir . "/admin", array("enick" => h($get['nick']),
                                 "user" => $edit_userid,
                                 "value" => _button_value_edit,
-                                "eemail" => re($get['email']),
+                                "eemail" => h($get['email']),
                                 "eloginname" => $get['user'],
                                 "esquad" => $esquads,
                                 "editpwd" => $editpwd,

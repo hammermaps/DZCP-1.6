@@ -10,8 +10,9 @@ if (defined('_UserMenu')) {
     $show_sql = isset($_GET['show']) ? $_GET['show'] : '';
 
     if ($show_sql == "search") {
+        $search = _real_escape_string($_GET['search']);
         $qry = db("SELECT `id`,`nick`,`level`,`email`,`hp`,`steamid`,`skypename`,`xboxid`,`psnid`,`originid`,`battlenetid`,`bday`,`sex`,`status`,`position`,`regdatum`,`show` FROM `" . $db['users'] . "`
-                   WHERE `nick` LIKE '%" . $_GET['search'] . "%'
+                   WHERE `nick` LIKE '%" . $search . "%'
                    AND level != 0 " . (permission("editusers") ? '' : 'AND `dsgvo_lock` != 1 ') . "
                    ORDER BY nick
                    LIMIT " . ($page - 1) * config('m_userlist') . "," . config('m_userlist') . ";");
@@ -61,12 +62,12 @@ if (defined('_UserMenu')) {
     $userliste = '';
     while ($get = _fetch($qry)) {
         $email = show(_emailicon, array("email" => eMailAddr(re($get['email']))));
-        $xboxu = empty($get['xboxid']) ? "-" : show(_xboxicon, array("id" => re($get['xboxid']), "img" => "1", "css" => ""));
-        $psnu = empty($get['psnid']) ? "-" : show(_psnicon, array("id" => re($get['psnid']), "img" => "1", "css" => ""));
-        $originu = empty($get['originid']) ? "-" : show(_originicon, array("id" => re($get['originid']), "img" => "1", "css" => ""));
-        $battlenetu = empty($get['battlenetid']) ? "-" : show(_battleneticon, array("id" => re($get['battlenetid']), "img" => "1", "css" => ""));
-        $skypename = empty($get['skypename']) ? "-" : "<a href=\"skype:" . re($get['skypename']) . "?chat\"><i class=\"fab fa-skype fa-lg\"></i></a>";
-        $hp = empty($get['hp']) ? "-" : show(_hpicon, array("hp" => re($get['hp'])));
+        $xboxu = empty($get['xboxid']) ? "-" : show(_xboxicon, array("id" => h($get['xboxid']), "img" => "1", "css" => ""));
+        $psnu = empty($get['psnid']) ? "-" : show(_psnicon, array("id" => h($get['psnid']), "img" => "1", "css" => ""));
+        $originu = empty($get['originid']) ? "-" : show(_originicon, array("id" => h($get['originid']), "img" => "1", "css" => ""));
+        $battlenetu = empty($get['battlenetid']) ? "-" : show(_battleneticon, array("id" => h($get['battlenetid']), "img" => "1", "css" => ""));
+        $skypename = empty($get['skypename']) ? "-" : "<a href=\"skype:" . h($get['skypename']) . "?chat\"><i class=\"fab fa-skype fa-lg\"></i></a>";
+        $hp = empty($get['hp']) ? "-" : show(_hpicon, array("hp" => h($get['hp'])));
 
         $sex = "-";
         if ($get['sex'] == "1")
@@ -96,14 +97,14 @@ if (defined('_UserMenu')) {
         if (!empty($get['steamid']) && fsockopen_support() || (!empty($get['steamid']) && fsockopen_support_bypass)) {
             $steam = '<div id="infoSteam_' . md5(re($get['steamid'])) . '">
             <div style="width:100%;text-align:center"><img src="../inc/images/ajax-loader-mini.gif" alt="" /></div>
-            <script language="javascript" type="text/javascript">DZCP.initDynLoader("infoSteam_' . md5(re($get['steamid'])) . '","steam","&steamid=' . re($get['steamid']) . '&list=true");</script></div>';
-        } else if(!empty($get['steamid']) && !fsockopen_support()) {
-            DebugConsole::insert_warning('user:userlist','fsockopen support is not available!');
+            <script language="javascript" type="text/javascript">DZCP.initDynLoader("infoSteam_' . md5(re($get['steamid'])) . '","steam","&steamid=' . h($get['steamid']) . '&list=true");</script></div>';
+        } else if (!empty($get['steamid']) && !fsockopen_support()) {
+            DebugConsole::insert_warning('user:userlist', 'fsockopen support is not available!');
         }
 
         $userliste .= show($dir . "/userliste_show", array("nick" => autor($get['id'], '', '', 10),
             "level" => getrank($get['id']),
-            "show" => $chkMe < $get['show'] ? '<i class="far fa-eye-slash fa-lg" title="'._user_profile_no_show.'"></i>' : '<i class="far fa-eye fa-lg" title="'._user_profile_show.'"></i>',
+            "show" => $chkMe < $get['show'] ? '<i class="far fa-eye-slash fa-lg" title="' . _user_profile_no_show . '"></i>' : '<i class="far fa-eye fa-lg" title="' . _user_profile_show . '"></i>',
             "status" => $status,
             "email" => $email,
             "age" => getAge($get['bday']),

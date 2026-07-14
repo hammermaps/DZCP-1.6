@@ -55,34 +55,40 @@ if ($do == "new") {
         $show = info(_link_added, "?admin=links");
     }
 } elseif ($do == "edit") {
-    $get = db("SELECT * FROM " . $db[$_GET['type']] . " WHERE id = '" . (int)($_GET['id']) . "'", false, true);
-
-    if ($get['banner'] == 1) {
-        $bchecked = 'checked="checked"';
-        $bnone = "";
+    // Validate table type - only allow 'links' or 'sponsoren'
+    $allowed_types = array('links', 'sponsoren');
+    if (!isset($_GET['type']) || !in_array($_GET['type'], $allowed_types)) {
+        $show = error(_error_wrong_get, 1);
     } else {
-        $tchecked = 'checked="checked"';
-        $bnone = "display:none";
-    }
+        $get = db("SELECT * FROM " . $db[$_GET['type']] . " WHERE id = '" . (int)($_GET['id']) . "'", false, true);
 
-    $linktyp = '<input type="hidden" name="type" value="' . $_GET['type'] . '" />';
+        if ($get['banner'] == 1) {
+            $bchecked = 'checked="checked"';
+            $bnone = "";
+        } else {
+            $tchecked = 'checked="checked"';
+            $bnone = "display:none";
+        }
 
-    $show = show($dir . "/form_links", array("head" => _links_admin_head_edit,
-        "link" => _links_link,
-        "linktyp" => $linktyp,
-        "beschreibung" => _links_beschreibung,
-        "art" => _links_art,
-        "text" => _links_admin_textlink,
-        "banner" => _links_admin_bannerlink,
-        "bchecked" => $bchecked,
-        "tchecked" => $tchecked,
-        "bnone" => $bnone,
-        "llink" => $get['url'],
-        "lbeschreibung" => re($get['beschreibung']),
+        $linktyp = '<input type="hidden" name="type" value="' . htmlspecialchars($_GET['type'], ENT_QUOTES, 'UTF-8') . '" />';
+
+        $show = show($dir . "/form_links", array("head" => _links_admin_head_edit,
+            "link" => _links_link,
+            "linktyp" => $linktyp,
+            "beschreibung" => _links_beschreibung,
+            "art" => _links_art,
+            "text" => _links_admin_textlink,
+            "banner" => _links_admin_bannerlink,
+            "bchecked" => $bchecked,
+            "tchecked" => $tchecked,
+            "bnone" => $bnone,
+            "llink" => $get['url'],
+        "lbeschreibung" => h($get['beschreibung']),
         "btext" => _links_text,
-        "ltext" => re($get['text']),
+        "ltext" => h($get['text']),
         "what" => _button_value_edit,
         "do" => "editlink&amp;id=" . $_GET['id'] . ""));
+    }
 } elseif ($do == "editlink") {
     if (empty($_POST['link']) || empty($_POST['beschreibung']) || (isset($_POST['banner']) && empty($_POST['text']))) {
         if (empty($_POST['link']))
@@ -119,7 +125,7 @@ if ($do == "new") {
         $color++;
 
         $show .= show($dir . "/links_show", array(
-            "link" => cut(re($get['url']), 40, true, false),
+            "link" => cut(h($get['url']), 40, true, false),
             "class" => $class,
             "type" => "links",
             "edit" => $edit,

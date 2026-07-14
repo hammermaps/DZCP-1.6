@@ -8,6 +8,39 @@
 if (version_compare(PHP_VERSION, '7.0', '>=') === false)
     die('DZCP required PHP 7.0 or newer!<p> Found PHP ' . PHP_VERSION);
 
+/**
+ * Gibt GUMP-Fehlermeldungen als HTML-Fehler-Tabelle zurück.
+ */
+function installer_validation_errors(array $errors): string {
+    $html = '<table width="100%" cellpadding="1" cellspacing="1" class="error">
+        <tr><td class="error_text"><b>Fehler:</b></td></tr>';
+    foreach ($errors as $error) {
+        $html .= '<tr><td class="error_text">' . htmlspecialchars($error) . '</td></tr>';
+    }
+    $html .= '</table>';
+    return $html;
+}
+
+/**
+ * Validiert Eingaben per GUMP und gibt bei Fehlern HTML zurück oder null bei Erfolg.
+ */
+function installer_validate(array $data, array $rules, array $filters = [], array $fieldNames = []): ?string {
+    $gump = new \GUMP('de');
+    if (!empty($fieldNames)) {
+        \GUMP::set_field_names($fieldNames);
+    }
+    if (!empty($filters)) {
+        $data = $gump->filter($data, $filters);
+    }
+    $gump->validation_rules($rules);
+    $result = $gump->run($data);
+    if ($result === false) {
+        $errors = $gump->get_errors_array();
+        return installer_validation_errors(array_values($errors));
+    }
+    return null;
+}
+
 ob_start();
 session_start();
 
@@ -50,9 +83,27 @@ switch ($action):
 
         include(basePath . '/_installer/html/welcome.php');
         break;
-    case 'prepare';
+    case 'prepare':
         if ($do == "set_chmods" && $_POST['check'] != "dont") {
-            if (function_exists('ftp_connect') && function_exists('ftp_login') && function_exists('ftp_site')) {
+            // GUMP-Validierung FTP-Daten
+            $ftpError = installer_validate($_POST, [
+                'host' => 'required',
+                'user' => 'required',
+                'pwd'  => 'required',
+                'pfad' => 'required',
+            ], [
+                'host' => 'trim|sanitize_string',
+                'user' => 'trim|sanitize_string',
+                'pfad' => 'trim|sanitize_string',
+            ], [
+                'host' => 'FTP-Host',
+                'user' => 'FTP-Benutzer',
+                'pwd'  => 'FTP-Passwort',
+                'pfad' => 'FTP-Pfad',
+            ]);
+            if ($ftpError !== null) {
+                echo $ftpError;
+            } elseif (function_exists('ftp_connect') && function_exists('ftp_login') && function_exists('ftp_site')) {
                 $host = $_POST['host'];
                 $user = $_POST['user'];
                 $pwd = $_POST['pwd'];
@@ -139,8 +190,8 @@ switch ($action):
         $cm .= check_file_dir('../_installer/update.php');
 
 //Check Scriptfiles
-        $c = check_file_dir('../rss.xml');
-        $c .= check_file_dir('../admin', 1);
+     #   $c = check_file_dir('../rss.xml');
+        $c = check_file_dir('../admin', 1);
         $c .= check_file_dir('../banner', 1);
         $c .= check_file_dir('../banner/partners', 1);
         $c .= check_file_dir('../gallery', 1);
@@ -212,7 +263,7 @@ switch ($action):
           </table>';
         }
         break;
-    case 'autoupdate';
+    case 'autoupdate':
         if (isset($_GET['agb']) && $_GET['agb']) {
             header("Location: install.php?agb=false");
         } else {
@@ -235,7 +286,7 @@ switch ($action):
             include(basePath . '/_installer/html/autoupdate.php');
         }
         break;
-    case 'require';
+    case 'require':
         if (isset($_GET['agb']) && $_GET['agb']) {
             header("Location: install.php?agb=false");
         } else {
@@ -291,27 +342,50 @@ switch ($action):
         break;
     case'install';
         if ($do == "test_mysql") {
-            $sql = false;
+            // GUMP-Validierung MySQL-Verbindungsdaten
+            $mysqlError = installer_validate($_POST, [
+                'host'     => 'required',
+                'user'     => 'required',
+                'database' => 'required',
+                'prefix'   => 'required',
+            ], [
+                'host'     => 'trim|sanitize_string',
+                'user'     => 'trim|sanitize_string',
+                'database' => 'trim|sanitize_string',
+                'prefix'   => 'trim|sanitize_string',
+            ], [
+                'host'     => 'MySQL-Host',
+                'user'     => 'MySQL-Benutzer',
+                'database' => 'Datenbankname',
+                'prefix'   => 'Tabellen-Prefix',
+            ]);
 
-//-> zur Datenbank connecten
-            if (!empty($_POST['host']) && !empty($_POST['user']) && !empty($_POST['database'])) {
-                $con = mysqli_connect($_POST['host'], $_POST['user'], $_POST['pwd'], $_POST['database']);
-                $sql = true;
-            }
-//-> MySQL-Daten testen
-            if (!$sql) {
-                echo '<table width="100%" cellpadding="1" cellspacing="1" class="error">
+            if ($mysqlError !== null) {
+                echo $mysqlError;
+                include(basePath . '/_installer/html/mysql.php');
+                include(basePath . '/_installer/html/mysql_data.php');
+            } else {
+                $sql = false;
+                $con = false;
+
+                if (!empty($_POST['host']) && !empty($_POST['user']) && !empty($_POST['database'])) {
+                    $con = mysqli_connect($_POST['host'], $_POST['user'], $_POST['pwd'], $_POST['database']);
+                    $sql = true;
+                }
+
+                if (!$sql) {
+                    echo '<table width="100%" cellpadding="1" cellspacing="1" class="error">
               <tr>
                 <td class="error_text"><b>Fehler:</b></td>
               </tr>
               <tr>
-                <td class="error_text">MySQL Angaben unvollstndig!<br />
+                <td class="error_text">MySQL Angaben unvollst&auml;ndig!<br />
                 &Uuml;berpr&uuml;fen Sie die eingegebenen Verbindungsdaten!
                 </td>
               </tr>
             </table>';
-            } else if (!$con) {
-                echo '<table width="100%" cellpadding="1" cellspacing="1" class="error">
+                } else if (!$con) {
+                    echo '<table width="100%" cellpadding="1" cellspacing="1" class="error">
               <tr>
                 <td class="error_text"><b>Fehler:</b></td>
               </tr>
@@ -321,19 +395,18 @@ switch ($action):
                 </td>
               </tr>
             </table>';
-            }
+                }
 
-            if (!$con || !$sql) {
-                include(basePath . '/_installer/html/mysql.php');
-                $prefix = $_POST['prefix'];
-                $host = $_POST['host'];
-                $user = $_POST['user'];
-                $pwd = $_POST['pwd'];
-                $database = $_POST['database'];
-
-                include(basePath . '/_installer/html/mysql_data.php');
-            } else {
-                echo '<table width="100%" cellpadding="1" cellspacing="1" class="done">
+                if (!$con || !$sql) {
+                    include(basePath . '/_installer/html/mysql.php');
+                    $prefix   = $_POST['prefix'];
+                    $host     = $_POST['host'];
+                    $user     = $_POST['user'];
+                    $pwd      = $_POST['pwd'];
+                    $database = $_POST['database'];
+                    include(basePath . '/_installer/html/mysql_data.php');
+                } else {
+                    echo '<table width="100%" cellpadding="1" cellspacing="1" class="done">
               <tr>
                 <td class="error_text"><b>Done!</b></td>
               </tr>
@@ -343,25 +416,49 @@ switch ($action):
               </tr>
             </table>';
 
-                include(basePath . '/_installer/html/mysql.php');
+                    include(basePath . '/_installer/html/mysql.php');
 
-                echo '<table width="100%" cellpadding="1" cellspacing="1">
+                    echo '<table width="100%" cellpadding="1" cellspacing="1">
               <tr>
                 <td>&nbsp;</td>
               </tr>
             <form action="install.php?action=install&amp;do=write_mysql" method="POST">
-              <input type="hidden" name="prefix" value="' . $_POST['prefix'] . '">
-              <input type="hidden" name="host" value="' . $_POST['host'] . '">
-              <input type="hidden" name="user" value="' . $_POST['user'] . '">
-              <input type="hidden" name="pwd" value="' . $_POST['pwd'] . '">
-              <input type="hidden" name="database" value="' . $_POST['database'] . '">
+              <input type="hidden" name="prefix"   value="' . htmlspecialchars($_POST['prefix'])   . '">
+              <input type="hidden" name="host"     value="' . htmlspecialchars($_POST['host'])     . '">
+              <input type="hidden" name="user"     value="' . htmlspecialchars($_POST['user'])     . '">
+              <input type="hidden" name="pwd"      value="' . htmlspecialchars($_POST['pwd'])      . '">
+              <input type="hidden" name="database" value="' . htmlspecialchars($_POST['database']) . '">
               <tr>
                 <td align="center"><input style="width:210px;" type="submit" value="MySQL-Daten abspeichern!"></td>
               </tr>
             </form>
             </table>';
+                }
             }
         } elseif ($do == "write_mysql") {
+            // GUMP-Validierung vor dem Speichern
+            $writeError = installer_validate($_POST, [
+                'host'     => 'required',
+                'user'     => 'required',
+                'database' => 'required',
+                'prefix'   => 'required',
+            ], [
+                'host'     => 'trim|sanitize_string',
+                'user'     => 'trim|sanitize_string',
+                'database' => 'trim|sanitize_string',
+                'prefix'   => 'trim|sanitize_string',
+            ], [
+                'host'     => 'MySQL-Host',
+                'user'     => 'MySQL-Benutzer',
+                'database' => 'Datenbankname',
+                'prefix'   => 'Tabellen-Prefix',
+            ]);
+
+            if ($writeError !== null) {
+                echo $writeError;
+                include(basePath . '/_installer/html/mysql.php');
+                include(basePath . '/_installer/html/mysql_data.php');
+            } else {
 //-> MySQL-Daten in mysql.php schreiben
             if (function_exists("fopen")) {
                 _m($_POST['prefix'], $_POST['host'], $_POST['user'], $_POST['pwd'], $_POST['database']);
@@ -453,41 +550,51 @@ switch ($action):
               </tr>
             </table>';
             }
+            } // end GUMP-else (write_mysql)
         } else {
             include(basePath . '/_installer/html/mysql.php');
             include(basePath . '/_installer/html/mysql_data.php');
         }
         break;
-    case 'database';
+    case 'database':
         if ($do == "install") {
-            if ($_POST['login'] && $_POST['nick'] && $_POST['pwd'] && $_POST['email']) {
+            // GUMP-Validierung Admin-Account
+            $adminError = installer_validate($_POST, [
+                'login' => 'required|min_len,3|max_len,30|alpha_numeric',
+                'nick'  => 'required|min_len,2|max_len,30',
+                'pwd'   => 'required|min_len,6',
+                'email' => 'required|valid_email',
+            ], [
+                'login' => 'trim|sanitize_string',
+                'nick'  => 'trim|sanitize_string',
+                'email' => 'trim|sanitize_email',
+            ], [
+                'login' => 'Login-Name',
+                'nick'  => 'Nickname',
+                'pwd'   => 'Passwort',
+                'email' => 'E-Mail-Adresse',
+            ]);
+
+            if ($adminError !== null) {
+                echo $adminError;
+                include(basePath . '/_installer/html/installation.php');
+                include(basePath . '/_installer/html/installation_admin.php');
+            } else {
                 @set_time_limit(60);
                 @ignore_user_abort(true);
                 install_mysql($_POST['login'], $_POST['nick'], $_POST['pwd'], $_POST['email']);
                 update_mysql_1_6();
                 update_mysql_1_6_0_4();
                 update_mysql_1_6_1_0();
+                update_mysql_1_6_1_2();
                 header("Location: install.php?action=done");
-            } else {
-                echo '<table width="100%" cellpadding="1" cellspacing="1" class="error">
-              <tr>
-                <td class="error_text"><b>Fehler:</b></td>
-              </tr>
-              <tr>
-                <td class="error_text">Sie haben mindestens ein Feld nicht ausgef&uuml;llt oder die Datenbankverbindung wurde unterbrochen!
-                </td>
-              </tr>
-            </table>';
-
-                include(basePath . '/_installer/html/installation.php');
-                include(basePath . '/_installer/html/installation_admin.php');
             }
         } else {
             include(basePath . '/_installer/html/installation.php');
             include(basePath . '/_installer/html/installation_admin.php');
         }
         break;
-    case 'done';
+    case 'done':
         include(basePath . '/_installer/html/done.php');
         break;
 endswitch;

@@ -36,7 +36,7 @@ if ($do == 'add') {
     $show = show($dir . "/form_glossar", array("head" => _admin_glossar_add,
         "link" => _glossar_bez,
         "beschreibung" => _glossar_erkl,
-        "llink" => re($get['word']),
+        "llink" => h($get['word']),
         "lbeschreibung" => re_bbcode(re($get['glossar'])),
         "do" => "update&amp;id=" . $_GET['id'],
         "value" => _button_value_edit
@@ -78,7 +78,7 @@ if ($do == 'add') {
         $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
         $color++;
 
-        $show .= show($dir . "/glossar_show", array("word" => re($get['word']),
+        $show .= show($dir . "/glossar_show", array("word" => h($get['word']),
             "class" => $class,
             "edit" => $edit,
             "delete" => $delete,

@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $where = _site_upload;
@@ -119,7 +116,7 @@ switch ($action):
         } else
             $index = error(_error_wrong_permissions, 1);
         break;
-    case 'partners';
+    case 'partners':
         if (permission('partners')) {
             $infos = show(_upload_partners_info, array("userpicsize" => config('upicsize')));
             $index = show($dir . "/upload", array("uploadhead" => _upload_partners_head,
@@ -164,7 +161,7 @@ switch ($action):
         } else
             $index = error(_error_wrong_permissions, 1);
         break;
-    case 'newskats';
+    case 'newskats':
         if (permission('news') || permission('artikel')) {
             if (isset($_GET['edit']))
                 $action = "?action=newskats&amp;do=upload&edit=" . $_GET['edit'] . "";
@@ -219,7 +216,7 @@ switch ($action):
         } else
             $index = error(_error_wrong_permissions, 1);
         break;
-    case 'taktiken';
+    case 'taktiken':
         if (permission("edittactics")) {
             $infos = show(_upload_usergallery_info, array("userpicsize" => 100));
             $index = show($dir . "/upload", array("uploadhead" => _upload_taktiken_head,
@@ -265,7 +262,7 @@ switch ($action):
         } else
             $index = error(_error_wrong_permissions, 1);
         break;
-    case 'userpic';
+    case 'userpic':
         if ($chkMe >= 1 && $userid) {
             $infos = show(_upload_userpic_info, array("userpicsize" => config('upicsize')));
             $index = show($dir . "/upload", array("uploadhead" => _upload_head,
@@ -327,7 +324,7 @@ switch ($action):
         } else
             $index = error(_error_wrong_permissions, 1);
         break;
-    case 'avatar';
+    case 'avatar':
         if ($chkMe >= 1) {
             $infos = show(_upload_userava_info, array("userpicsize" => config('upicsize')));
             $index = show($dir . "/upload", array("uploadhead" => _upload_ava_head,
@@ -389,7 +386,7 @@ switch ($action):
         } else
             $index = error(_error_wrong_permissions, 1);
         break;
-    case 'usergallery';
+    case 'usergallery':
         if ($chkMe >= 1) {
             $infos = show(_upload_usergallery_info, array("userpicsize" => config('upicsize')));
             $index = show($dir . "/usergallery", array("uploadhead" => _upload_head_usergallery,
@@ -454,7 +451,7 @@ switch ($action):
                             "file" => _upload_file,
                             "showpic" => img_size("inc/images/uploads/usergallery/" . $get['user'] . "_" . $get['pic']),
                             "id" => $get['id'],
-                            "showbeschreibung" => re($get['beschreibung']),
+                            "showbeschreibung" => h($get['beschreibung']),
                             "name" => "file",
                             "upload" => _button_value_edit,
                             "beschreibung" => _upload_beschreibung,

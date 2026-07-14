@@ -15,12 +15,12 @@ function gallerie()
     $gallery = '';
     if ($files && $cnt >= 1) {
         shuffle($files);
-        $files = limited_array($files, 1, 4);
+        $files = limited_array(1, 4, $files);
         foreach ($files as $file) {
             if (!empty($file)) {
                 $info = 'onmouseover="DZCP.showInfo(\'' . jsconvert(re($get['kat'])) . '\', \'' . _gal_pics . '\', \'' . $cnt . '\')" onmouseout="DZCP.hideInfo()"';
                 $gallery .= show("menu/gallerie", array("image" => $file,
-                    "kat" => re($get['kat']),
+                    "kat" => h($get['kat']),
                     "info" => $info,
                     "id" => $get['id']));
             }

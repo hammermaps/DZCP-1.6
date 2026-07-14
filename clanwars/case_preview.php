@@ -10,18 +10,18 @@ if (defined('_Clanwars')) {
              WHERE id = '" . (int)($_POST['squad']) . "'");
     $get = _fetch($qry);
 
-    $serverpwd = show(_cw_serverpwd, array("cw_serverpwd" => re($_POST['serverpwd'])));
+    $serverpwd = show(_cw_serverpwd, array("cw_serverpwd" => htmlspecialchars($_POST['serverpwd'], ENT_QUOTES, 'UTF-8')));
 
     $img = squad($get['icon']);
-    $show = show(_cw_details_squad, array("game" => re($get['game']),
-        "name" => re($get['name']),
+    $show = show(_cw_details_squad, array("game" => h($get['game']),
+        "name" => h($get['name']),
         "id" => $_POST['squad'],
         "img" => $img));
     $flagge = flag(re($get['gcountry']));
-    $gegner = show(_cw_details_gegner_blank, array("gegner" => re($_POST['clantag'] . " - " . $_POST['gegner']),
+    $gegner = show(_cw_details_gegner_blank, array("gegner" => htmlspecialchars($_POST['clantag'] . " - " . $_POST['gegner'], ENT_QUOTES, 'UTF-8'),
         "url" => links(re($_POST['url'], true))));
-    $server = show(_cw_details_server, array("servername" => re($_POST['servername']),
-        "serverip" => re($_POST['serverip'])));
+    $server = show(_cw_details_server, array("servername" => htmlspecialchars($_POST['servername'], ENT_QUOTES, 'UTF-8'),
+        "serverip" => htmlspecialchars($_POST['serverip'], ENT_QUOTES, 'UTF-8')));
 
     if (!$_POST['punkte'] && !$_POST['gpunkte'])
         $result = _cw_no_results;
@@ -86,11 +86,11 @@ if (defined('_Clanwars')) {
         "logo_squad" => '_defaultlogo.jpg',
         "logo_gegner" => '_defaultlogo.jpg',
         "squad" => $show,
-        "squad_name" => re($get['name']),
-        "gametype" => re($_POST['gametype']),
-        "lineup" => preg_replace("#\,#", "<br />", re($_POST['lineup'])),
-        "glineup" => preg_replace("#\,#", "<br />", re($_POST['glineup'])),
-        "match_admins" => re($_POST['match_admins']),
+        "squad_name" => h($get['name']),
+        "gametype" => htmlspecialchars($_POST['gametype'], ENT_QUOTES, 'UTF-8'),
+        "lineup" => preg_replace("#\,#", "<br />", htmlspecialchars($_POST['lineup'], ENT_QUOTES, 'UTF-8')),
+        "glineup" => preg_replace("#\,#", "<br />", htmlspecialchars($_POST['glineup'], ENT_QUOTES, 'UTF-8')),
+        "match_admins" => htmlspecialchars($_POST['match_admins'], ENT_QUOTES, 'UTF-8'),
         "datum" => _datum,
         "gegner" => _cw_head_gegner,
         "xonx" => _cw_head_xonx,
@@ -105,14 +105,14 @@ if (defined('_Clanwars')) {
         "serverpwd" => $serverpwd,
         "cw_datum" => date("d.m.Y H:i", $datum) . _uhr,
         "cw_gegner" => $gegner,
-        "cw_xonx" => re($xonx),
-        "cw_liga" => re($_POST['liga']),
-        "cw_maps" => re($_POST['maps']),
+        "cw_xonx" => htmlspecialchars($xonx, ENT_QUOTES, 'UTF-8'),
+        "cw_liga" => htmlspecialchars($_POST['liga'], ENT_QUOTES, 'UTF-8'),
+        "cw_maps" => htmlspecialchars($_POST['maps'], ENT_QUOTES, 'UTF-8'),
         "cw_server" => $server,
         "cw_result" => $result,
         "cw_bericht" => $bericht,
         "screenshots" => $screens));
-    echo utf8_encode('<table class="mainContent" cellspacing="1">' . $index . '</table>');
+    echo mb_convert_encoding('<table class="mainContent" cellspacing="1">' . $index . '</table>', 'UTF-8', 'ISO-8859-1');
 
     if (!mysqli_persistconns)
         $mysql->close(); //MySQL

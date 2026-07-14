@@ -5,6 +5,7 @@
     <td>
         <form name="gallery" action="?action=admin&amp;do=editgallery&amp;id=[id]" method="post"
               onsubmit="DZCP.submitButton()">
+                <input type="hidden" name="csrf_token" value="[csrf_token]" />
             <table class="hperc" cellspacing="1">
                 <tr>
                     <td class="contentMainTop" width="25%"><span class="fontBold">[gallery]:</span></td>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * This file is part of phpFastCache.
@@ -15,6 +16,7 @@ declare(strict_types=1);
 
 namespace Phpfastcache\Helper;
 
+use DateInterval;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -40,7 +42,7 @@ class CacheConditionalHelper
     /**
      * @param string $cacheKey
      * @param callable $callback
-     * @param int|\DateInterval $expiresAfter
+     * @param int|DateInterval $expiresAfter
      * @return mixed
      */
     public function get(string $cacheKey, callable $callback, $expiresAfter = null)
@@ -48,7 +50,8 @@ class CacheConditionalHelper
         $cacheItem = $this->cacheInstance->getItem($cacheKey);
 
         if (!$cacheItem->isHit()) {
-            $cacheItem->set($callback());
+            /** Parameter $cacheItem will be available as of 8.0.6 */
+            $cacheItem->set($callback($cacheItem));
             if ($expiresAfter) {
                 $cacheItem->expiresAfter($expiresAfter);
             }

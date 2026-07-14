@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $where = _site_member;
@@ -24,7 +21,7 @@ else if (!empty($_GET['show']))
     header('Location: ?action=shows&id=' . (int)($_GET['show']));
 
 switch (strtolower($action)):
-    case 'shows';
+    case 'shows':
         $get = db("SELECT * FROM `" . $db['squads'] . "` WHERE `id` = " . (int)($_GET['id']) . ";", false, true);
         $qrym = db("SELECT s1.`user`,s1.`squad`,s2.`id`,s2.`nick`," .
             "s2.`email`,s2.`rlname`,s2.`steamid`,s2.`level`,s2.`bday`,s2.`hp`," .
@@ -46,7 +43,7 @@ switch (strtolower($action)):
                 continue;
 
             $cntall = cnt($db['squaduser'], " WHERE squad= '" . $get['id'] . "'");
-            $steam = (!empty($getm['steamid']) && steam_enable ? '<div id="infoSteam_' . md5(re($getm['steamid'])) . '"><div style="width:100%"><img src="../inc/images/ajax-loader-mini.gif" alt="" /></div><script language="javascript" type="text/javascript">DZCP.initDynLoader("infoSteam_' . md5(re($getm['steamid'])) . '","steam","&steamid=' . re($getm['steamid']) . '");</script></div>' : '-');
+            $steam = (!empty($getm['steamid']) && steam_enable ? '<div id="infoSteam_' . md5(re($getm['steamid'])) . '"><div style="width:100%"><img src="../inc/images/ajax-loader-mini.gif" alt="" /></div><script language="javascript" type="text/javascript">DZCP.initDynLoader("infoSteam_' . md5(re($getm['steamid'])) . '","steam","&steamid=' . h($getm['steamid']) . '");</script></div>' : '-');
             $class = ($color % 2) ? "contentMainFirst" : "contentMainSecond";
             $color++;
             $nick = autor($getm['user'], '', '', '', 20, '&amp;sq=' . $getm['squad']);
@@ -54,9 +51,9 @@ switch (strtolower($action)):
             if (!empty($getm['rlname'])) {
                 $real = explode(" ", re($getm['rlname']));
                 if (count($real) >= 2) {
-                    $nick = '<b>' . $real[0] . ' &#x93;</b> ' . $nick . ' <b>&#x94; ' . $real[1] . '</b>';
+                    $nick = '<b>' . h($real[0]) . ' &#x93;</b> ' . $nick . ' <b>&#x94; ' . h($real[1]) . '</b>';
                 } else {
-                    $nick = '<b>' . re($getm['rlname']) . ' &#x93;</b> ' . $nick;
+                    $nick = '<b>' . h($getm['rlname']) . ' &#x93;</b> ' . $nick;
                 }
             }
 
@@ -73,12 +70,12 @@ switch (strtolower($action)):
 
         }
 
-        $squad = re($get['name']);
+        $squad = h($get['name']);
         $style = '';
-        foreach ($picformat AS $end) {
+        foreach ($picformat as $end) {
             if (file_exists(basePath . '/inc/images/squads/' . (int)($get['id']) . '.' . $end)) {
                 $style = 'padding:0;';
-                $squad = '<img src="../inc/images/squads/' . (int)($get['id']) . '.' . $end . '" alt="' . re($get['name']) . '" />';
+                $squad = '<img src="../inc/images/squads/' . (int)($get['id']) . '.' . $end . '" alt="' . h($get['name']) . '" />';
                 break;
             }
         }
@@ -95,13 +92,13 @@ switch (strtolower($action)):
         while ($get = _fetch($qry)) {
             $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
             $color++;
-            $squad = show(_gameicon, array("icon" => $get['icon'])) . ' ' . re($get['name']);
+            $squad = show(_gameicon, array("icon" => $get['icon'])) . ' ' . h($get['name']);
             $style = '';
 
-            foreach ($picformat AS $end) {
+            foreach ($picformat as $end) {
                 if (file_exists(basePath . '/inc/images/squads/' . (int)($get['id']) . '.' . $end)) {
                     $style = 'text-align:center;padding:0';
-                    $squad = '<img src="../inc/images/squads/' . (int)($get['id']) . '.' . $end . '" alt="' . re($get['name']) . '" />';
+                    $squad = '<img src="../inc/images/squads/' . (int)($get['id']) . '.' . $end . '" alt="' . h($get['name']) . '" />';
                     break;
                 }
             }
@@ -111,7 +108,7 @@ switch (strtolower($action)):
                 "style" => $style,
                 "class" => $class,
                 "beschreibung" => bbcode(re($get['beschreibung'])),
-                "squadname" => re($get['name'])));
+                "squadname" => h($get['name'])));
         }
 
         $cnt = array('num' => 0);

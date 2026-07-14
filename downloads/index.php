@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $where = _site_dl;
@@ -41,11 +38,11 @@ switch ($action):
                         $img = "collapse";
                         $download = highlight(re($getdl['download']));
                     } else
-                        $download = re($getdl['download']);
+                        $download = h($getdl['download']);
 
                     $link = show(_downloads_link, array("id" => $getdl['id'],
                         "download" => $download,
-                        "titel" => re($getdl['download'])));
+                        "titel" => h($getdl['download'])));
 
                     $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
                     $color++;
@@ -63,7 +60,7 @@ switch ($action):
                 $kat = show(_dl_titel, array("id" => $get['id'],
                     "file" => $dltitel,
                     "cnt" => $cntKat,
-                    "name" => re($get['name'])));
+                    "name" => h($get['name'])));
 
                 $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
                 $color++;
@@ -81,7 +78,7 @@ switch ($action):
         $index = show($dir . "/downloads", array("kats" => $kats,
             "head" => _downloads_head));
         break;
-    case 'download';
+    case 'download':
         if (settings("reg_dl") && !$chkMe)
             $index = error(_error_unregistered);
         else {
@@ -169,7 +166,7 @@ switch ($action):
                     "date" => $date,
                     "lastdate" => $lastdate,
                     "id" => $_GET['id'],
-                    "dlname" => re($get['download']),
+                    "dlname" => h($get['download']),
                     "loaded" => $get['hits'],
                     "traffic" => $traffic,
                     "speed_modem" => $speed_modem,
@@ -188,7 +185,7 @@ switch ($action):
                 $index = error(_id_dont_exist, 1);
         }
         break;
-    case 'getfile';
+    case 'getfile':
         if (settings("reg_dl") && !$chkMe)
             $index = error(_error_unregistered, 1);
         else {

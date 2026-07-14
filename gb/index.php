@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $where = _site_gb;
@@ -65,7 +62,7 @@ switch ($action):
 
                 if (!$get['reg']) {
                     $gbtitel = show(_gb_titel_noreg, array("postid" => $i,
-                        "nick" => re($get['nick']),
+                        "nick" => h($get['nick']),
                         "edit" => $edit,
                         "delete" => $delete,
                         "comment" => $comment,
@@ -150,7 +147,7 @@ switch ($action):
             "entry" => $entry,
             "seiten" => $seiten));
         break;
-    case 'do';
+    case 'do':
         if (isset($_GET['what']) && $_GET['what'] == "addgb" && HasDSGVO()) {
             if ($userid >= 1) {
                 $toCheck = empty($_POST['eintrag']);
@@ -244,10 +241,9 @@ switch ($action):
                     $form = show("page/editor_notregged", array("nickhead" => _nick,
                         "emailhead" => _email,
                         "hphead" => _hp,
-                        "postemail" => re($get['email']),
-                        "posthp" => re($get['hp']),
-                        "postnick" => re($get['nick'])));
-                }
+                        "postemail" => h($get['email']),
+                        "posthp" => h($get['hp']),
+                        "postnick" => h($get['nick'])));                }
 
                 $index = show($dir . "/add", array("titel" => _eintragen_titel,
                     "nickhead" => _nick,
@@ -294,7 +290,7 @@ switch ($action):
             }
         }
         break;
-    case 'admin';
+    case 'admin':
         if (!permission("gb")) {
             $index = error(_error_wrong_permissions, 1);
         } else {
@@ -314,7 +310,7 @@ switch ($action):
 
                 if ($get['reg'] == "0") {
                     $gbtitel = show(_gb_titel_noreg, array("postid" => "?",
-                        "nick" => re($get['nick']),
+                        "nick" => h($get['nick']),
                         "edit" => "",
                         "delete" => "",
                         "comment" => "",
@@ -367,7 +363,7 @@ switch ($action):
             }
         }
         break;
-    case 'preview';
+    case 'preview':
         header("Content-type: text/html; charset=utf-8");
         $editby = "";
         if (isset($_GET['edit']) && !empty($_GET['edit'])) {
@@ -402,7 +398,7 @@ switch ($action):
 
         if ($regCheck) {
             $gbtitel = show(_gb_titel_noreg, array("postid" => $get_id,
-                "nick" => re($get_nick),
+                "nick" => htmlspecialchars($get_nick, ENT_QUOTES, 'UTF-8'),
                 "edit" => "",
                 "delete" => "",
                 "comment" => "",
@@ -432,7 +428,7 @@ switch ($action):
             "editby" => bbcode($editby, true),
             "ip" => $userip . _only_for_admins));
 
-        echo utf8_encode('<table class="mainContent" cellspacing="1">' . $index . '</table>');
+        echo mb_convert_encoding('<table class="mainContent" cellspacing="1">' . $index . '</table>', 'UTF-8', 'ISO-8859-1');
 
         if (!mysqli_persistconns)
             $mysql->close(); //MySQL

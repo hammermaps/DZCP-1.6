@@ -24,7 +24,7 @@ ob_start();
 $ajaxJob = false;
 include(basePath . '/vendor/autoload.php');
 
-use GUMP\GUMP;
+
 $gump = GUMP::get_instance();
 
 include(basePath . "/inc/debugger.php");

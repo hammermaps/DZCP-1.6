@@ -4,17 +4,20 @@
  * http://www.dzcp.de
  */
 
+if (defined('_BUFFER_LOADED')) return;
+define('_BUFFER_LOADED', true);
+
+if (!defined('basePath'))
+    define('basePath', dirname(dirname(__FILE__) . '../'));
+
 ob_start();
 ob_implicit_flush(false);
-define('basePath', dirname(dirname(__FILE__) . '../'));
 
-if (version_compare(phpversion(), '7.0', '<')) {
-    die('Bitte verwende PHP-Version 7.0 oder h&ouml;her.<p>Please use PHP-Version 7.0 or higher.');
+if (version_compare(phpversion(), '8.0', '<')) {
+    die('Bitte verwende PHP-Version 8.0 oder h&ouml;her.<p>Please use PHP-Version 8.0 or higher.');
 }
 
-include(basePath . '/vendor/autoload.php');
-
-use GUMP\GUMP;
+require_once(basePath . '/vendor/autoload.php');
 
 function getmicrotime()
 {
@@ -40,6 +43,12 @@ $_POST = $filter;
 unset($filter, $key, $var);
 $_GET = $gump->sanitize($_GET);
 
+// ── Kern-Includes automatisch laden ──────────────────────────────────────────
+// Damit jede index.php nur noch buffer.php einbinden muss
+require_once(basePath . '/inc/debugger.php');
+require_once(basePath . '/inc/config.php');
+require_once(basePath . '/inc/bbcode.php');
+
 function gz_output($output = '')
 {
     $gzip_compress_level = (!defined('buffer_gzip_compress_level') ? 4 : buffer_gzip_compress_level);
@@ -48,7 +57,7 @@ function gz_output($output = '')
 
     if (buffer_show_licence_bar) {
         $licence_bar = '<div class="licencebar"> <table style="margin:auto" cellspacing="0"><tr><td class="licencebar" nowrap="nowrap">Powered by <a class="licencebar" href="https://www.dzcp.de" target="_blank" title="deV!L`z Clanportal">DZCP - deV!L`z&nbsp;Clanportal V' . _version .
-            (_edition == 'dev' ? ' - Development Editon' : (_edition == 'cb' ?  ' - Custom Build' : '')) . '</a></td></tr> </table> </div>';
+            (_edition == 'dev' ? ' - Development Editon' : (_edition == 'cb' ? ' - Custom Build' : '')) . '</a></td></tr> </table> </div>';
 
         if (!file_exists(basePath . '/_codeking.licence'))
             $output = str_ireplace('</body>', $licence_bar . "\r\n</body>", $output);

@@ -6,20 +6,20 @@
 
 //Filter 404
 $filter404 = strtolower(GetServerVars("REQUEST_URI"));
-if (strpos($filter404, 'index.php/') !== false ||
-    strpos($filter404, 'ajax.php/') !== false) {
+if (str_contains($filter404, 'index.php/') ||
+    str_contains($filter404, 'ajax.php/')) {
     header("HTTP/1.0 404 Not Found");
     exit();
-} unset($filter404);
+}
+unset($filter404);
 
 ## INCLUDES/REQUIRES ##
+// Klassen (dbc_index, api, cookie, SteamAPI, DebugConsole) werden via
+// Composer classmap geladen (vendor/autoload.php in buffer.php)
 require_once(basePath . '/inc/_version.php');
-require_once(basePath . "/inc/cookie.php");
+require_once(basePath . '/inc/logger.php');
 require_once(basePath . '/inc/server_query/_functions.php');
-require_once(basePath . "/inc/teamspeak_query.php");
-require_once(basePath . '/inc/steamapi.php');
-require_once(basePath . '/inc/dbc.php');
-require_once(basePath . '/inc/api.php');
+require_once(basePath . '/inc/teamspeak_query.php');
 
 //Libs
 use Phpfastcache\CacheManager;
@@ -27,9 +27,9 @@ use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use PHPMailer\PHPMailer\PHPMailer;
 
 //Set Build
-$_build = str_replace('.','',_version);
+$_build = str_replace('.', '', _version);
 $_release = substr(_release, 0, -5);
-define('_build', $_build.'.'.$_release);
+define('_build', $_build . '.' . $_release);
 
 ## Is AjaxJob ##
 $ajaxJob = (!isset($ajaxJob) ? false : $ajaxJob);
@@ -50,20 +50,18 @@ if (isset($_GET['dsgvo'])) {
         case 1:
             $_SESSION['DSGVO'] = true;
             $_SESSION['do_show_dsgvo'] = true;
-            header("Location: " . GetServerVars('HTTP_REFERER'));
-            exit();
             break;
         default:
             $_SESSION['DSGVO'] = false;
             $_SESSION['do_show_dsgvo'] = true;
             $_SESSION['user_has_dsgvo_lock'] = false;
-            header("Location: " . GetServerVars('HTTP_REFERER'));
-            exit();
     }
+    header("Location: " . GetServerVars('HTTP_REFERER'));
+    exit();
 }
 
 // Cache
-$cache = CacheManager::getInstance($config_cache['storage'], $config_cache['config'],'default');
+$cache = CacheManager::getInstance($config_cache['storage'], $config_cache['config'], 'default');
 
 //-> Settingstabelle auslesen * Use function settings('xxxxxx');
 if (!dbc_index::issetIndex('settings')) {
@@ -71,6 +69,9 @@ if (!dbc_index::issetIndex('settings')) {
     dbc_index::setIndex('settings', $get_settings);
     unset($get_settings);
 }
+
+// Antispam-Typ in der Session speichern, damit antispam.php keinen DB-Zugriff benötigt
+$_SESSION['antispam_type'] = (int)settings('antispam_type');
 
 //-> Configtabelle auslesen * Use function config('xxxxxx');
 if (!dbc_index::issetIndex('config')) {
@@ -103,6 +104,13 @@ if (array_key_exists('language', $_SESSION) && !empty($_SESSION['language'])) {
 //-> einzelne Definitionen
 $CrawlerDetect = new CrawlerDetect();
 $isSpider = $CrawlerDetect->isCrawler();
+if ($isSpider) {
+    DzcpLogger::access()->info('Spider/Bot erkannt', [
+        'user_agent' => $CrawlerDetect->getUserAgent(),
+        'ip'         => isset($userip) ? $userip : ($_SERVER['REMOTE_ADDR'] ?? 'unknown'),
+        'url'        => GetServerVars('REQUEST_URI'),
+    ]);
+}
 $subfolder = basename(dirname(dirname(GetServerVars('PHP_SELF')) . '../'));
 $httphost = GetServerVars('HTTP_HOST') . (empty($subfolder) ? '' : '/' . $subfolder);
 $domain = str_replace('www.', '', $httphost);
@@ -123,7 +131,9 @@ $api = new api('api.dzcp.de');
 $action = isset($_GET['action']) ? strtolower($_GET['action']) : '';
 $page = (isset($_GET['page']) && (int)($_GET['page']) >= 1) ? (int)($_GET['page']) : 1;
 $do = isset($_GET['do']) ? strtolower($_GET['do']) : '';
-$index = ''; $show = ''; $color = 0;
+$index = '';
+$show = '';
+$color = 0;
 
 //-> Auslesen der Cookies und automatisch anmelden
 if (is_validate_ip($userip) && HasDSGVO() && (cookie::get('id') != false &&
@@ -149,7 +159,7 @@ if (is_validate_ip($userip) && HasDSGVO() && (cookie::get('id') != false &&
             //-> Schreibe Werte in die Server Sessions
             $_SESSION['id'] = $get['id'];
             $_SESSION['pwd'] = $get['pwd'];
-            $_SESSION['lastvisit'] = userstats('lastvisit',$get['id']);
+            $_SESSION['lastvisit'] = userstats('lastvisit', $get['id']);
             $_SESSION['ip'] = $userip;
 
             if (!empty($get['language'])) {
@@ -157,16 +167,20 @@ if (is_validate_ip($userip) && HasDSGVO() && (cookie::get('id') != false &&
             }
 
             if (data("ip", $get['id']) != $_SESSION['ip'])
-                $_SESSION['lastvisit'] = userstats('lastvisit',$get['id']);
+                $_SESSION['lastvisit'] = userstats('lastvisit', $get['id']);
 
             if (empty($_SESSION['lastvisit']))
-                $_SESSION['lastvisit'] = userstats('lastvisit',$get['id']);
+                $_SESSION['lastvisit'] = userstats('lastvisit', $get['id']);
 
             //-> Aktualisiere Datenbank
-            db("UPDATE `" . $db['users'] . "` SET `online` = 1, `sessid` = '" . session_id() . "', `ip` = '" . $userip . "', `pkey` = '" . $permanent_key . "', `time` = ".time()." WHERE `id` = " . $get['id'] . ";");
+            db("UPDATE `" . $db['users'] . "` SET `online` = 1, `sessid` = '" . session_id() . "', `ip` = '" . $userip . "', `pkey` = '" . $permanent_key . "', `time` = " . time() . " WHERE `id` = " . $get['id'] . ";");
 
             //-> Aktualisiere die User-Statistik
             db("UPDATE `" . $db['userstats'] . "` SET `logins` = (logins+1) WHERE `user` = " . $get['id'] . ";");
+            DzcpLogger::app()->info('Auto-Login via Cookie erfolgreich', [
+                'user_id' => $get['id'],
+                'ip'      => $userip,
+            ]);
             unset($get, $permanent_key);
         }
     } else {
@@ -175,6 +189,10 @@ if (is_validate_ip($userip) && HasDSGVO() && (cookie::get('id') != false &&
         $_SESSION['ip'] = '';
         $_SESSION['lastvisit'] = '';
         $_SESSION['pkey'] = '';
+        DzcpLogger::security()->warning('Auto-Login via Cookie fehlgeschlagen (User nicht gefunden)', [
+            'ip'        => $userip,
+            'cookie_id' => cookie::get('id'),
+        ]);
     }
 
     unset($sql);
@@ -188,6 +206,10 @@ $chkMe = checkme();
 if (isset($_GET['set_language'])) {
     if (file_exists(basePath . "/inc/lang/languages/" . $_GET['set_language'] . ".php")) {
         $_SESSION['language'] = $_GET['set_language'];
+        DzcpLogger::app()->info('Sprache geändert', [
+            'language' => $_GET['set_language'],
+            'user_id'  => isset($userid) ? $userid : 0,
+        ]);
     }
 
     if ($chkMe && $userid) {
@@ -210,6 +232,13 @@ if (!$chkMe) {
 //-> Prueft ob der User gebannt ist, oder die IP des Clients warend einer offenen session verändert wurde.
 if ($chkMe && $userid && !empty($_SESSION['ip'])) {
     if ($_SESSION['ip'] != visitorIp() || isBanned($userid, false)) {
+        $reason = ($_SESSION['ip'] != visitorIp()) ? 'IP-Änderung' : 'User gebannt';
+        DzcpLogger::security()->warning('Session invalidiert: ' . $reason, [
+            'user_id'      => $userid,
+            'session_ip'   => $_SESSION['ip'],
+            'current_ip'   => visitorIp(),
+            'is_banned'    => isBanned($userid, false),
+        ]);
         $_SESSION['id'] = '';
         $_SESSION['pwd'] = '';
         $_SESSION['ip'] = '';
@@ -223,18 +252,41 @@ if ($chkMe && $userid && !empty($_SESSION['ip'])) {
     }
 }
 
+// CSRF Protection: validate all POST requests (skip installer, updater, thumbgen and ajax jobs)
+if (!$ajaxJob && !$installation && !$updater && !$thumbgen &&
+    GetServerVars('REQUEST_METHOD') === 'POST') {
+    if (!csrf_check()) {
+        DzcpLogger::security()->critical('CSRF-Token ungültig', [
+            'ip'      => isset($userip) ? $userip : ($_SERVER['REMOTE_ADDR'] ?? 'unknown'),
+            'url'     => GetServerVars('REQUEST_URI'),
+            'referer' => GetServerVars('HTTP_REFERER'),
+            'user_id' => isset($userid) ? $userid : 0,
+            'method'  => 'POST',
+        ]);
+        die(error2(_csrf_invalid));
+    }
+}
+
 /**
  * Prüft ob die DSGVO akzeptiert wurde
  * @return bool
  */
-function HasDSGVO() {
+function HasDSGVO()
+{
     if (array_key_exists('DSGVO', $_SESSION) && $_SESSION['DSGVO'])
         return true;
 
     return false;
 }
 
-function isSecure() {
+/**
+ * Prüft, ob die aktuelle Verbindung über HTTPS (SSL/TLS) erfolgt.
+ * Berücksichtigt auch Reverse-Proxy-Header (X-Forwarded-Proto, X-Forwarded-SSL).
+ *
+ * @return bool TRUE wenn HTTPS aktiv, FALSE bei HTTP
+ */
+function isSecure()
+{
     if (GetServerVars('HTTPS') && GetServerVars('HTTPS') == 'on') {
         return true;
     } elseif ((GetServerVars('HTTP_X_FORWARDED_PROTO') && GetServerVars('HTTP_X_FORWARDED_PROTO') == 'https') ||
@@ -245,11 +297,18 @@ function isSecure() {
     return false;
 }
 
-function hasSecure() {
-    if (isset($_SERVER['HTTPS']) ) {
-        if (strtolower(GetServerVars('HTTPS')) == 'on' )
+/**
+ * Prüft ob der Server HTTPS-Unterstützung besitzt (Server-seitig).
+ * Prüft HTTPS-Serverkonfiguration anhand des HTTPS-Flags oder Port 443.
+ *
+ * @return bool TRUE wenn HTTPS verfügbar, FALSE sonst
+ */
+function hasSecure()
+{
+    if (isset($_SERVER['HTTPS'])) {
+        if (strtolower(GetServerVars('HTTPS')) == 'on')
             return true;
-    } elseif (isset($_SERVER['SERVER_PORT']) && ( '443' == $_SERVER['SERVER_PORT'] ) ) {
+    } elseif (isset($_SERVER['SERVER_PORT']) && ('443' == $_SERVER['SERVER_PORT'])) {
         return true;
     }
 
@@ -257,16 +316,16 @@ function hasSecure() {
 }
 
 //Weiterleitung zu einer SSL Verbindung
-if(is_validate_ip($userip) && !isSecure() && use_ssl_auto_redirect && !$ajaxJob && !$installation && !$updater ) {
-    if(!$isSecure_cheked['check']) {
-        if(hasSecure()) {
+if (is_validate_ip($userip) && !isSecure() && use_ssl_auto_redirect && !$ajaxJob && !$installation && !$updater) {
+    if (!$isSecure_cheked['check']) {
+        if (hasSecure()) {
             header("Location: https://" . GetServerVars('HTTP_HOST') .
                 GetServerVars('REQUEST_URI'));
             exit();
         }
     }
 
-    if($isSecure_cheked['check'] && $isSecure_cheked['isSecure']) {
+    if ($isSecure_cheked['check'] && $isSecure_cheked['isSecure']) {
         header("Location: https://" . GetServerVars('HTTP_HOST') .
             GetServerVars('REQUEST_URI'));
         exit();
@@ -277,7 +336,8 @@ if(is_validate_ip($userip) && !isSecure() && use_ssl_auto_redirect && !$ajaxJob 
  * Gibt die IP des Besuchers / Users zurück
  * Forwarded IP Support
  */
-function visitorIp() {
+function visitorIp()
+{
     if (array_key_exists('identy_ip', $_SESSION)) {
         if (!empty($_SESSION['identy_ip']))
             return $_SESSION['identy_ip'];
@@ -306,11 +366,13 @@ function visitorIp() {
 }
 
 /**
- * @param $ip
+ * Prüft ob eine IP valide ist
+ * @param string $ip
  * @return bool
  */
-function is_validate_ip(string $ip) {
-    if(strpos($ip, '0.0.0.0') !== false)
+function is_validate_ip(string $ip): bool
+{
+    if (str_contains($ip, '0.0.0.0'))
         return false;
 
     return (filter_var($ip, FILTER_VALIDATE_IP) == true);
@@ -319,10 +381,11 @@ function is_validate_ip(string $ip) {
 /**
  * Pruft eine IP gegen eine IP-Range
  * @param string $ip
- * @param string|array $range
+ * @param array|string $range
  * @return boolean
  */
-function validateIpV4Range(string $ip, $range) {
+function validateIpV4Range(string $ip, array|string $range): bool
+{
     if (!is_array($range)) {
         $counter = 0;
         $tip = explode('.', $ip);
@@ -368,7 +431,8 @@ function validateIpV4Range(string $ip, $range) {
  * Funktion um notige Erweiterungen zu prufen
  * @return boolean
  **/
-function fsockopen_support() {
+function fsockopen_support(): bool
+{
     if (fsockopen_support_bypass) return true;
 
     if (disable_functions('fsockopen') || disable_functions('fopen'))
@@ -377,7 +441,13 @@ function fsockopen_support() {
     return true;
 }
 
-function disable_functions(string $function = '')
+/**
+ * Prüft ob eine PHP-Funktion serverseitig deaktiviert oder nicht verfügbar ist.
+ *
+ * @param string $function Name der zu prüfenden PHP-Funktion
+ * @return bool TRUE wenn die Funktion deaktiviert/nicht vorhanden ist, FALSE wenn verfügbar
+ */
+function disable_functions(string $function = ''): bool
 {
     if (!function_exists($function)) return true;
     $disable_functions = ini_get('disable_functions');
@@ -391,9 +461,17 @@ function disable_functions(string $function = '')
     return false;
 }
 
+/**
+ * Liest die ID des aktuell eingeloggten Users aus der Session aus.
+ * Verwendet dbc_index als Cache, um wiederholte DB-Abfragen zu vermeiden.
+ * Gibt 0 zurück wenn kein User eingeloggt oder DSGVO nicht akzeptiert wurde.
+ *
+ * @return int User-ID des eingeloggten Users, 0 bei nicht eingeloggt
+ */
 //-> Auslesen der UserID
-function userid() {
-    global $db,$userip;
+function userid()
+{
+    global $db, $userip;
     if (HasDSGVO() && is_validate_ip($userip)) {
         if (empty($_SESSION['id']) || empty($_SESSION['pwd'])) return 0;
         if (!dbc_index::issetIndex('user_' . $_SESSION['id'])) {
@@ -410,7 +488,16 @@ function userid() {
     return 0;
 }
 
-function sysTemplateswitch() {
+/**
+ * Wechselt das aktive Template basierend auf dem GET-Parameter 'tmpl_set'.
+ * Liest verfügbare Templates aus dem Verzeichnis, prüft Berechtigungen anhand
+ * der template.xml und setzt das Template in Session und Cookie.
+ * Leitet anschließend zur vorherigen Seite weiter (HTTP Redirect).
+ *
+ * @return void
+ */
+function sysTemplateswitch()
+{
     global $chkMe;
     $files = get_files(basePath . '/inc/_templates_/', true);
     foreach ($files as $templ) {
@@ -451,11 +538,19 @@ function sysTemplateswitch() {
     unset($xml, $templ);
 }
 
-function GetServerVars(string $var) {
+/**
+ * Liest eine Server- oder Umgebungsvariable aus $_SERVER oder $_ENV aus.
+ * Konvertiert den Wert nach UTF-8. Gibt bei HTTP_REFERER einen Fallback zurück.
+ *
+ * @param string $var Name der Server/ENV-Variable (z.B. 'REMOTE_ADDR', 'HTTP_HOST')
+ * @return string|false Wert der Variable als UTF-8-String, FALSE wenn nicht vorhanden
+ */
+function GetServerVars(string $var)
+{
     if (array_key_exists($var, $_SERVER) && !empty($_SERVER[$var])) {
-        return utf8_encode($_SERVER[$var]);
+        return mb_convert_encoding($_SERVER[$var], 'UTF-8', 'ISO-8859-1');
     } else if (array_key_exists($var, $_ENV) && !empty($_ENV[$var])) {
-        return utf8_encode($_ENV[$var]);
+        return mb_convert_encoding($_ENV[$var], 'UTF-8', 'ISO-8859-1');
     }
 
     if ($var == 'HTTP_REFERER') { //Fix for empty HTTP_REFERER
@@ -492,12 +587,27 @@ unset($files);
 
 $designpath = '../inc/_templates_/' . $tmpdir;
 
+/**
+ * Lädt die Sprachdatei sowie globale und DSGVO-Sprachdefinitionen.
+ * Setzt HTTP-Header (Content-Type, Security-Header), initialisiert GUMP
+ * mit der passenden Sprache und bindet zusätzliche Sprachdateien ein.
+ * Alle Sprach-Konstanten werden über define() global verfügbar gemacht.
+ *
+ * @param string $lng Sprachname (z.B. 'deutsch', 'english', 'russian')
+ * @return void
+ */
 //-> Languagefiles einlesen
-function lang(string $lng) {
+function lang(string $lng)
+{
     global $gump;
     if (!file_exists(basePath . "/inc/lang/languages/" . $lng . ".php")) {
         $files = get_files(basePath . '/inc/lang/languages/', false, true, array('php'));
-        $lng = str_replace('.php', '', $files[0]);
+        $fallback_lng = str_replace('.php', '', $files[0]);
+        DzcpLogger::app()->warning('Sprachdatei nicht gefunden, Fallback wird genutzt', [
+            'requested' => $lng,
+            'fallback'  => $fallback_lng,
+        ]);
+        $lng = $fallback_lng;
     }
 
     $language_text = array();
@@ -513,12 +623,24 @@ function lang(string $lng) {
     //Set bBase-Content-type header
     header("Content-type: text/html; charset=" . $charset);
 
+    //Security headers
+    header("X-Frame-Options: SAMEORIGIN");
+    header("X-Content-Type-Options: nosniff");
+    header("Referrer-Policy: strict-origin-when-cross-origin");
+    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self';");
+    // TODO: Replace 'unsafe-inline'/'unsafe-eval' with nonces or hashes once inline scripts/styles are refactored
+
     //Set language for GUMP
-    $gump->language(language_short_tag());
+    $gump_lang = language_short_tag();
+    $gump_lang_file = __DIR__ . '/../vendor/wixel/gump/lang/' . $gump_lang . '.php';
+    if (!file_exists($gump_lang_file)) {
+        $gump_lang = 'en';
+    }
+    $gump = new GUMP($gump_lang);
 
     //-> Neue Languages einbinden, sofern vorhanden
     if ($language_files = get_files(basePath . '/inc/additional-languages/' . $lng . '/', false, true, array('php'))) {
-        foreach ($language_files AS $languages) {
+        foreach ($language_files as $languages) {
             if (file_exists(basePath . '/inc/additional-languages/' . $lng . '/' . $languages))
                 include_once(basePath . '/inc/additional-languages/' . $lng . '/' . $languages);
         }
@@ -534,11 +656,15 @@ function lang(string $lng) {
 }
 
 /**
- * @param $csv_string
- * @param string $delimiter
- * @param bool $skip_empty_lines
- * @param bool $trim_fields
- * @return array|false[][]|string[][]|string[][][]
+ * Parst einen CSV-String in ein zweidimensionales Array.
+ * Unterstützt benutzerdefinierte Trennzeichen, Leerzeilen-Übersprung
+ * und automatisches Trimmen der Felder. Behandelt Anführungszeichen korrekt.
+ *
+ * @param string $csv_string       Der zu parsende CSV-Rohtext
+ * @param string $delimiter        Trennzeichen zwischen Feldern (Standard: ',')
+ * @param bool   $skip_empty_lines Leere Zeilen überspringen (Standard: true)
+ * @param bool   $trim_fields      Felder von Leerzeichen bereinigen (Standard: true)
+ * @return array Zweidimensionales Array mit den CSV-Daten [Zeile][Spalte]
  */
 function parse_csv($csv_string, $delimiter = ",", $skip_empty_lines = true, $trim_fields = true)
 {
@@ -546,7 +672,7 @@ function parse_csv($csv_string, $delimiter = ",", $skip_empty_lines = true, $tri
         function ($line) use ($delimiter, $trim_fields) {
             return array_map(
                 function ($field) {
-                    return str_replace('!!Q!!', '"', utf8_decode(urldecode($field)));
+                    return str_replace('!!Q!!', '"', mb_convert_encoding(urldecode($field), 'ISO-8859-1', 'UTF-8'));
                 },
                 $trim_fields ? array_map('trim', explode($delimiter, $line)) : explode($delimiter, $line)
             );
@@ -556,7 +682,7 @@ function parse_csv($csv_string, $delimiter = ",", $skip_empty_lines = true, $tri
             preg_replace_callback(
                 '/"(.*?)"/s',
                 function ($field) {
-                    return urlencode(utf8_encode($field[1]));
+                    return urlencode(mb_convert_encoding($field[1], 'UTF-8', 'ISO-8859-1'));
                 },
                 $enc = preg_replace('/(?<!")""/', '!!Q!!', $csv_string)
             )
@@ -565,10 +691,11 @@ function parse_csv($csv_string, $delimiter = ",", $skip_empty_lines = true, $tri
 }
 
 /**
- * @param string $land
- * @return false|mixed|string|string[]
- * @throws \Psr\Cache\InvalidArgumentException
- * @throws \phpFastCache\Exceptions\phpFastCacheInvalidArgumentException
+ * Gibt den ausgeschriebenen Ländernamen zu einem ISO-3166-Ländercode zurück.
+ * Lädt die Länderliste als CSV von einem externen Server und cached sie 7 Tage.
+ *
+ * @param string $land ISO-3166 Ländercode (z.B. 'de', 'us', 'fr')
+ * @return string Ausgeschriebener Ländername (z.B. 'Germany'), leer wenn nicht gefunden
  */
 function getCountryName(string $land)
 {
@@ -578,28 +705,43 @@ function getCountryName(string $land)
         return '';
 
     $csv = [];
-    $CachedString = $cache->getItem('CountryNames');
-    if (is_null($CachedString->get())) {
-        $stream = get_external_contents('https://static.dzcp.de/csv/iso3166.csv');
-        if (!empty($stream)) {
-            $csv = parse_csv($stream);
-            $CachedString->set(serialize($csv))->expiresAfter(604800);
-            $cache->save($CachedString);
+    try {
+        $CachedString = $cache->getItem('CountryNames');
+        if (is_null($CachedString->get())) {
+            $stream = get_external_contents('https://static.dzcp.de/csv/iso3166.csv');
+            if (!empty($stream)) {
+                $csv = parse_csv($stream);
+                $CachedString->set(serialize($csv))->expiresAfter(604800);
+                $cache->save($CachedString);
+            }
+        } else {
+            $csv = unserialize($CachedString->get());
         }
-    } else {
-        $csv = unserialize($CachedString->get());
+    } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
     }
 
     foreach ($csv as $row) {
-        if(strtolower(trim($row[0])) == strtolower(trim($land)))
+        if (strtolower(trim($row[0])) == strtolower(trim($land)))
             return $row[1];
     }
 
     return '';
 }
 
-//->Daten uber file_get_contents oder curl abrufen
-function get_external_contents(string $url, $post = false, bool $nogzip = false, int $timeout = file_get_contents_timeout) {
+/**
+ * Lädt den Inhalt einer externen URL via cURL oder file_get_contents.
+ * Unterstützt POST-Requests, automatische gzip-Dekomprimierung und Timeout.
+ * Prüft vorab ob der Ziel-Port erreichbar ist (ping_port).
+ * HTTPS wird bei file_get_contents automatisch zu HTTP degradiert (kein SSL-Support).
+ *
+ * @param string     $url     Ziel-URL (http:// oder https://)
+ * @param mixed      $post    POST-Daten als Array oder false für GET-Request
+ * @param bool       $nogzip  gzip-Dekomprimierung deaktivieren (Standard: false)
+ * @param float|int  $timeout Verbindungs-Timeout in Sekunden (Standard: file_get_contents_timeout)
+ * @return string|false Inhalt der URL als String, FALSE bei Fehler oder nicht erreichbar
+ */
+function get_external_contents(string $url, $post = false, bool $nogzip = false, $timeout = file_get_contents_timeout)
+{
     if (!fsockopen_support() && (!extension_loaded('curl') || !use_curl_support))
         return false;
 
@@ -622,7 +764,7 @@ function get_external_contents(string $url, $post = false, bool $nogzip = false,
         curl_setopt($curl, CURLOPT_USERAGENT, "DZCP");
 
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $timeout);
-        curl_setopt($curl, CURLOPT_TIMEOUT, $timeout * 2); // x 2
+        curl_setopt($curl, CURLOPT_TIMEOUT, (int)($timeout * 2)); // x 2
 
         //For POST
         /** @var TYPE_NAME $post */
@@ -650,15 +792,14 @@ function get_external_contents(string $url, $post = false, bool $nogzip = false,
             return false;
         }
 
-        if ( strlen($content) && (curl_errno($curl)==CURLE_OK) && (curl_getinfo($curl, CURLINFO_HTTP_CODE)==200) ) {
+        if (strlen($content) && (curl_errno($curl) == CURLE_OK) && (curl_getinfo($curl, CURLINFO_HTTP_CODE) == 200)) {
             // check for gzipped content
-            if ( (ord($content[0])==0x1f) && (ord($content[1])==0x8b) ) {
+            if ((ord($content[0]) == 0x1f) && (ord($content[1]) == 0x8b)) {
                 // skip header and ungzip the data
-                $content = gzinflate(substr($content,10));
+                $content = gzinflate(substr($content, 10));
             }
         }
 
-        @curl_close($curl);
         unset($curl);
     } else {
         if ($url_p['scheme'] == 'https') //HTTPS not Supported!
@@ -666,7 +807,7 @@ function get_external_contents(string $url, $post = false, bool $nogzip = false,
 
         $opts = array();
         $opts['http']['method'] = "GET";
-        $opts['http']['timeout'] = $timeout * 2;
+        $opts['http']['timeout'] = (int)($timeout * 2);
 
         $gzip = false;
 
@@ -683,7 +824,10 @@ function get_external_contents(string $url, $post = false, bool $nogzip = false,
         $content = substr($content, -1, 40000);
 
         if ($gzip) {
-            foreach ($http_response_header as $c => $h) {
+            $response_headers = function_exists('http_get_last_response_headers')
+                ? http_get_last_response_headers()
+                : [];
+            foreach ($response_headers as $c => $h) {
                 if (stristr($h, 'content-encoding') && stristr($h, 'gzip')) {
                     $content = gzinflate(substr($content, 10, -8));
                 }
@@ -695,7 +839,15 @@ function get_external_contents(string $url, $post = false, bool $nogzip = false,
 }
 
 //-> Sprachdateien auflisten
-function languages() {
+/**
+ * Gibt alle verfügbaren Sprachauswahl-Icons als HTML-String zurück.
+ * Durchsucht das Sprachdatei-Verzeichnis nach PHP-Dateien und erstellt
+ * für jede Sprache einen Flag-Link, sofern ein passendes GIF-Flaggenbild vorhanden ist.
+ *
+ * @return string HTML-String mit Bild-Links zur Sprachumschaltung
+ */
+function languages()
+{
     $lang = "";
     $files = get_files('../inc/lang/languages/', false, true, array('php'));
     for ($i = 0; $i <= count($files) - 1; $i++) {
@@ -714,7 +866,16 @@ if ($userid >= 1 && $ajaxJob != true && HasDSGVO()) {
 }
 
 //-> Settings auslesen
-function settings($what, bool $use_dbc = true) {
+/**
+ * Liest einen oder mehrere Werte aus der Settings-Tabelle der Datenbank.
+ * Nutzt standardmäßig den dbc_index-Cache für bessere Performance.
+ *
+ * @param string|array $what     Feldname als String oder Array mit mehreren Feldnamen
+ * @param bool         $use_dbc  Cache (dbc_index) verwenden (Standard: true)
+ * @return mixed Einzelwert als String/int oder Array mit Schlüssel=>Wert-Paaren
+ */
+function settings($what, bool $use_dbc = true)
+{
     global $db;
 
     if (is_array($what)) {
@@ -741,8 +902,17 @@ function settings($what, bool $use_dbc = true) {
     }
 }
 
+/**
+ * Liest einen oder mehrere Werte aus der Config-Tabelle der Datenbank.
+ * Nutzt standardmäßig den dbc_index-Cache für bessere Performance.
+ *
+ * @param string|array $what     Feldname als String oder Array mit mehreren Feldnamen
+ * @param bool         $use_dbc  Cache (dbc_index) verwenden (Standard: true)
+ * @return mixed Einzelwert als String/int oder Array mit Schlüssel=>Wert-Paaren, 0 bei Fehler
+ */
 //-> Config auslesen
-function config($what, bool $use_dbc = true) {
+function config($what, bool $use_dbc = true)
+{
     global $db;
 
     if (is_array($what)) {
@@ -774,16 +944,33 @@ function config($what, bool $use_dbc = true) {
     return 0;
 }
 
+/**
+ * Prüft ob ein User Root-Administrator ist.
+ * Vergleicht die User-ID mit der konfigurierten $rootAdmins-Liste.
+ *
+ * @param int $userid User-ID (0 = aktuell eingeloggter User)
+ * @return bool TRUE wenn Root-Admin, FALSE sonst
+ */
 //-> Prueft ob der User ein Rootadmin ist
-function rootAdmin(int $userid = 0) {
+function rootAdmin(int $userid = 0)
+{
     global $rootAdmins;
     $userid = !$userid ? userid() : $userid;
     if (!count($rootAdmins)) return false;
     return in_array($userid, $rootAdmins);
 }
 
+/**
+ * Wandelt [php]...[/php] BBCode-Tags in farbig hervorgehobenen PHP-Quellcode um.
+ * Fügt eine Zeilennummerierung hinzu und gibt den Code in einer formatierten
+ * HTML-Tabelle mit CSS-Klassen aus.
+ *
+ * @param string $txt Eingabetext mit optionalen [php]...[/php] BBCode-Tags
+ * @return string Text mit ersetzten PHP-Code-Blöcken als HTML
+ */
 //-> PHP-Code farbig anzeigen
-function highlight_text(string $txt) {
+function highlight_text(string $txt)
+{
     while (preg_match("=\[php\](.*)\[/php\]=Uis", $txt) != FALSE) {
         preg_match("=\[php\](.*)\[/php\]=Uis", $txt, $matches);
         $src = $matches[1];
@@ -840,7 +1027,15 @@ function highlight_text(string $txt) {
     return $txt;
 }
 
-function regexChars(string $txt) {
+/**
+ * Escapt alle Sonderzeichen in einem String für die sichere Verwendung in regulären Ausdrücken.
+ * Entfernt vorher HTML-Tags sowie Zeilenumbrüche.
+ *
+ * @param string $txt Eingabetext der escapet werden soll
+ * @return string Text mit escapteten Regex-Sonderzeichen, ohne HTML und Zeilenumbrüche
+ */
+function regexChars(string $txt)
+{
     $txt = strip_tags($txt);
     $txt = str_replace('"', '&quot;', $txt);
     $txt = str_replace('\\', '\\\\', $txt);
@@ -866,9 +1061,16 @@ function regexChars(string $txt) {
     return str_replace("\n", '', $txt);
 }
 
+/**
+ * Lädt alle Glossar-Einträge aus der Datenbank in den dbc_index-Cache.
+ * Wird intern von glossar() aufgerufen, wenn der Cache noch nicht befüllt ist.
+ *
+ * @return bool TRUE bei Erfolg, FALSE wenn Glossar deaktiviert
+ */
 //-> Glossarfunktion
 $use_glossar = true; //Global
-function glossar_load_index() {
+function glossar_load_index()
+{
     global $db, $use_glossar;
     if (!$use_glossar) return false;
 
@@ -885,10 +1087,15 @@ function glossar_load_index() {
 }
 
 /**
- * @param $txt
- * @return mixed
+ * Verlinkt Glossar-Begriffe im Text mit Tooltip und Link zur Glossar-Seite.
+ * Lädt den Glossar-Index aus dem Cache (oder DB) und ersetzt gefundene Wörter
+ * durch anklickbare Links mit onmouseover-Info. Im AjaxJob-Modus inaktiv.
+ *
+ * @param string $txt Eingabetext in dem Glossar-Begriffe verlinkt werden sollen
+ * @return string Text mit verlinkten Glossar-Begriffen als HTML
  */
-function glossar(string $txt) {
+function glossar(string $txt)
+{
     global $gl_words, $gl_desc, $use_glossar, $ajaxJob;
 
     if (!$use_glossar || $ajaxJob)
@@ -927,12 +1134,30 @@ function glossar(string $txt) {
     return str_replace('[', '&#91;', $txt);
 }
 
-function bbcodetolow(array $founds) {
+/**
+ * Callback für preg_replace_callback: Wandelt BBCode-Tags in Kleinbuchstaben um.
+ * Wird intern von replace() genutzt, um BBCode case-insensitiv zu verarbeiten.
+ *
+ * @param array $founds Treffer-Array aus preg_replace_callback ([0]=Gesamt, [1]=Tag, [2]=Inhalt, [3]=Schlusstag)
+ * @return string BBCode-Tag mit Kleinbuchstaben-Tags und getrimmtem Inhalt
+ */
+function bbcodetolow(array $founds)
+{
     return "[" . strtolower($founds[1]) . "]" . trim($founds[2]) . "[/" . strtolower($founds[3]) . "]";
 }
 
+/**
+ * Verarbeitet BBCode-Grundtags (url, img, b, i, u, color) und wandelt sie in HTML um.
+ * Unterstützt optional YouTube-Video-Tags und TinyMCE-spezifische Bildkonvertierung.
+ *
+ * @param string $txt        Eingabetext mit BBCode
+ * @param bool   $type       TinyMCE-Modus: konvertiert mce_src-Attribute in src (Standard: false)
+ * @param bool   $no_vid_tag Video-Tags (YouTube) deaktivieren (Standard: false)
+ * @return string Text mit umgewandelten BBCode-Tags als HTML
+ */
 //-> Replaces
-function replace(string $txt, bool $type = false, bool $no_vid_tag = false) {
+function replace(string $txt, bool $type = false, bool $no_vid_tag = false)
+{
     $txt = str_replace("&#34;", "\"", $txt);
 
     if ($type)
@@ -978,8 +1203,16 @@ function replace(string $txt, bool $type = false, bool $no_vid_tag = false) {
     return preg_replace("#(\w){1,1}(&nbsp;)#Uis", "$1 ", $txt);
 }
 
+/**
+ * Filtert konfigurierte verbotene Wörter aus einem Text und ersetzt sie durch Sternchen.
+ * Die Wortliste wird aus den Settings geladen (Komma-separiert).
+ *
+ * @param string $txt Eingabetext der gefiltert werden soll
+ * @return string Text mit durch Sternchen ersetzten Badwords
+ */
 //-> Badword Filter
-function BadwordFilter($txt) {
+function BadwordFilter($txt)
+{
     $words = explode(",", trim(settings('badwords')));
     foreach ($words as $word) {
         $txt = preg_replace("#" . $word . "#i", str_repeat("*", strlen($word)), $txt);
@@ -987,8 +1220,17 @@ function BadwordFilter($txt) {
     return $txt;
 }
 
+/**
+ * Hebt Suchwörter im Text farbig hervor (für Suchergebnisse).
+ * Gibt ein Array mit dem modifizierten Text und einer CSS-Klasse zurück.
+ *
+ * @param string $text  Originaltext in dem hervorgehoben werden soll
+ * @param string $word  Suchwort(e) das/die hervorgehoben werden soll(en)
+ * @return array ['text' => string (Text mit <span>-Markierungen), 'class' => string (CSS-Klasse)]
+ */
 //-> Funktion um Bestimmte Textstellen zu markieren
-function hl($text, $word) {
+function hl($text, $word)
+{
     $ret = array();
     if (!empty($_GET['hl']) && $_SESSION['search_type'] == 'text') {
         if ($_SESSION['search_con'] == 'or') {
@@ -1010,6 +1252,13 @@ function hl($text, $word) {
     return $ret;
 }
 
+/**
+ * Wandelt eine E-Mail-Adresse in HTML-Entities (Unicode-Zeichencodes) um.
+ * Schützt die Adresse vor einfachem E-Mail-Harvesting durch Bots.
+ *
+ * @param string $email E-Mail-Adresse die kodiert werden soll
+ * @return string E-Mail als HTML-Entity-String (z.B. "&#109;&#97;&#105;&#108;...")
+ */
 //-> Emailadressen in Unicode umwandeln
 function eMailAddr(string $email)
 {
@@ -1022,6 +1271,12 @@ function eMailAddr(string $email)
     return $output;
 }
 
+/**
+ * Ersetzt Leerzeichen durch '+' (URL-konform nach W3C) und konvertiert Sonderzeichen.
+ *
+ * @param string $string Eingabestring
+ * @return string String mit '+' statt Leerzeichen und konvertierten Sonderzeichen
+ */
 //-> Leerzeichen mit + ersetzen (w3c)
 function convSpace(string $string)
 {
@@ -1029,6 +1284,13 @@ function convSpace(string $string)
     return str_replace(" ", "+", $string);
 }
 
+/**
+ * Konvertiert einen Text für die sichere Speicherung in der Datenbank (BBCode-Vorbereitung).
+ * Escapt Anführungszeichen, eckige Klammern und HTML-Entities; entfernt Backslashes.
+ *
+ * @param string $txt Eingabetext der konvertiert werden soll
+ * @return string Escapteter String für DB-Speicherung
+ */
 //-> BBCode
 function re_bbcode(string $txt)
 {
@@ -1043,6 +1305,14 @@ function re_bbcode(string $txt)
 
 /* START # from wordpress under GBU GPL license
    URL autolink function */
+
+/**
+ * Callback für preg_replace_callback: Wandelt http/https URLs in anklickbare Links um.
+ * Entfernt abschließende Satzzeichen (.,;:) vom URL-Ende und hängt sie nach dem Link an.
+ *
+ * @param array $matches Treffer-Array aus dem regulären Ausdruck
+ * @return string HTML-Anker-Tag oder Original-Match bei leerer URL
+ */
 function _make_url_clickable_cb(array $matches)
 {
     $ret = '';
@@ -1059,6 +1329,13 @@ function _make_url_clickable_cb(array $matches)
     return $matches[1] . "<a href=\"$url\" rel=\"nofollow\">$url</a>" . $ret;
 }
 
+/**
+ * Callback für preg_replace_callback: Wandelt www./ftp. URLs in anklickbare Links um.
+ * Ergänzt automatisch 'http://' als Protokoll-Präfix.
+ *
+ * @param array $matches Treffer-Array aus dem regulären Ausdruck
+ * @return string HTML-Anker-Tag oder Original-Match bei leerer URL
+ */
 function _make_web_ftp_clickable_cb(array $matches)
 {
     $ret = '';
@@ -1077,12 +1354,25 @@ function _make_web_ftp_clickable_cb(array $matches)
     return $matches[1] . "<a href=\"$dest\" rel=\"nofollow\">$dest</a>" . $ret;
 }
 
+/**
+ * Callback für preg_replace_callback: Wandelt E-Mail-Adressen in mailto-Links um.
+ *
+ * @param array $matches Treffer-Array ([1]=Prefix, [2]=User, [3]=Domain)
+ * @return string HTML mailto-Anker-Tag
+ */
 function _make_email_clickable_cb(array $matches)
 {
     $email = $matches[2] . '@' . $matches[3];
     return $matches[1] . "<a href=\"mailto:$email\">$email</a>";
 }
 
+/**
+ * Macht alle URLs, www/ftp-Adressen und E-Mail-Adressen in einem Text anklickbar.
+ * Basiert auf dem WordPress make_clickable()-Algorithmus (GPL-lizenziert).
+ *
+ * @param string $ret Eingabetext mit rohen URLs/E-Mails
+ * @return string Text mit HTML-Anker-Tags für alle gefundenen Links
+ */
 function make_clickable(string $ret)
 {
     $ret = ' ' . $ret;
@@ -1098,6 +1388,18 @@ function make_clickable(string $ret)
 
 /* END # from wordpress under GBU GPL license */
 
+/**
+ * Hauptfunktion zur vollständigen BBCode-Verarbeitung für die HTML-Ausgabe.
+ * Führt BBCode-Konvertierung, Badword-Filter, Smiley-Ersetzung, Glossar-Verlinkung
+ * und optionale URL-Verlinkung durch. Bereinigt unsicheres HTML (strip_tags).
+ *
+ * @param string $txt     Eingabetext mit BBCode
+ * @param bool   $tinymce TinyMCE-Modus aktiv (Standard: false)
+ * @param bool   $no_vid  Video/YouTube-Tags und Glossar deaktivieren (Standard: false)
+ * @param bool   $ts      TeamSpeak-Modus: strip_tags deaktivieren (Standard: false)
+ * @param bool   $nolink  URL-Verlinkung deaktivieren (Standard: false)
+ * @return string Verarbeiteter HTML-String für die Ausgabe
+ */
 //Diverse BB-Codefunktionen
 function bbcode(string $txt, bool $tinymce = false, bool $no_vid = false, bool $ts = false, bool $nolink = false)
 {
@@ -1126,6 +1428,13 @@ function bbcode(string $txt, bool $tinymce = false, bool $no_vid = false, bool $
     return str_replace('<p></p>', '<p>&nbsp;</p>', $txt);
 }
 
+/**
+ * Wandelt Newlines in <br>-Tags um und fügt einen CSS-Reset für <p>-Abstände ein.
+ * Geeignet für Newsletter/E-Mail-Inhalte mit Zeilenumbrüchen.
+ *
+ * @param string $txt Eingabetext mit Newlines
+ * @return string HTML mit <br>-Tags und eingebettetem style-Tag
+ */
 function bbcode_nletter(string $txt)
 {
     $txt = stripslashes($txt);
@@ -1133,6 +1442,13 @@ function bbcode_nletter(string $txt)
     return '<style type="text/css">p { margin: 0px; padding: 0px; }</style>' . $txt;
 }
 
+/**
+ * Konvertiert HTML-formatierten Text in reinen Plaintext für E-Mail-Versand (AltBody).
+ * Entfernt HTML-Tags, konvertiert <p>- und <br>-Tags in Zeilenumbrüche.
+ *
+ * @param string $txt HTML-Eingabetext
+ * @return string Reiner Text ohne HTML-Tags
+ */
 function bbcode_nletter_plain(string $txt)
 {
     $txt = preg_replace("#\<\/p\>#Uis", "\r\n", $txt);
@@ -1144,6 +1460,15 @@ function bbcode_nletter_plain(string $txt)
     return strip_tags($txt);
 }
 
+/**
+ * Verarbeitet BBCode in HTML-Inhalt (z.B. aus TinyMCE gespeicherte Inhalte).
+ * Dekodiert HTML-Entities, wendet BBCode-Konvertierung, Badword-Filter,
+ * Smiley-Ersetzung und Glossar-Verlinkung an.
+ *
+ * @param string $txt     Eingabetext (HTML mit BBCode-Elementen)
+ * @param bool   $tinymce TinyMCE-Modus aktiv (Standard: false)
+ * @return string Verarbeiteter HTML-String
+ */
 function bbcode_html(string $txt, bool $tinymce = false)
 {
     $txt = str_replace("&lt;", "<", $txt);
@@ -1158,15 +1483,31 @@ function bbcode_html(string $txt, bool $tinymce = false)
     return str_replace("&#34;", "\"", $txt);
 }
 
+/**
+ * Verarbeitet BBCode für E-Mail-Versand.
+ * Konvertiert BBCode zu HTML, ersetzt relative Pfade (../) durch absolute URLs
+ * und dekodiert BBCode-Klammer-Entities wieder zurück.
+ *
+ * @param string $txt BBCode-Eingabetext
+ * @return string HTML-String mit absoluten URLs, geeignet für E-Mail-Body
+ */
 function bbcode_email(string $txt)
 {
     $txt = bbcode($txt);
     $txt = str_replace("&#91;", "[", $txt);
     $txt = str_ireplace("../",
-        GetServerVars('REQUEST_SCHEME').'://'.GetServerVars('HTTP_HOST').'/', $txt);
+        GetServerVars('REQUEST_SCHEME') . '://' . GetServerVars('HTTP_HOST') . '/', $txt);
     return str_replace("&#93;", "]", $txt);
 }
 
+/**
+ * Setzt einen Text in ein formatiertes HTML-Zitatfeld mit Autorenangabe.
+ * Bereinigt Sonderzeichen (Curly Quotes, Zeilenumbrüche) und escapt BBCode-Zeichen.
+ *
+ * @param string $nick  Name des zitierten Autors
+ * @param string $zitat Der zu zitierende Text
+ * @return string HTML-Div mit Zitat-Formatierung und "Hat geschrieben:"-Zeile
+ */
 //-> Textteil in Zitat-Tags setzen
 function zitat(string $nick, string $zitat)
 {
@@ -1181,6 +1522,15 @@ function zitat(string $nick, string $zitat)
     return '<div class="quote"><b>' . $nick . ' ' . _wrote . ':</b><br />' . re_bbcode($zitat) . '</div><br /><br /><br />';
 }
 
+/**
+ * Konvertiert einen Datenbankwert für die sichere HTML-Ausgabe.
+ * Entfernt Backslashes, konvertiert Sonderzeichen zu HTML-Entities
+ * und dekodiert HTML-Entities (ISO-8859-1 kompatibel).
+ *
+ * @param mixed $txt                 Eingabewert aus der Datenbank
+ * @param bool  $only_stripslashes   Nur stripslashes anwenden, keine weitere Konvertierung (Standard: false)
+ * @return string Für HTML-Ausgabe aufbereiteter String
+ */
 //-> convert string for output
 function re($txt, bool $only_stripslashes = false)
 {
@@ -1188,9 +1538,30 @@ function re($txt, bool $only_stripslashes = false)
     if ($only_stripslashes)
         return strval(stripslashes($txt));
 
-    return strval(trim(stripslashes(spChars(html_entity_decode(utf8_decode($txt), ENT_COMPAT, $charset), true))));
+    return strval(trim(stripslashes(spChars(html_entity_decode(mb_convert_encoding($txt, 'ISO-8859-1', 'UTF-8'), ENT_COMPAT, $charset), true))));
 }
 
+/**
+ * Sicher escaptete HTML-Ausgabe eines Datenbankwertes.
+ * Kombiniert re() mit htmlspecialchars() für maximale XSS-Sicherheit.
+ *
+ * @param mixed $txt                Eingabewert aus der Datenbank
+ * @param bool  $only_stripslashes  Nur stripslashes in re() anwenden (Standard: false)
+ * @return string HTML-sicher escapteter String (ENT_QUOTES, UTF-8)
+ */
+//-> HTML-escape for safe output in HTML context (re() + htmlspecialchars)
+function h($txt, bool $only_stripslashes = false)
+{
+    return htmlspecialchars(re($txt, $only_stripslashes), ENT_QUOTES, 'UTF-8');
+}
+
+/**
+ * Ersetzt Smiley-Codes (z.B. :smile:, :D, :P, ;)) durch entsprechende GIF-Bilder.
+ * Liest verfügbare Smileys dynamisch aus dem Smiley-Verzeichnis.
+ *
+ * @param string $txt Eingabetext mit Smiley-Codes
+ * @return string Text mit <img>-Tags statt Smiley-Codes
+ */
 //-> Smileys ausgeben
 function smileys(string $txt)
 {
@@ -1225,7 +1596,22 @@ function smileys(string $txt)
     return str_replace(" ^^", " <img src=\"../inc/images/smileys/^^.gif\" alt=\"\" />", $txt);
 }
 
-function cut(string $text, int $length = 0, bool $dots = true, bool $html = true, string $ending = '', bool $exact = false, bool $considerHtml = true) {
+/**
+ * Kürzt einen Text auf eine maximale Zeichenanzahl und berücksichtigt dabei HTML-Tags.
+ * Schließt offene HTML-Tags automatisch, verhindert das Abschneiden von HTML-Entities
+ * und fügt optional einen Endstring (z.B. "...") an.
+ *
+ * @param string $text          Eingabetext (kann HTML enthalten)
+ * @param int    $length        Maximale Ausgabelänge in Zeichen (0 = leer zurückgeben)
+ * @param bool   $dots          Auslassungspunkte "..." am Ende anfügen (Standard: true)
+ * @param bool   $html          HTML-Tags bei Längenberechnung ignorieren (Standard: true)
+ * @param string $ending        Eigener Endstring statt "..." (Standard: '')
+ * @param bool   $exact         Wörter mitten durchschneiden erlauben (Standard: false)
+ * @param bool   $considerHtml  HTML-Tags beim Kürzen berücksichtigen und schließen (Standard: true)
+ * @return string Gekürzter Text mit geschlossenen HTML-Tags und optionalem Endstring
+ */
+function cut(string $text, int $length = 0, bool $dots = true, bool $html = true, string $ending = '', bool $exact = false, bool $considerHtml = true)
+{
     if ($length === 0)
         return '';
 
@@ -1332,12 +1718,37 @@ function cut(string $text, int $length = 0, bool $dots = true, bool $html = true
     return $truncate;
 }
 
-function wrap(string $str, int $width = 75, string $break = "\n", bool $cut = true) {
+/**
+ * Bricht einen String an Wortgrenzen um und erhält dabei HTML-Entities korrekt.
+ *
+ * @param string $str   Eingabestring der umgebrochen werden soll
+ * @param int    $width Maximale Zeichenbreite pro Zeile (Standard: 75)
+ * @param string $break Zeilenumbruch-Zeichen (Standard: "\n")
+ * @param bool   $cut   Wörter hart umbrechen wenn länger als $width (Standard: true)
+ * @return string Umgebrochener String mit erhaltenen HTML-Entities
+ */
+function wrap(string $str, int $width = 75, string $break = "\n", bool $cut = true)
+{
     return strtr(str_replace(htmlentities($break), $break, htmlentities(wordwrap(html_entity_decode($str), $width, $break, $cut), ENT_QUOTES)), array_flip(get_html_translation_table(HTML_SPECIALCHARS, ENT_COMPAT)));
 }
 
+/**
+ * Liest Dateien und/oder Verzeichnisse aus einem Ordner aus.
+ * Unterstützt Filter nach Dateiendung, Blacklist, Regex-Match und Verzeichnis-/Datei-Modus.
+ * Ergebnisse werden im dbc_index-Cache gespeichert.
+ *
+ * @param string|null $dir            Absoluter Pfad des Verzeichnisses
+ * @param bool        $only_dir       Nur Unterverzeichnisse zurückgeben (Standard: false)
+ * @param bool        $only_files     Nur Dateien zurückgeben (Standard: false)
+ * @param array       $file_ext       Erlaubte Dateiendungen z.B. ['php','html'] (Standard: alle)
+ * @param mixed       $preg_match     Regex-Pattern als Filter oder false (Standard: false)
+ * @param array       $blacklist      Dateinamen die ausgeschlossen werden sollen (Standard: [])
+ * @param mixed       $blacklist_word Wort das im Dateinamen nicht vorkommen darf (Standard: false)
+ * @return array|false Array mit Datei-/Verzeichnisnamen, FALSE bei Fehler oder leerem Ergebnis
+ */
 //-> Funktion um Dateien aus einem Verzeichnis auszulesen
-function get_files(string $dir = null, bool $only_dir = false, bool $only_files = false, array $file_ext = array(), $preg_match = false, array $blacklist = array(), $blacklist_word = false) {
+function get_files(?string $dir = null, bool $only_dir = false, bool $only_files = false, array $file_ext = array(), $preg_match = false, array $blacklist = array(), $blacklist_word = false)
+{
     $cache_hash = md5($dir . $only_dir . $only_files . print_r($file_ext, true) . $preg_match . print_r($blacklist, true) . $blacklist_word);
     if (!dbc_index::issetIndex('files') || !dbc_index::getIndexKey('files', $cache_hash) || !dbc_index::MemSetIndex()) {
         $files = array();
@@ -1410,8 +1821,17 @@ function get_files(string $dir = null, bool $only_dir = false, bool $only_files 
     }
 }
 
+/**
+ * Gibt einen definierten Ausschnitt eines numerischen Arrays zurück (Pagination-Hilfe).
+ *
+ * @param int   $begin  Start-Index (1-basiert)
+ * @param int   $max    Anzahl der zurückzugebenden Elemente
+ * @param array $array  Quellarry (Standard: [])
+ * @return array Teil-Array mit den Elementen im angegebenen Bereich
+ */
 //-> Gibt einen Teil eines nummerischen Arrays wieder
-function limited_array(array $array = array(), int $begin, int $max) {
+function limited_array(int $begin, int $max, array $array = array())
+{
     $array_exp = array();
     $range = range($begin = ($begin - 1), ($begin + $max - 1));
     foreach ($array as $key => $wert) {
@@ -1422,15 +1842,30 @@ function limited_array(array $array = array(), int $begin, int $max) {
     return $array_exp;
 }
 
-function array_var_exists($var, $search) {
+/**
+ * Prüft ob ein Wert in einem Array vorhanden ist (Wertvergleich, nicht Schlüssel).
+ *
+ * @param mixed $var    Gesuchter Wert
+ * @param array $search Zu durchsuchendes Array
+ * @return bool TRUE wenn Wert gefunden, FALSE sonst
+ */
+function array_var_exists($var, $search)
+{
     foreach ($search as $key => $var_) {
         if ($var_ == $var) return true;
     }
     return false;
 }
 
+/**
+ * Konvertiert deutsche Sonderzeichen (Umlaute, ß, €) in HTML-Entities.
+ *
+ * @param string $txt Eingabetext mit Sonderzeichen
+ * @return string Text mit HTML-Entities statt Sonderzeichen
+ */
 //-> Funktion um Sonderzeichen zu konvertieren
-function spChars(string $txt) {
+function spChars(string $txt)
+{
     $txt = str_replace("Ä", "&Auml;", $txt);
     $txt = str_replace("ä", "&auml;", $txt);
     $txt = str_replace("Ü", "&Uuml;", $txt);
@@ -1441,19 +1876,38 @@ function spChars(string $txt) {
     return str_replace("€", "&euro;", $txt);
 }
 
+/**
+ * Bereitet einen Wert für die sichere Speicherung in der Datenbank auf.
+ * Konvertiert zu HTML-Entities, konvertiert Sonderzeichen und encodiert nach UTF-8.
+ * Optional wird der String mit _real_escape_string() für SQL escapet.
+ *
+ * @param mixed $txt    Eingabewert der für die DB aufbereitet werden soll
+ * @param bool  $escape SQL-Escape mit _real_escape_string() anwenden (Standard: true)
+ * @return string Für DB-Speicherung vorbereiteter String
+ */
 //-> Funktion um sauber in die DB einzutragen
-function up($txt, bool $escape = true) {
+function up($txt, bool $escape = true)
+{
     global $charset;
     $txt = strval($txt);
     $txt = htmlentities($txt, ENT_COMPAT, $charset);
     $txt = spChars($txt);
     $txt = stripcslashes($txt);
-    $txt = utf8_encode($txt);
+    $txt = mb_convert_encoding($txt, 'UTF-8', 'ISO-8859-1');
     return $escape ? _real_escape_string($txt) : $txt;
 }
 
+/**
+ * Zählt Datensätze in einer Datenbanktabelle (COUNT).
+ *
+ * @param string $count Tabellenname (mit optionalem DB-Präfix)
+ * @param string $where WHERE-Klausel inkl. "WHERE" (Standard: '')
+ * @param string $what  Zu zählendes Feld (Standard: 'id')
+ * @return int Anzahl der gefundenen Datensätze, 0 bei keinem Ergebnis
+ */
 //-> Funktion um diverse Dinge aus Tabellen auszaehlen zu lassen
-function cnt($count, $where = "", $what = "id") {
+function cnt($count, $where = "", $what = "id")
+{
     $cnt_sql = db("SELECT COUNT(" . $what . ") AS `num` FROM " . $count . " " . $where . ";");
     if (_rows($cnt_sql)) {
         $cnt = _fetch($cnt_sql);
@@ -1463,8 +1917,17 @@ function cnt($count, $where = "", $what = "id") {
     return 0;
 }
 
+/**
+ * Summiert Werte eines Feldes in einer Datenbanktabelle (SUM).
+ *
+ * @param string $db    Tabellenname (mit optionalem DB-Präfix)
+ * @param string $what  Zu summierendes Feld
+ * @param string $where WHERE-Klausel inkl. "WHERE" (Standard: '')
+ * @return int|float Summe der Feldwerte, 0 bei keinem Ergebnis
+ */
 //-> Funktion um diverse Dinge aus Tabellen zusammenzaehlen zu lassen
-function sum($db, $where = "", $what) {
+function sum($db, $what, $where = "")
+{
     $cnt_sql = db("SELECT SUM(" . $what . ") AS `num` FROM " . $db . $where . ";");
     if (_rows($cnt_sql)) {
         $cnt = _fetch($cnt_sql);
@@ -1474,7 +1937,15 @@ function sum($db, $where = "", $what) {
     return 0;
 }
 
-function orderby($sort) {
+/**
+ * Erstellt einen Sortier-URL für eine Tabellenspalte (Toggle ASC/DESC).
+ * Liest die aktuelle URL-Query-String und tauscht die Sortierrichtung um.
+ *
+ * @param string $sort Feldname nach dem sortiert werden soll
+ * @return string URL mit gesetzten orderby- und order-Parametern
+ */
+function orderby($sort)
+{
     $split = explode("&", GetServerVars('QUERY_STRING'));
     $url = "?";
 
@@ -1493,7 +1964,18 @@ function orderby($sort) {
     return $url . "orderby=" . $sort . "&order=ASC";
 }
 
-function orderby_sql(array $sort_by = array(), $default_order = '', $join = '', array $order_by = array('ASC', 'DESC')) {
+/**
+ * Erstellt eine sichere SQL ORDER BY Klausel aus GET-Parametern.
+ * Validiert Feld- und Richtungsangaben gegen Whitelist-Arrays.
+ *
+ * @param array  $sort_by       Whitelist erlaubter Sortierfelder
+ * @param string $default_order Standard SQL-ORDER wenn keine/ungültige Parameter (Standard: '')
+ * @param string $join          Tabel-Alias-Präfix für das Sortierfeld (Standard: '')
+ * @param array  $order_by      Erlaubte Sortierrichtungen (Standard: ['ASC','DESC'])
+ * @return string SQL ORDER BY Klausel oder $default_order bei ungültigen Parametern
+ */
+function orderby_sql(array $sort_by = array(), $default_order = '', $join = '', array $order_by = array('ASC', 'DESC'))
+{
     if (!isset($_GET['order']) || empty($_GET['order']) || !in_array($_GET['order'], $order_by)) return $default_order;
     if (!isset($_GET['orderby']) || empty($_GET['orderby']) || !in_array($_GET['orderby'], $sort_by)) return $default_order;
     $orderby_real = _real_escape_string($_GET['orderby']);
@@ -1503,24 +1985,48 @@ function orderby_sql(array $sort_by = array(), $default_order = '', $join = '', 
     return 'ORDER BY ' . $join . $orderby_real . " " . $order_real;
 }
 
-function orderby_nav() {
+/**
+ * Gibt die aktuellen Sortier-Parameter (orderby & order) als URL-Anhang zurück.
+ * Wird für die Seitennavigation genutzt, um Sortierung beizubehalten.
+ *
+ * @return string URL-Parameter-String (z.B. "&orderby=name&order=ASC") oder leer
+ */
+function orderby_nav()
+{
     $orderby = isset($_GET['orderby']) ? "&orderby" . $_GET['orderby'] : "";
     $orderby .= isset($_GET['order']) ? "&order=" . $_GET['order'] : "";
     return $orderby;
 }
 
+/**
+ * Hebt ein Wort in einem Text durch einen roten <span> hervor.
+ *
+ * @param string $word Das hervorzuhebende Wort (wird auch als Eingabetext verwendet)
+ * @return string Text mit <span class="fontRed"> um das gefundene Wort
+ */
 //-> Funktion um ein Datenbankinhalt zu highlighten
-function highlight(string $word) {
+function highlight(string $word)
+{
     if (substr(phpversion(), 0, 1) == 5)
         return str_ireplace($word, '<span class="fontRed">' . $word . '</span>', $word);
     else
         return str_replace($word, '<span class="fontRed">' . $word . '</span>', $word);
 }
 
+/**
+ * Aktualisiert den Seitenbesucher-Counter für den heutigen Tag.
+ * Speichert Besucher-IPs mit Timestamp und verhindert Mehrfachzählung
+ * innerhalb der konfigurierten Reload-Sperrzeit. Ignoriert Spider/Bots.
+ *
+ * @return void
+ */
 //-> Counter updaten
-function updateCounter() {
+function updateCounter()
+{
     global $db, $reload, $today, $datum, $userip, $CrawlerDetect;
-    $ipcheck = db("SELECT `id`,`ip`,`datum` FROM `" . $db['c_ips'] . "` WHERE `ip` = '" . $userip . "' AND FROM_UNIXTIME(datum,'%d.%m.%Y') = '" . date("d.m.Y") . "'");
+    $userip_escaped = _real_escape_string($userip);
+    $agent_escaped = _real_escape_string($CrawlerDetect->getUserAgent());
+    $ipcheck = db("SELECT `id`,`ip`,`datum` FROM `" . $db['c_ips'] . "` WHERE `ip` = '" . $userip_escaped . "' AND FROM_UNIXTIME(datum,'%d.%m.%Y') = '" . date("d.m.Y") . "'");
     db("DELETE FROM `" . $db['c_ips'] . "` WHERE `datum`+" . $reload . " <= " . time() . " OR FROM_UNIXTIME(datum,'%d.%m.%Y') != '" . date("d.m.Y") . "'");
     $count = db("SELECT id,visitors,today FROM " . $db['counter'] . " WHERE today = '" . $today . "'");
     if (_rows($ipcheck) >= 1) {
@@ -1532,11 +2038,15 @@ function updateCounter() {
             else
                 db("INSERT INTO `" . $db['counter'] . "` SET `visitors` = '1', `today` = '" . $today . "'");
 
-            if (db("SELECT `id` FROM `" . $db['c_ips'] . "` WHERE `ip` = '" . $userip . "';", true)) {
-                db("UPDATE " . $db['c_ips'] . " SET `datum` = " . ((int)$datum) . ", `agent` = '" . $CrawlerDetect->userAgent . "' WHERE `ip` = '" . $userip . "';");
+            if (db("SELECT `id` FROM `" . $db['c_ips'] . "` WHERE `ip` = '" . $userip_escaped . "';", true)) {
+                db("UPDATE " . $db['c_ips'] . " SET `datum` = " . ((int)$datum) . ", `agent` = '" . $agent_escaped . "' WHERE `ip` = '" . $userip_escaped . "';");
             } else {
-                db("INSERT INTO `" . $db['c_ips'] . "` SET `ip` = '" . $userip . "', `datum` = '" . ((int)$datum) . "', `agent` = '" . $CrawlerDetect->userAgent . "';");
+                db("INSERT INTO `" . $db['c_ips'] . "` SET `ip` = '" . $userip_escaped . "', `datum` = '" . ((int)$datum) . "', `agent` = '" . $agent_escaped . "';");
             }
+            DzcpLogger::access()->debug('Wiederkehrer-Besuch gezählt (nach Reload-Zeit)', [
+                'ip'  => $userip,
+                'day' => $today,
+            ]);
         }
     } else {
         if (_rows($count))
@@ -1544,16 +2054,27 @@ function updateCounter() {
         else
             db("INSERT INTO `" . $db['counter'] . "` SET `visitors` = '1', `today` = '" . $today . "'");
 
-        if (db("SELECT `id` FROM `" . $db['c_ips'] . "` WHERE `ip` = '" . $userip . "';", true)) {
-            db("UPDATE `" . $db['c_ips'] . "` SET `datum` = '" . ((int)$datum) . "', `agent` = '" . $CrawlerDetect->userAgent . "' WHERE `ip` = '" . $userip . "';");
+        if (db("SELECT `id` FROM `" . $db['c_ips'] . "` WHERE `ip` = '" . $userip_escaped . "';", true)) {
+            db("UPDATE `" . $db['c_ips'] . "` SET `datum` = '" . ((int)$datum) . "', `agent` = '" . $agent_escaped . "' WHERE `ip` = '" . $userip_escaped . "';");
         } else {
-            db("INSERT INTO `" . $db['c_ips'] . "` SET `ip` = '" . $userip . "', `datum` = '" . ((int)$datum) . "', `agent` = '" . $CrawlerDetect->userAgent . "';");
+            db("INSERT INTO `" . $db['c_ips'] . "` SET `ip` = '" . $userip_escaped . "', `datum` = '" . ((int)$datum) . "', `agent` = '" . $agent_escaped . "';");
         }
+        DzcpLogger::access()->info('Neuer Besucher gezählt', [
+            'ip'         => $userip,
+            'user_agent' => $CrawlerDetect->getUserAgent(),
+            'day'        => $today,
+        ]);
     }
 }
 
+/**
+ * Aktualisiert den Rekord der gleichzeitig online gewesenen Besucher für den heutigen Tag.
+ *
+ * @return void
+ */
 //-> Updatet die Maximalen User die gleichzeitig online sind
-function update_maxonline() {
+function update_maxonline()
+{
     global $db, $today;
 
     $get = db("SELECT `maxonline` FROM `" . $db['counter'] . "` WHERE `today` = '" . $today . "';", false, true);
@@ -1563,8 +2084,16 @@ function update_maxonline() {
         db("UPDATE `" . $db['counter'] . "` SET `maxonline` = " . ((int)$count) . " WHERE `today` = '" . $today . "';");
 }
 
+/**
+ * Erfasst den aktuellen Besucher in der Online-Tabelle und gibt die Anzahl der
+ * aktuell aktiven Besucher zurück. Löscht veraltete Einträge (Timeout).
+ *
+ * @param string $where Aktueller Seitenbereich (für "Wer ist wo online") (Standard: '')
+ * @return int|bool Anzahl der aktiven Besucher, TRUE bei Spider/Bot-Erkennung
+ */
 //-> Prueft, wieviele Besucher gerade online sind
-function online_guests(string $where = '') {
+function online_guests(string $where = '')
+{
     global $db, $useronline, $userip, $chkMe, $isSpider;
 
     if (!$isSpider) {
@@ -1580,8 +2109,15 @@ function online_guests(string $where = '') {
     return true;
 }
 
+/**
+ * Gibt die Anzahl der aktuell eingeloggten registrierten User zurück.
+ * Zählt User deren letzter Aktivitäts-Timestamp innerhalb des Online-Timeout liegt.
+ *
+ * @return int Anzahl der eingeloggten registrierten User
+ */
 //-> Prueft, wieviele registrierte User gerade online sind
-function online_reg() {
+function online_reg()
+{
     global $db, $useronline;
     return cnt($db['users'], " WHERE (time+" . $useronline . ") > " . time() . " AND `online` = 1;");
 }
@@ -1591,7 +2127,8 @@ function online_reg() {
  * @param int $userid_set
  * @return bool|int
  */
-function checkme(int $userid_set = 0) {
+function checkme(int $userid_set = 0)
+{
     global $db;
     if (HasDSGVO() || $userid_set != 0) {
         if (!$userid = ($userid_set != 0 ? (int)($userid_set) : userid())) return 0;
@@ -1617,12 +2154,17 @@ function checkme(int $userid_set = 0) {
  * @param bool $logout
  * @return bool
  */
-function isBanned(int $userid_set = 0, bool $logout = true) {
+function isBanned(int $userid_set = 0, bool $logout = true)
+{
     global $db, $userid;
     $userid_set = $userid_set ? $userid_set : $userid;
     if (checkme($userid_set) >= 1 || $userid_set) {
         $get = db("SELECT `banned` FROM `" . $db['users'] . "` WHERE `id` = " . (int)($userid_set) . " LIMIT 1;", false, true);
         if ($get['banned']) {
+            DzcpLogger::security()->warning('Gesperrter User erkannt', [
+                'user_id'      => $userid_set,
+                'auto_logout'  => $logout,
+            ]);
             if ($logout) {
                 $_SESSION['id'] = '';
                 $_SESSION['pwd'] = '';
@@ -1650,7 +2192,8 @@ function isBanned(int $userid_set = 0, bool $logout = true) {
  * @param int $uid
  * @return bool
  */
-function permission(string $check, int $uid = 0) {
+function permission(string $check, int $uid = 0)
+{
     global $db, $userid, $chkMe;
     if (!$uid) $uid = $userid;
     if (rootAdmin($uid)) return true;
@@ -1686,7 +2229,8 @@ function permission(string $check, int $uid = 0) {
  * Checkt, ob neue Nachrichten vorhanden sind
  * @return string
  */
-function check_msg() {
+function check_msg()
+{
     global $db;
     if (db("SELECT `page` FROM `" . $db['msg'] . "` WHERE `an` = " . ((int)$_SESSION['id']) . " AND `page` = 0;", true)) {
         db("UPDATE `" . $db['msg'] . "` SET `page` = 1 WHERE `an` = " . ((int)$_SESSION['id']) . ";");
@@ -1701,7 +2245,8 @@ function check_msg() {
  * @param int $buddy
  * @return bool
  */
-function check_buddy(int $buddy) {
+function check_buddy(int $buddy)
+{
     global $db, $userid;
     return db("SELECT `id` FROM `" . $db['buddys'] . "` WHERE `user` = " . (int)($userid) . " AND `buddy` = " . (int)($buddy) . ";", true) >= 1;
 }
@@ -1711,7 +2256,8 @@ function check_buddy(int $buddy) {
  * @param $code
  * @return string
  */
-function flag($code) {
+function flag($code)
+{
     global $picformat;
     if (empty($code))
         return '<img src="../inc/images/flaggen/nocountry.gif" alt="" class="icon" />';
@@ -1731,7 +2277,8 @@ function flag($code) {
  * @param $code
  * @return string
  */
-function rawflag($code) {
+function rawflag($code)
+{
     global $picformat;
     if (empty($code))
         return '<img src=../inc/images/flaggen/nocountry.gif alt= class=icon />';
@@ -1751,7 +2298,8 @@ function rawflag($code) {
  * @param string $i
  * @return string
  */
-function show_countrys(string $i = "") {
+function show_countrys(string $i = "")
+{
     if ($i != "")
         $options = preg_replace('#<option value="' . $i . '">(.*?)</option>#', '<option value="' . $i . '" selected="selected"> \\1</option>', _country_list);
     else
@@ -1765,7 +2313,8 @@ function show_countrys(string $i = "") {
  * @param string $code
  * @return string
  */
-function squad(string $code) {
+function squad(string $code)
+{
     global $picformat;
     if (empty($code))
         return '<img src="../inc/images/gameicons/nogame.gif" alt="" class="icon" />';
@@ -1786,7 +2335,8 @@ function squad(string $code) {
  * @param string $hp
  * @return mixed|string
  */
-function links(string $hp) {
+function links(string $hp)
+{
     if (!empty($hp)) {
         //SSL
         $count = 0;
@@ -1806,13 +2356,48 @@ function links(string $hp) {
 }
 
 /**
+ * Generates or retrieves the CSRF token for the current session.
+ * @return string
+ */
+function csrf_token(): string
+{
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+/**
+ * Returns an HTML hidden input field containing the CSRF token.
+ * @return string
+ */
+function csrf_field(): string
+{
+    return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') . '" />';
+}
+
+/**
+ * Validates the CSRF token submitted with a POST request.
+ * @return bool
+ */
+function csrf_check(): bool
+{
+    if (empty($_SESSION['csrf_token'])) {
+        return false;
+    }
+    $token = (isset($_POST['csrf_token']) && is_string($_POST['csrf_token'])) ? $_POST['csrf_token'] : '';
+    return hash_equals($_SESSION['csrf_token'], $token);
+}
+
+/**
  * Funktion um Passwoerter generieren zu lassen
  * @param int $length
  * @param bool $add_dashes
  * @param string $available_sets
  * @return bool|string
  */
-function mkpwd(int $length = 8, bool $add_dashes = false, string $available_sets = 'luds') {
+function mkpwd(int $length = 8, bool $add_dashes = false, string $available_sets = 'luds')
+{
     $sets = array();
     if (strpos($available_sets, 'l') !== false)
         $sets[] = 'abcdefghjkmnpqrstuvwxyz';
@@ -1855,20 +2440,52 @@ function mkpwd(int $length = 8, bool $add_dashes = false, string $available_sets
  * @param string $pwd
  * @return bool|mixed
  */
-function checkpwd(string $user, string $pwd) {
+function checkpwd(string $user, string $pwd)
+{
     global $db;
-    $sql = db("SELECT * FROM `" . $db['users'] . "` WHERE `user` = '" . up($user) .
-        "' AND (`pwd` = '" . hash('sha256', $pwd) . "' OR (`pwd` = '" . md5($pwd) . "' AND `pwd_md5` = 1)) AND `level` != 0;");
+
+    // First, get the user record
+    $sql = db_stmt("SELECT * FROM `" . $db['users'] . "` WHERE `user` = ? AND `level` != 0",
+        array('s', up($user)));
+
     if (_rows($sql)) {
         $get = _fetch($sql);
-        if ($get['pwd_md5']) {
-            //Update Password to SHA256
-            db("UPDATE `" . $db['users'] . "` SET `pwd` = '" . hash('sha256', $pwd) . "', `pwd_md5` = 0 WHERE `id` = " . $get['id'] . ";");
-            $get['pwd'] = hash('sha256', $pwd);
+        $password_valid = false;
+
+        // Check if password needs migration (old MD5 or SHA256)
+        if ($get['pwd_md5'] == 1) {
+            // Legacy MD5 password
+            if ($get['pwd'] === md5($pwd)) {
+                $password_valid = true;
+                $needs_rehash = true;
+            }
+        } elseif (substr($get['pwd'], 0, 3) !== '$2y') {
+            // SHA256 hash (64 characters, not starting with $2y)
+            if ($get['pwd'] === hash('sha256', $pwd)) {
+                $password_valid = true;
+                $needs_rehash = true;
+            }
+        } else {
+            // Modern password_hash() format
+            if (password_verify($pwd, $get['pwd'])) {
+                $password_valid = true;
+                // Check if rehash is needed (e.g., cost factor changed)
+                $needs_rehash = password_needs_rehash($get['pwd'], PASSWORD_DEFAULT);
+            }
+        }
+
+        // If password is valid and needs rehashing, update to password_hash()
+        if ($password_valid && isset($needs_rehash) && $needs_rehash) {
+            $new_hash = password_hash($pwd, PASSWORD_DEFAULT);
+            db_stmt("UPDATE `" . $db['users'] . "` SET `pwd` = ?, `pwd_md5` = 0 WHERE `id` = ?",
+                array('si', $new_hash, $get['id']));
+            $get['pwd'] = $new_hash;
             $get['pwd_md5'] = 0;
         }
 
-        return $get;
+        if ($password_valid) {
+            return $get;
+        }
     }
 
     return false;
@@ -1878,10 +2495,11 @@ function checkpwd(string $user, string $pwd) {
  * Infomeldung ausgeben
  * @param string $msg
  * @param string $url
- * @param int $timeout
+ * @param float $timeout
  * @return bool|mixed|null|string|string[]
  */
-function info(string $msg, string $url, int $timeout = 5) {
+function info(string $msg, string $url, $timeout = 5)
+{
     if (config('direct_refresh')) {
         header('Location: ' . str_replace('&amp;', '&', $url));
         exit();
@@ -1914,7 +2532,8 @@ function info(string $msg, string $url, int $timeout = 5) {
  * @param int $back
  * @return bool|mixed|null|string|string[]
  */
-function error(string $error, int $back = 1) {
+function error(string $error, int $back = 1)
+{
     return show("errors/error", array("error" => $error, "back" => $back, "fehler" => _error, "backtopage" => _error_back));
 }
 
@@ -1923,7 +2542,8 @@ function error(string $error, int $back = 1) {
  * @param string $error
  * @return bool|mixed|null|string|string[]
  */
-function error2(string $error) {
+function error2(string $error)
+{
     return show("errors/error2", array("error" => $error, "fehler" => _error));
 }
 
@@ -1933,7 +2553,8 @@ function error2(string $error) {
  * @return bool
  * @throws Exception
  */
-function check_email(string $email) {
+function check_email(string $email)
+{
     global $gump;
     $email = $gump->filter(array('email' => $email), array('email' => 'trim|sanitize_email'));
     return ($gump->validate($email, array('email' => 'valid_email')) === true);
@@ -1944,7 +2565,8 @@ function check_email(string $email) {
  * @param string $img
  * @return string
  */
-function img_size(string $img) {
+function img_size(string $img)
+{
     return "<a href=\"../" . $img . "\" rel=\"lightbox[l_" . (int)($img) . "]\"><img src=\"../thumbgen.php?img=" . $img . "\" alt=\"\" /></a>";
 }
 
@@ -1954,7 +2576,8 @@ function img_size(string $img) {
  * @param string $img
  * @return string
  */
-function img_cw(string $folder, string $img) {
+function img_cw(string $folder, string $img)
+{
     return "<a href=\"../" . $folder . $img . "\" rel=\"lightbox[cw_" . (int)($folder) . "]\"><img src=\"../thumbgen.php?img=" . $folder . $img . "\" alt=\"\" /></a>";
 }
 
@@ -1963,7 +2586,8 @@ function img_cw(string $folder, string $img) {
  * @param string $img
  * @return string
  */
-function gallery_size(string $img = "") {
+function gallery_size(string $img = "")
+{
     return "<a href=\"../gallery/images/" . $img . "\" rel=\"lightbox[gallery_" . (int)($img) . "]\"><img src=\"../thumbgen.php?img=gallery/images/" . $img . "\" alt=\"\" /></a>";
 }
 
@@ -1975,7 +2599,8 @@ function gallery_size(string $img = "") {
  * @param bool $icon
  * @return string
  */
-function nav(int $entrys, int $perpage, string $urlpart = '', bool $icon = true) {
+function nav(int $entrys, int $perpage, string $urlpart = '', bool $icon = true)
+{
     global $page;
     if ($perpage == 0)
         return "&#xAB; <span class=\"fontSites\">0</span> &#xBB;";
@@ -2033,7 +2658,8 @@ function nav(int $entrys, int $perpage, string $urlpart = '', bool $icon = true)
  * @param string $add
  * @return bool|mixed|null|string|string[]
  */
-function autor(int $uid, string $class = "", string $nick = "", string $email = "", int $cut = 20, string $add = "") {
+function autor(int $uid, string $class = "", string $nick = "", string $email = "", int $cut = 20, string $add = "")
+{
     global $db;
     if (!dbc_index::issetIndex('user_' . (int)($uid))) {
         $qry = db("SELECT * FROM `" . $db['users'] . "` WHERE `id` = " . (int)($uid) . ";");
@@ -2063,7 +2689,8 @@ function autor(int $uid, string $class = "", string $nick = "", string $email = 
  * @param int $cut
  * @return bool|mixed|null|string|string[]
  */
-function cleanautor(int $uid, string $class = "", string $nick = "", string $email = "", int $cut = 20) {
+function cleanautor(int $uid, string $class = "", string $nick = "", string $email = "", int $cut = 20)
+{
     global $db;
     if (!dbc_index::issetIndex('user_' . (int)($uid))) {
         $qry = db("SELECT * FROM `" . $db['users'] . "` WHERE `id` = " . (int)($uid) . ";");
@@ -2078,7 +2705,15 @@ function cleanautor(int $uid, string $class = "", string $nick = "", string $ema
         "class" => $class, "nick" => re(cut(dbc_index::getIndexKey('user_' . (int)($uid), 'nick'), $cut, false, false))));
 }
 
-function rawautor(int $uid) {
+/**
+ * Gibt Länderflagge und Nickname eines Users als reinen Text (für rawflag) zurück.
+ * Wird z.B. für TeamSpeak oder nicht-HTML-Kontexte verwendet.
+ *
+ * @param int $uid User-ID
+ * @return string Flaggen-HTML + Nickname, oder Leer-Flagge + User-ID bei nicht gefundenen Usern
+ */
+function rawautor(int $uid)
+{
     global $db;
     if (!dbc_index::issetIndex('user_' . (int)($uid))) {
         $qry = db("SELECT * FROM `" . $db['users'] . "` WHERE `id` = " . (int)($uid) . ";");
@@ -2098,7 +2733,8 @@ function rawautor(int $uid) {
  * @param int $uid
  * @return bool|mixed|null|string|string[]
  */
-function fabo_autor(int $uid) {
+function fabo_autor(int $uid)
+{
     global $db;
     $qry = db("SELECT `nick` FROM `" . $db['users'] . "` WHERE `id` = " . $uid . ";");
     if (_rows($qry)) {
@@ -2113,7 +2749,8 @@ function fabo_autor(int $uid) {
  * @param int $uid
  * @return bool|mixed|null|string|string[]
  */
-function blank_autor(int $uid) {
+function blank_autor(int $uid)
+{
     global $db;
     $qry = db("SELECT `nick` FROM `" . $db['users'] . "` WHERE `id` = " . $uid . ";");
     if (_rows($qry)) {
@@ -2129,7 +2766,8 @@ function blank_autor(int $uid) {
  * @param int $id
  * @return bool
  */
-function fintern(int $id) {
+function fintern(int $id)
+{
     global $db, $userid, $chkMe;
     $sql = db("SELECT s1.`intern`,s2.`id` FROM `" . $db['f_kats'] . "` AS `s1` LEFT JOIN `" . $db['f_skats'] . "` AS `s2` ON s2.`sid` = s1.`id` WHERE s2.`id` = " . (int)($id) . ";");
     if (_rows($sql)) {
@@ -2153,7 +2791,8 @@ function fintern(int $id) {
  * @param int $tid
  * @return bool|null
  */
-function data(string $what, int $tid = 0) {
+function data(string $what, int $tid = 0)
+{
     global $db, $userid;
     if (!$tid) $tid = $userid;
     if (!dbc_index::issetIndex('user_' . $tid)) {
@@ -2198,32 +2837,44 @@ function userstats(string $what, int $tid = 0)
  * @param string $subject
  * @param string $content
  * @return bool
- * @throws \PHPMailer\PHPMailer\Exception
  */
-function sendMail(string $mailto, string $subject, string $content) {
-    $mail = new PHPMailer(false);
-    if (phpmailer_use_smtp) {
-        $mail->isSMTP();
-        $mail->Host = phpmailer_smtp_host;
-        $mail->SMTPAuth = phpmailer_use_auth;
-        $mail->Username = phpmailer_smtp_user;
-        $mail->Password = phpmailer_smtp_password;
-        $mail->SMTPSecure = phpmailer_smtp_secure;
-        $mail->Port = phpmailer_smtp_port;
+function sendMail(string $mailto, string $subject, string $content)
+{
+    try {
+        $mail = new PHPMailer(true);
+        if (phpmailer_use_smtp) {
+            $mail->isSMTP();
+            $mail->Host = phpmailer_smtp_host;
+            $mail->SMTPAuth = phpmailer_use_auth;
+            $mail->Username = phpmailer_smtp_user;
+            $mail->Password = phpmailer_smtp_password;
+            $mail->SMTPSecure = phpmailer_smtp_secure;
+            $mail->Port = phpmailer_smtp_port;
+        }
+
+        $mail->setFrom(($mailfrom = re(settings('mailfrom'))), $mailfrom);
+        $mail->AddAddress(preg_replace('/(\\n+|\\r+|%0A|%0D)/i', '', $mailto));
+        $mail->isHTML(true);
+        $mail->Subject = re($subject);
+        $mail->Body = $content;
+        $mail->AltBody = bbcode_nletter_plain($content);
+
+        $mail->setLanguage(language_short_tag(), basePath . '/vendor/phpmailer/phpmailer/language');
+        return $mail->send();
+    } catch (\PHPMailer\PHPMailer\Exception $e) {
+        DebugConsole::insert_error('sendMail()', $e->getMessage());
+        return false;
     }
-
-    $mail->setFrom(($mailfrom = re(settings('mailfrom'))), $mailfrom);
-    $mail->AddAddress(preg_replace('/(\\n+|\\r+|%0A|%0D)/i', '', $mailto));
-    $mail->isHTML(true);
-    $mail->Subject = re($subject);
-    $mail->Body = $content;
-    $mail->AltBody = bbcode_nletter_plain($content);
-
-    $mail->setLanguage(language_short_tag(), basePath . '/vendor/phpmailer/phpmailer/language');
-    return $mail->send();
 }
 
-function language_short_tag() {
+/**
+ * Gibt den ISO-639-1 Sprachkurzcode der aktuellen Session-Sprache zurück.
+ * Wird für PHPMailer-Sprachdateien und GUMP-Validierung verwendet.
+ *
+ * @return string Sprachkurzcode (z.B. 'de', 'en', 'es', 'ru')
+ */
+function language_short_tag()
+{
     switch ($_SESSION['language']) {
         case "spanish":
             return 'es';
@@ -2236,7 +2887,15 @@ function language_short_tag() {
     }
 }
 
-function check_msg_emal() {
+/**
+ * Prüft auf neue ungelesene private Nachrichten und sendet E-Mail-Benachrichtigungen.
+ * Versendet nur wenn der Empfänger die E-Mail-Benachrichtigung aktiviert hat (pnmail=1)
+ * und die Nachricht noch nicht per E-Mail versendet wurde (sendmail=0).
+ *
+ * @return void
+ */
+function check_msg_emal()
+{
     global $db, $httphost;
     $qry = db("SELECT s1.`an`,s1.`page`,s1.`titel`,s1.`sendmail`,s1.`id` AS `mid`,s2.`id`,s2.`nick`,s2.`email`,s2.`pnmail` FROM `"
         . $db['msg'] . "` AS `s1` LEFT JOIN `" . $db['users'] .
@@ -2261,7 +2920,8 @@ if (!$ajaxJob && HasDSGVO())
  * @param int $datum
  * @return bool
  */
-function check_new(int $datum) {
+function check_new(int $datum)
+{
     global $userid;
     if ($userid) {
         if ($datum >= userstats('lastvisit') ||
@@ -2280,7 +2940,8 @@ function check_new(int $datum) {
  * @param int $age
  * @return string
  */
-function dropdown(string $what, int $wert, int $age = 0) {
+function dropdown(string $what, int $wert, int $age = 0)
+{
     $return = '';
     if ($what == "day") {
         $return = ($age == 1 ? '<option value="" class="dropdownKat">' . _day . '</option>' . "\n" : '');
@@ -2344,49 +3005,86 @@ function dropdown(string $what, int $wert, int $age = 0) {
  * @param string $game
  * @return mixed|string
  */
-function sgames($game = '') {
-    $protocols = get_files(basePath.'/inc/server_query/');
+function sgames($game = '')
+{
+    $protocols = get_files(basePath . '/inc/server_query/');
     $games = '';
-    foreach($protocols AS $protocol)
-    {
+    foreach ($protocols as $protocol) {
         unset($gamemods, $server_name_config);
         $protocol = str_replace('.php', '', $protocol);
-        if(substr($protocol, 0, 1) != '_')
-        {
+        if (substr($protocol, 0, 1) != '_') {
             $explode = '##############################################################################################################################';
-            $protocol_config = explode($explode, file_get_contents(basePath.'/inc/server_query/'.$protocol.'.php'));
-            eval(str_replace('<?php', '', $protocol_config[0]));
-            if(!empty($server_name_config) && count($server_name_config) > 2) {
+            $protocol_config = explode($explode, file_get_contents(basePath . '/inc/server_query/' . $protocol . '.php'));
+            // Parse configuration variables safely without eval()
+            // The configuration contains variable assignments like: $server_name_config = [...];
+            $config_code = str_replace('<?php', '', $protocol_config[0]);
+            // Create isolated scope for variable extraction
+            $extract_vars = function() use ($config_code) {
+                // Parse only if the code looks safe (basic variable assignments)
+                if (preg_match('/^\s*\$\w+\s*=/', $config_code)) {
+                    $temp_file = tempnam(sys_get_temp_dir(), 'dzcp_protocol_');
+                    file_put_contents($temp_file, '<?php ' . $config_code . ' return get_defined_vars();');
+                    $vars = include($temp_file);
+                    unlink($temp_file);
+                    return $vars;
+                }
+                return [];
+            };
+            $vars = $extract_vars();
+            $server_name_config = $vars['server_name_config'] ?? null;
+            $gamemods = $vars['gamemods'] ?? null;
+
+            if (!empty($server_name_config) && count($server_name_config) > 2) {
                 $gamemods = '';
-                foreach($server_name_config AS $slabel => $sconfig) {
-                    $gamemods .= $sconfig[1].', ';
+                foreach ($server_name_config as $slabel => $sconfig) {
+                    $gamemods .= $sconfig[1] . ', ';
                 }
             }
-            $gamemods = empty($gamemods) ? '' : ' ('.substr($gamemods, 0, strlen($gamemods) - 2).')';
+            $gamemods = empty($gamemods) ? '' : ' (' . substr($gamemods, 0, strlen($gamemods) - 2) . ')';
 
-            $games .= '<option value="'.$protocol.'">';
-            switch($protocol):
-                case 'bf1942'; case 'bf2142'; case 'bf2'; case 'bfvietnam'; case 'bfbc2';
-                $protocol = strtr($protocol, array('bfbc2' => 'Battlefield Bad Company 2', 'bfv' => 'Battlefield V', 'bf' => 'Battlefield '));
-                break;
-                case 'swat4'; $protocol = strtoupper($protocol); break;
-                case 'aarmy'; $protocol = 'Americas Army'; break;
-                case 'arma'; $protocol = 'Armed Assault'; break;
-                case 'wet'; $protocol = 'Wolfenstein: Enemy Territory'; break;
-                case 'mta'; $protocol = 'Multi-Theft-Auto'; break;
-                case 'cnc'; $protocol = 'Command &amp; Conquer'; break;
-                case 'sof2'; $protocol = 'Soldiers of Fortune 2'; break;
-                case 'ut'; $protocol = 'Unreal Tournament'; break;
-                default;
+            $games .= '<option value="' . $protocol . '">';
+            switch ($protocol):
+                case 'bf1942':
+                case 'bf2142':
+                case 'bf2':
+                case 'bfvietnam':
+                case 'bfbc2':
+                    $protocol = strtr($protocol, array('bfbc2' => 'Battlefield Bad Company 2', 'bfv' => 'Battlefield V', 'bf' => 'Battlefield '));
+                    break;
+                case 'swat4':
+                    $protocol = strtoupper($protocol);
+                    break;
+                case 'aarmy':
+                    $protocol = 'Americas Army';
+                    break;
+                case 'arma':
+                    $protocol = 'Armed Assault';
+                    break;
+                case 'wet':
+                    $protocol = 'Wolfenstein: Enemy Territory';
+                    break;
+                case 'mta':
+                    $protocol = 'Multi-Theft-Auto';
+                    break;
+                case 'cnc':
+                    $protocol = 'Command &amp; Conquer';
+                    break;
+                case 'sof2':
+                    $protocol = 'Soldiers of Fortune 2';
+                    break;
+                case 'ut':
+                    $protocol = 'Unreal Tournament';
+                    break;
+                default:
                     $protocol = ucfirst(str_replace('_', ' ', $protocol));
                     $protocol = (strlen($protocol) < 4) ? strtoupper($protocol) : $protocol;
                     break;
             endswitch;
-            $games .= $protocol.$gamemods;
+            $games .= $protocol . $gamemods;
             $games .= '</option>';
         }
     }
-    $games = str_replace("value=\"".$game."\"","value=\"".$game."\" selected=\"selected\"",$games);
+    $games = str_replace("value=\"" . $game . "\"", "value=\"" . $game . "\" selected=\"selected\"", $games);
     return $games;
 }
 
@@ -2400,7 +3098,7 @@ function search_game_icon(string $icon = '')
     global $picformat;
     $image = '../inc/images/gameicons/unknown.gif';
     $found = false;
-    foreach ($picformat AS $end) {
+    foreach ($picformat as $end) {
         if (file_exists(basePath . '/inc/images/gameicons/' . $icon . '.' . $end)) {
             $found = true;
             $image = '../inc/images/gameicons/' . $icon . '.' . $end;
@@ -2415,9 +3113,10 @@ function search_game_icon(string $icon = '')
  * @param string $game
  * @return string
  */
-function listgame(string $games, string $game) {
+function listgame(string $games, string $game)
+{
     $content = '';
-    foreach ($games AS $sname => $info) {
+    foreach ($games as $sname => $info) {
         $selected = (!empty($game) && $game != false && $game == $sname ? 'selected="selected" ' : '');
         $content .= '<option ' . $selected . 'value="' . $sname . '">' . htmlentities($info['name']) . '</option>';
     }
@@ -2431,7 +3130,8 @@ function listgame(string $games, string $game) {
  * @param int $vid
  * @return string
  */
-function voteanswer(string $what, int $vid) {
+function voteanswer(string $what, int $vid)
+{
     global $db;
     $get = db("SELECT `sel` FROM `" . $db['vote_results'] . "` WHERE `what` = '" . up($what) . "' AND `vid` = " . (int)$vid . ";", false, true);
     return re($get['sel']);
@@ -2442,7 +3142,8 @@ function voteanswer(string $what, int $vid) {
  * @param $txt
  * @return mixed
  */
-function conv($txt) {
+function conv($txt)
+{
     return str_replace(array("ä", "ü", "ö", "", "Ä", "Ö", ""), array("ae", "ue", "oe", "Ae", "Ue", "Oe", "ss"), $txt);
 }
 
@@ -2451,7 +3152,8 @@ function conv($txt) {
  * @param $bday
  * @return false|int|string
  */
-function getAge($bday) {
+function getAge($bday)
+{
     if (!empty($bday) && $bday) {
         $bday = date('d.m.Y', $bday);
         list($tiday, $iMonth, $iYear) = explode(".", $bday);
@@ -2475,7 +3177,8 @@ function getAge($bday) {
  * @param bool $profil
  * @return string
  */
-function getrank(int $tid, int $squad = 0, bool $profil = false) {
+function getrank(int $tid, int $squad = 0, bool $profil = false)
+{
     global $db;
     if ($squad) {
         if ($profil)
@@ -2536,7 +3239,8 @@ function getrank(int $tid, int $squad = 0, bool $profil = false) {
 /**
  * Session fuer den letzten Besuch setzen
  */
-function set_lastvisit() {
+function set_lastvisit()
+{
     global $db, $useronline, $userid;
     if ($userid) {
         if (!db("SELECT `id` FROM `" . $db['users'] . "` WHERE `id` = " . (int)($userid) . " AND (time+" . $useronline . ") > " . time() . ";", true)) {
@@ -2550,7 +3254,8 @@ function set_lastvisit() {
  * @param int $tid
  * @return string
  */
-function onlinecheck(int $tid) {
+function onlinecheck(int $tid)
+{
     global $db, $useronline;
     $row = db("SELECT `id` FROM `" . $db['users'] . "` WHERE `id` = " . (int)($tid) . " AND (time+" . $useronline . ") > " . time() . " AND `online` = 1;", true);
     return $row ? "<img src=\"../inc/images/online.gif\" alt=\"\" class=\"icon\" />" : "<img src=\"../inc/images/offline.gif\" alt=\"\" class=\"icon\" />";
@@ -2561,7 +3266,8 @@ function onlinecheck(int $tid) {
  * @param string $name
  * @return null|string|string[]
  */
-function pfields_name(string $name) {
+function pfields_name(string $name)
+{
     return preg_replace_callback("=_(.*?)_=Uis",
         function ($match) {
             if (defined("_profil" . substr(trim($match[0]), 0, -1)))
@@ -2577,16 +3283,19 @@ function pfields_name(string $name) {
  * @param int $time
  * @return bool
  */
-function ipcheck(string $what, int $time = 0) {
+function ipcheck(string $what, int $time = 0)
+{
     global $db, $userip;
-    $get = db("SELECT `time`,`what` FROM `" . $db['ipcheck'] . "` WHERE `what` = '" . $what . "' AND `ip` = '" . $userip . "' ORDER BY `time` DESC;", false, true);
+    $what_escaped = _real_escape_string($what);
+    $userip_escaped = _real_escape_string($userip);
+    $get = db("SELECT `time`,`what` FROM `" . $db['ipcheck'] . "` WHERE `what` = '" . $what_escaped . "' AND `ip` = '" . $userip_escaped . "' ORDER BY `time` DESC;", false, true);
     if ($get != null && count($get) >= 1) {
         if (preg_match("#vid#", $get['what']))
             return true;
         else {
             if ($get['time'] + (int)($time) < time())
                 db("DELETE FROM `" . $db['ipcheck'] . "` WHERE `what` = '" .
-                    $what . "' AND `ip` = '" . $userip . "' AND (`time`+" . $time . ") < " . time() . ";");
+                    $what_escaped . "' AND `ip` = '" . $userip_escaped . "' AND (`time`+" . $time . ") < " . time() . ";");
 
             if (($get['time'] + $time) > time())
                 return true;
@@ -2601,15 +3310,23 @@ function ipcheck(string $what, int $time = 0) {
  * @param int $month
  * @param int $year
  */
-function cal(int $i) {
+function cal(int $i)
+{
     if (preg_match("=10|20|30=Uis", $i) == FALSE) $i = preg_replace("=0=", "", $i);
     if ($i < 10) $tag_nr = "0" . $i;
     else $tag_nr = $i;
     return $tag_nr;
 }
 
+/**
+ * Entfernt führende Nullen bei Monatsangaben (außer bei "10").
+ *
+ * @param int $i Monatszahl mit möglicher führender Null (z.B. 01, 09)
+ * @return int|string Monat ohne führende Null (z.B. 1, 9), oder unverändert bei 10
+ */
 //-> Entfernt fuehrende Nullen bei Monatsangaben
-function nonum(int $i) {
+function nonum(int $i)
+{
     if (preg_match("=10=Uis", $i) == false)
         return preg_replace("=0=", "", $i);
 
@@ -2621,7 +3338,8 @@ function nonum(int $i) {
  * @param string $name
  * @return mixed|null|string|string[]
  */
-function navi_name(string $name) {
+function navi_name(string $name)
+{
     $name = trim($name);
     if (preg_match("#^_(.*?)_$#Uis", $name)) {
         $name = preg_replace("#_(.*?)_#Uis", "$1", $name);
@@ -2638,7 +3356,8 @@ function navi_name(string $name) {
  * @param string $txt
  * @return string
  */
-function convert_feed(string $txt) {
+function convert_feed(string $txt)
+{
     global $charset;
     $txt = stripslashes($txt);
     $txt = str_replace("&Auml;", "Ae", $txt);
@@ -2670,7 +3389,8 @@ function convert_feed(string $txt) {
  * @param int $height
  * @return bool|mixed|null|string|string[]
  */
-function userpic(int $userid, int $width = 170, int $height = 210) {
+function userpic(int $userid, int $width = 170, int $height = 210)
+{
     global $picformat;
     $pic = '';
     foreach ($picformat as $endung) {
@@ -2691,7 +3411,8 @@ function userpic(int $userid, int $width = 170, int $height = 210) {
  * @param int $height
  * @return bool|mixed|null|string|string[]
  */
-function useravatar(int $uid = 0, int $width = 100, int $height = 100) {
+function useravatar(int $uid = 0, int $width = 100, int $height = 100)
+{
     global $picformat, $userid;
     $pic = '';
     $uid = $uid == 0 ? $userid : $uid;
@@ -2713,7 +3434,8 @@ function useravatar(int $uid = 0, int $width = 100, int $height = 100) {
  * @param int $height
  * @return string
  */
-function hoveruserpic(int $userid, int $width = 170, int $height = 210) {
+function hoveruserpic(int $userid, int $width = 170, int $height = 210)
+{
     global $picformat;
     $pic = "../inc/images/nopic.gif', '" . $width . "', '" . $height;
     foreach ($picformat as $endung) {
@@ -2731,7 +3453,8 @@ function hoveruserpic(int $userid, int $width = 170, int $height = 210) {
  * @param int $userid
  * @return bool
  */
-function admin_perms(int $userid) {
+function admin_perms(int $userid)
+{
     global $db, $chkMe;
     if (empty($userid))
         return false;
@@ -2746,7 +3469,7 @@ function admin_perms(int $userid) {
     // check user permission
     $c = db("SELECT * FROM `" . $db['permissions'] . "` WHERE `user` = " . (int)($userid) . ";", false, true);
     if (!empty($c)) {
-        foreach ($c AS $v => $k) {
+        foreach ($c as $v => $k) {
             if ($v != 'id' && $v != 'user' && $v != 'pos' && !in_array($v, $e)) {
                 if ($k == 1) {
                     return true;
@@ -2759,7 +3482,7 @@ function admin_perms(int $userid) {
     // check rank permission
     $qry = db("SELECT s1.* FROM `" . $db['permissions'] . "` AS `s1` LEFT JOIN `" . $db['userpos'] . "` AS `s2` ON s1.`pos` = s2.`posi` WHERE s2.`user` = " . (int)($userid) . " AND s2.`posi` != 0;");
     while ($r = _fetch($qry)) {
-        foreach ($r AS $v => $k) {
+        foreach ($r as $v => $k) {
             if ($v != 'id' && $v != 'user' && $v != 'pos' && !in_array($v, $e)) {
                 if ($k == 1) {
                     return true;
@@ -2777,7 +3500,8 @@ function admin_perms(int $userid) {
  * @param string $pholder
  * @return mixed
  */
-function pholderreplace(string $pholder) {
+function pholderreplace(string $pholder)
+{
     /** @noinspection CssInvalidAtRule */
     $search = array('@<script[^>]*?>.*?</script>@si',
         '@<style[^>]*?>.*?</style>@siU',
@@ -2804,7 +3528,8 @@ function pholderreplace(string $pholder) {
  * Zugriffsberechtigung auf die Seite
  * @return bool
  */
-function check_internal_url() {
+function check_internal_url()
+{
     global $db, $chkMe;
     if ($chkMe >= 1) return false;
     $install_pfad = explode("/", dirname(dirname(GetServerVars('SCRIPT_NAME')) . "../"));
@@ -2828,7 +3553,7 @@ function check_internal_url() {
         $pfad = str_replace('index.php', '', $pfad);
 
     $qry_navi = db_stmt("SELECT `internal` FROM `" . $db['navi'] . "` WHERE `url` = ? OR `url` = ?;",
-        array('ss', $pfad, $pfad.'index.php'));
+        array('ss', $pfad, $pfad . 'index.php'));
     if (_rows($qry_navi)) {
         $get_navi = _fetch($qry_navi);
         if ($get_navi['internal'])
@@ -2842,7 +3567,8 @@ function check_internal_url() {
  * Ladezeit
  * @return float
  */
-function generatetime() {
+function generatetime()
+{
     list($usec, $sec) = explode(" ", microtime());
     return ((float)$usec + (float)$sec);
 }
@@ -2853,30 +3579,33 @@ function generatetime() {
  * @param int $pos
  * @return string
  */
-function getPermissions(int $checkID = 0, int $pos = 0) {
+function getPermissions(int $checkID = 0, int $pos = 0)
+{
     global $db, $lang;
 
     if (!empty($checkID)) {
         $check = empty($pos) ? 'user' : 'pos';
         $checked = array();
         $qry = db("SELECT * FROM " . $db['permissions'] . " WHERE `" . $check . "` = '" . (int)($checkID) . "'");
-        if (_rows($qry)) foreach (_fetch($qry) AS $k => $v) $checked[$k] = $v;
+        if (_rows($qry)) foreach (_fetch($qry) as $k => $v) $checked[$k] = $v;
     }
 
     $permission = array();
     $qry = db("SHOW COLUMNS FROM " . $db['permissions'] . "");
     while ($get = _fetch($qry)) {
         if ($get['Field'] != 'id' && $get['Field'] != 'user' && $get['Field'] != 'pos' && $get['Field'] != 'intforum') {
-            @eval("\$lang = _perm_" . $get['Field'] . ";");
+            // Access language array directly instead of using eval()
+            $lang_key = '_perm_' . $get['Field'];
+            $lang_value = $lang[$lang_key] ?? $get['Field']; // Fallback to field name if translation missing
             $chk = empty($checked[$get['Field']]) ? '' : ' checked="checked"';
-            $permission[$lang] = '<input type="checkbox" class="checkbox" id="' . $get['Field'] . '" name="perm[p_' . $get['Field'] . ']" value="1"' . $chk . ' /><label for="' . $get['Field'] . '"> ' . $lang . '</label> ';
+            $permission[$lang_value] = '<input type="checkbox" class="checkbox" id="' . $get['Field'] . '" name="perm[p_' . $get['Field'] . ']" value="1"' . $chk . ' /><label for="' . $get['Field'] . '"> ' . $lang_value . '</label> ';
         }
     }
 
     natcasesort($permission);
     $break = 1;
     $p = '';
-    foreach ($permission AS $perm) {
+    foreach ($permission as $perm) {
         $br = ($break % 2) ? '<br />' : '';
         $break++;
         $p .= $perm . $br;
@@ -2891,7 +3620,8 @@ function getPermissions(int $checkID = 0, int $pos = 0) {
  * @param int $pos
  * @return string
  */
-function getBoardPermissions(int $checkID = 0, int $pos = 0) {
+function getBoardPermissions(int $checkID = 0, int $pos = 0)
+{
     global $db;
 
     $break = 0;
@@ -2925,14 +3655,15 @@ function getBoardPermissions(int $checkID = 0, int $pos = 0) {
  * @param $txt
  * @return mixed
  */
-function jsconvert($txt) {
+function jsconvert($txt)
+{
     global $charset;
     $txt = str_replace(
-        array("'","&#039;","\"","\r","\n","&Uuml;","&uuml;","&Auml;","&auml;","&Ouml;","&ouml;","&szlig;"),
-        array("\'","\'","&quot;","","","\u00dc","\u00fc","\u00c4","\u00e4","\u00d6","\u00f6","\u00df"),$txt);
+        array("'", "&#039;", "\"", "\r", "\n", "&Uuml;", "&uuml;", "&Auml;", "&auml;", "&Ouml;", "&ouml;", "&szlig;"),
+        array("\'", "\'", "&quot;", "", "", "\u00dc", "\u00fc", "\u00c4", "\u00e4", "\u00d6", "\u00f6", "\u00df"), $txt);
 
     $txt = htmlentities($txt, ENT_COMPAT, $charset);
-    return utf8_encode($txt);
+    return mb_convert_encoding($txt, 'UTF-8', 'ISO-8859-1');
 }
 
 /**
@@ -2940,7 +3671,8 @@ function jsconvert($txt) {
  * @param string $what
  * @param bool $time
  */
-function setIpcheck(string $what = '', bool $time = true) {
+function setIpcheck(string $what = '', bool $time = true)
+{
     global $db, $userip;
     db("INSERT INTO `" . $db['ipcheck'] . "` SET `ip` = '" . $userip . "', "
         . "`user_id` = " . userid() . ", `what` = '" . $what . "', "
@@ -2958,7 +3690,8 @@ function setIpcheck(string $what = '', bool $time = true) {
  * @param string $standard * falls der timestamp 0 oder ungueltig ist, gebe diesen string zurueck
  * @return string
  */
-function get_elapsed_time(int $timestamp, int $aktuell = 0, int $anzahl_einheiten = 0, int $zeige_leere_einheiten = 0, int $zeige_einheiten = 0, $standard = null) {
+function get_elapsed_time(int $timestamp, int $aktuell = 0, int $anzahl_einheiten = 0, int $zeige_leere_einheiten = 0, int $zeige_einheiten = 0, $standard = null)
+{
     if ($aktuell === null) $aktuell = time();
     if ($anzahl_einheiten === null) $anzahl_einheiten = 1;
     if ($zeige_leere_einheiten === null) $zeige_leere_einheiten = true;
@@ -3016,7 +3749,7 @@ function get_elapsed_time(int $timestamp, int $aktuell = 0, int $anzahl_einheite
 
 //-> Neue Funktionen einbinden, sofern vorhanden
 if ($functions_files = get_files(basePath . '/inc/additional-functions/', false, true, array('php'))) {
-    foreach ($functions_files AS $func) {
+    foreach ($functions_files as $func) {
         include_once(basePath . '/inc/additional-functions/' . $func);
     }
     unset($functions_files, $func);
@@ -3025,22 +3758,29 @@ if ($functions_files = get_files(basePath . '/inc/additional-functions/', false,
 /**
  * Class javascript
  */
-class javascript {
-    private static $data_array = [];
+class javascript
+{
+    private static array $data_array = [];
 
-    public static function set($key='',$var='') {
+    public static function set($key = '', $var = ''): self
+    {
         self::$data_array[$key] = $var;
+        return new self();
     }
 
-    public static function remove($key='') {
+    public static function remove($key = ''): self
+    {
         unset(self::$data_array[$key]);
+        return new self();
     }
 
-    public static function get($key='') {
-        return utf8_decode(self::$data_array[$key]);
+    public static function get($key = ''): false|array|string
+    {
+        return mb_convert_encoding(self::$data_array[$key] ?? '', 'ISO-8859-1', 'UTF-8');
     }
 
-    public static function encode() {
+    public static function encode(): false|string
+    {
         return json_encode(self::$data_array);
     }
 }
@@ -3056,26 +3796,38 @@ include_once(basePath . '/inc/menu-functions/navi.php');
  * @param string $wysiwyg
  * @param string $index_templ
  */
-function page(string $index = '', string $title = '', string $where = '', string $wysiwyg = '', string $index_templ = 'index') {
+function page(string $index = '', string $title = '', string $where = '', string $wysiwyg = '', string $index_templ = 'index'): void
+{
     global $db, $userid, $userip, $tmpdir, $chkMe, $mysql, $isSpider;
     global $designpath, $time_start;
 
     // Timer Stop
     $time = round(generatetime() - $time_start, 4);
 
+    DzcpLogger::app()->debug('Seitenaufruf', [
+        'where'   => $where,
+        'title'   => $title,
+        'user_id' => $userid ?? 0,
+        'ip'      => $userip ?? '',
+        'time_ms' => $time,
+        'method'  => GetServerVars('REQUEST_METHOD'),
+        'uri'     => GetServerVars('REQUEST_URI'),
+    ]);
+
     // JS-Dateine einbinden
-    $lng = language_short_tag(); $login = '';
+    $lng = language_short_tag();
+    $login = '';
     $dsgvo = (!array_key_exists('do_show_dsgvo', $_SESSION) || !$_SESSION['do_show_dsgvo'] ? 1 : 0);
     $dsgvo_lock = (!array_key_exists('user_has_dsgvo_lock', $_SESSION) || !$_SESSION['user_has_dsgvo_lock'] ? 0 : 1);
 
-    javascript::set('maxW',config('maxwidth'));
-    javascript::set('lng',$lng);
-    javascript::set('dsgvo',$dsgvo);
-    javascript::set('dsgvo_lock',$dsgvo_lock);
-    javascript::set('dzcp_editor',($wysiwyg == '_word') ? 'advanced' : 'normal');
-    javascript::set('tempdir',$_SESSION['tmpdir']);
+    javascript::set('maxW', config('maxwidth'));
+    javascript::set('lng', $lng);
+    javascript::set('dsgvo', $dsgvo);
+    javascript::set('dsgvo_lock', $dsgvo_lock);
+    javascript::set('dzcp_editor', ($wysiwyg == '_word') ? 'advanced' : 'normal');
+    javascript::set('tempdir', $_SESSION['tmpdir']);
 
-    $java_vars = '<script language="javascript" type="text/javascript">DZCP.setConfig(\''.javascript::encode().'\');</script>'."\n";
+    $java_vars = '<script language="javascript" type="text/javascript">DZCP.setConfig(\'' . javascript::encode() . '\');</script>' . "\n";
     $min = (use_min_css_js_files ? '.min' : '');
     if (!strstr(GetServerVars('HTTP_USER_AGENT'), 'Android') && !strstr(GetServerVars('HTTP_USER_AGENT'), 'webOS'))
         $java_vars .= '<script language="javascript" type="text/javascript" src="' . $designpath . '/_js/wysiwyg' . $min . '.js"></script>' . "\n";
@@ -3139,7 +3891,8 @@ function page(string $index = '', string $title = '', string $where = '', string
         $arr = array("idir" => '../inc/images/admin', "dir" => $designpath);
 
         //check if placeholders are given
-        $pholder = file_get_contents($designpath . "/index.html");
+        $indexHtmlPath = basePath . '/inc/_templates_/' . $tmpdir . '/index.html';
+        $pholder = file_exists($indexHtmlPath) ? @file_get_contents($indexHtmlPath) : '';
 
         //filter placeholders
         $blArr = array("[clanname]", "[title]", "[copyright]", "[java_vars]", "[min]",

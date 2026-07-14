@@ -46,10 +46,10 @@ if (defined('_Clanwars')) {
                         "status" => $status));
                 }
 
-                $cntPlayers = cnt($db['cw_player'], " WHERE cwid = '" . (int)($_GET['id']) . "' AND member = '" . $userid . "'", "cwid");
+                $cntPlayers = cnt($db['cw_player'], " WHERE cwid = '" . (int)($_GET['id']) . "' AND member = '" . (int)$userid . "'", "cwid");
                 $value = $cntPlayers ? _button_value_edit : _button_value_add;
                 $form_player = "";
-                if (db("SELECT id FROM " . $db['squaduser'] . " WHERE squad = '" . $get['squad_id'] . "' AND user = '" . $userid . "'", true)) {
+                if (db("SELECT id FROM " . $db['squaduser'] . " WHERE squad = '" . $get['squad_id'] . "' AND user = '" . (int)$userid . "'", true)) {
                     $form_player = show($dir . "/form_player", array("id" => (int)($_GET['id']),
                         "admin" => (permission('clanwars') ? '<input id="contentSubmitAdmin" type="button" value="' . _cw_reset_button . '" class="submit" onclick="DZCP.submitButton(\'contentSubmitAdmin\');DZCP.goTo(\'?action=resetplayers&amp;id=' . (int)($_GET['id']) . '\')" />' : ''),
                         "yes" => _yes,
@@ -68,20 +68,20 @@ if (defined('_Clanwars')) {
                     "head" => _cw_players_head,
                     "form_player" => $form_player));
 
-                $serverpwd = show(_cw_serverpwd, array("cw_serverpwd" => re($get['serverpwd'])));
+                $serverpwd = show(_cw_serverpwd, array("cw_serverpwd" => h($get['serverpwd'])));
             }
         }
 
-        $show = show(_cw_details_squad, array("game" => re($get['game']),
-            "name" => re($get['name']),
+        $show = show(_cw_details_squad, array("game" => h($get['game']),
+            "name" => h($get['name']),
             "id" => $get['squad_id'],
             "img" => squad($get['icon'])));
         $flagge = flag($get['gcountry']);
-        $gegner = show(_cw_details_gegner_blank, array("gegner" => re($get['clantag'] . " - " . $get['gegner']),
-            "url" => !empty($get['url']) ? re($get['url']) : "#"));
+        $gegner = show(_cw_details_gegner_blank, array("gegner" => h($get['clantag'] . " - " . $get['gegner']),
+            "url" => !empty($get['url']) ? h($get['url']) : "#"));
 
-        $server = show(_cw_details_server, array("servername" => re($get['servername']),
-            "serverip" => re($get['serverip'])));
+        $server = show(_cw_details_server, array("servername" => h($get['servername']),
+            "serverip" => h($get['serverip'])));
 
         if ($get['punkte'] == "0" && $get['gpunkte'] == "0")
             $result = _cw_no_results;
@@ -191,7 +191,7 @@ if (defined('_Clanwars')) {
             if (!$getc['reg']) {
                 $hp = $getc['hp'] ? show(_hpicon, array("hp" => $getc['hp'])) : '';
                 $email = $getc['email'] ? '<br />' . show(_emailicon_forum, array("email" => eMailAddr(re($getc['email'])))) : '';
-                $nick = show(_link_mailto, array("nick" => re($getc['nick']), "email" => $getc['email']));
+                $nick = show(_link_mailto, array("nick" => h($getc['nick']), "email" => $getc['email']));
             } else {
                 $onoff = onlinecheck($getc['reg']);
                 $nick = autor($getc['reg']);
@@ -269,14 +269,14 @@ if (defined('_Clanwars')) {
 
         $logo_squad = '_defaultlogo.jpg';
         $logo_gegner = '_defaultlogo.jpg';
-        foreach ($picformat AS $end) {
+        foreach ($picformat as $end) {
             if (file_exists(basePath . '/inc/images/clanwars/' . $get['id'] . '_logo.' . $end)) {
                 $logo_gegner = $get['id'] . '_logo.' . $end;
                 break;
             }
         }
 
-        foreach ($picformat AS $end) {
+        foreach ($picformat as $end) {
             if (file_exists(basePath . '/inc/images/squads/' . $get['squad_id'] . '_logo.' . $end)) {
                 $logo_squad = $get['squad_id'] . '_logo.' . $end;
                 break;
@@ -298,11 +298,11 @@ if (defined('_Clanwars')) {
             "logo_squad" => $logo_squad,
             "logo_gegner" => $logo_gegner,
             "squad" => $show,
-            "squad_name" => re($get['name']),
-            "gametype" => empty($get['gametype']) ? '-' : re($get['gametype']),
-            "lineup" => preg_replace("#\,#", "<br />", re($get['lineup'])),
-            "glineup" => preg_replace("#\,#", "<br />", re($get['glineup'])),
-            "match_admins" => empty($get['matchadmins']) ? '-' : re($get['matchadmins']),
+            "squad_name" => h($get['name']),
+            "gametype" => empty($get['gametype']) ? '-' : h($get['gametype']),
+            "lineup" => preg_replace("#\,#", "<br />", h($get['lineup'])),
+            "glineup" => preg_replace("#\,#", "<br />", h($get['glineup'])),
+            "match_admins" => empty($get['matchadmins']) ? '-' : h($get['matchadmins']),
             "datum" => _datum,
             "gegner" => _cw_head_gegner,
             "xonx" => _cw_head_xonx,
@@ -317,9 +317,9 @@ if (defined('_Clanwars')) {
             "serverpwd" => $serverpwd,
             "cw_datum" => date("d.m.Y H:i", $get['datum']) . _uhr,
             "cw_gegner" => $gegner,
-            "cw_xonx" => empty($get['xonx']) ? '-' : re($get['xonx']),
-            "cw_liga" => empty($get['liga']) ? '-' : re($get['liga']),
-            "cw_maps" => empty($get['maps']) ? '-' : re($get['maps']),
+            "cw_xonx" => empty($get['xonx']) ? '-' : h($get['xonx']),
+            "cw_liga" => empty($get['liga']) ? '-' : h($get['liga']),
+            "cw_maps" => empty($get['maps']) ? '-' : h($get['maps']),
             "cw_server" => $server,
             "cw_result" => $result,
             "cw_bericht" => $bericht,
@@ -373,9 +373,9 @@ if (defined('_Clanwars')) {
                                 "prevurl" => '../clanwars/?action=compreview&id=' . $_GET['id'],
                                 "id" => $_GET['id'],
                                 "show" => "",
-                                "postemail" => isset($_POST['email']) ? $_POST['email'] : '',
+                                "postemail" => isset($_POST['email']) ? htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8') : '',
                                 "posthp" => isset($_POST['hp']) ? links(re($_POST['hp'])) : '',
-                                "postnick" => isset($_POST['nick']) ? re($_POST['nick']) : '',
+                                "postnick" => isset($_POST['nick']) ? htmlspecialchars($_POST['nick'], ENT_QUOTES, 'UTF-8') : '',
                                 "posteintrag" => re_bbcode(re($_POST['comment'], true)),
                                 "error" => $error,
                                 "eintraghead" => _eintrag));
@@ -450,9 +450,9 @@ if (defined('_Clanwars')) {
                     $form = show("page/editor_notregged", array("nickhead" => _nick,
                         "emailhead" => _email,
                         "hphead" => _hp,
-                        "postemail" => re($get['email']),
+                        "postemail" => h($get['email']),
                         "posthp" => links(re($get['hp'])),
-                        "postnick" => re($get['nick'])));
+                        "postnick" => h($get['nick']));
                 }
 
                 $index = show("page/comments_add", array("titel" => _comments_edit,

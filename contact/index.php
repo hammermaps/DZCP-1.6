@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $where = _site_contact;
@@ -35,7 +32,7 @@ switch ($action):
                 "steam" => _steamid));
         }
         break;
-    case 'fightus';
+    case 'fightus':
         if (HasDSGVO()) {
             $qry = db("SELECT id,name,game FROM " . $db['squads'] . "
                    WHERE status = 1
@@ -45,8 +42,8 @@ switch ($action):
             $squads = '';
             while ($get = _fetch($qry)) {
                 $squads .= show(_select_field_fightus, array("id" => $get['id'],
-                    "squad" => re($get['name']),
-                    "game" => re($get['game'])));
+                    "squad" => h($get['name']),
+                    "game" => h($get['game'])));
             }
 
             if (!_rows($qry)) {
@@ -87,7 +84,7 @@ switch ($action):
                 "steam" => _steamid));
         }
         break;
-    case 'joinus';
+    case 'joinus':
         if (HasDSGVO()) {
             $qrysquads = db("SELECT id,name,game FROM " . $db['squads'] . "
                         WHERE status = 1 AND team_joinus = 1
@@ -96,8 +93,8 @@ switch ($action):
             $squads = '';
             while ($getsquads = _fetch($qrysquads)) {
                 $squads .= show(_select_field_fightus, array("id" => $getsquads['id'],
-                    "squad" => re($getsquads['name']),
-                    "game" => re($getsquads['game'])));
+                    "squad" => h($getsquads['name']),
+                    "game" => h($getsquads['game'])));
             }
 
             if (!_rows($qrysquads)) {
@@ -125,7 +122,7 @@ switch ($action):
                 "steam" => _steamid));
         }
         break;
-    case 'do';
+    case 'do':
         if (HasDSGVO()) {
             if ($_GET['what'] == "contact") {
                 if ($_POST['secure'] != $_SESSION['sec_contact'] || empty($_SESSION['sec_contact']))
@@ -206,7 +203,7 @@ switch ($action):
                         "email" => $email,
                         "age" => $_POST['age'],
                         "text" => $_POST['text'],
-                        "squad" => re($qrysquads['name']),
+                        "squad" => h($qrysquads['name']),
                         "nick" => $_POST['nick']));
 
                     $qry = db("SELECT s1.id FROM " . $db['users'] . " AS s1

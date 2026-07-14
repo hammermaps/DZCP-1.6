@@ -132,8 +132,9 @@ div#wrapper {
 }
 
 div#header {
-    height: 145px;
-    position: relative
+    min-height: 0;
+    height: auto;
+    position: relative;
 }
 
 div#footer {
@@ -144,25 +145,29 @@ div#footer {
     text-align: center;
 }
 
-/* ClanLogoLeft banner in header */
+/* ClanLogoLeft banner in header – now in #clanlogo_banner fullwidth box */
 div#clanlogo_left {
-    position: absolute;
-    left: 6px;
-    top: -1px;
+    position: static;
+    left: auto;
+    top: auto;
+    display: block;
+    text-align: center;
 }
 
-/* ClanLogoRight banner in header */
+/* ClanLogoRight banner – now in #clanlogo_banner fullwidth box */
 div#clanlogo_right {
-    position: absolute;
-    left: 1165px;
-    top: 35px;
+    position: static;
+    left: auto;
+    top: auto;
 }
 
-/* ClanName banner in header */
+/* ClanName banner – now in #clanlogo_banner fullwidth box */
 div#clanname {
-    position: absolute;
-    left: 395px;
-    top: 81px;
+    position: static;
+    left: auto;
+    top: auto;
+    flex: 1;
+    text-align: center;
 }
 
 /* Rotation banner in header */
@@ -194,7 +199,7 @@ div#brackets div#search {
 /* Footer */
 div#footwrapper {
     margin: 0 auto;
-    padding: 0 0 10px 440px;
+    padding: 0 20px 10px 20px;
 }
 
 /* Footer navigation */
@@ -224,11 +229,13 @@ div#middleContent {
 }
 
 div#middleContent {
-    width: 799px;
+    width: calc(100% - 449px);
+    min-width: 0;
 }
 
 div.sideContent {
-    width: 221px
+    width: 221px;
+    min-width: 0;
 }
 
 /* Index area (mainframe) */
@@ -327,12 +334,14 @@ div#index {
 
 /* Display of the gallery box */
 #galleriebox {
-    padding: 10px 10px 10px 10px;
+    padding: 10px;
     background-color: #fff;
-    width: 755px;
-    margin: 10px 10px 10px 10px;
+    width: auto;
+    max-width: 100%;
+    margin: 10px;
     border-radius: 4px;
     border: 1px #e6e6e6 solid;
+    box-sizing: border-box;
 }
 
 /* Title Galleriebox */
@@ -352,7 +361,8 @@ div#index {
 
 /* Slideshow Plugin */
 div#slideshow {
-    width: 777px;
+    width: 100%;
+    max-width: 100%;
     height: 200px;
     position: relative;
     overflow: hidden;
@@ -362,7 +372,8 @@ div#slideshow {
 }
 
 div.images {
-    width: 777px;
+    width: 100%;
+    max-width: 100%;
     height: 200px;
     position: absolute;
     z-index: 1;
@@ -421,7 +432,8 @@ div.slidetabs a.slidertabs.current {
 table.maintable {
     background: url(../images/bg_content.jpg) repeat-y;
     margin: auto;
-    width: 1005px;
+    width: 100%;
+    max-width: 100%;
 }
 
 /* Set attributes for the content-table */
@@ -547,11 +559,8 @@ input.voteSubmit {
 }
 
 input.voteSubmit:hover {
-    background-color: #cc0033; /* fallback color if gradients are not supported */
-    background-image: -webkit-linear-gradient(to top, #cc0033 10%, #660000); /* For Chrome 25 and Safari 6, iOS 6.1, Android 4.3 */
-    background-image:    -moz-linear-gradient(to top, #cc0033 10%, #660000); /* For Firefox (3.6 to 15) */
-    background-image:      -o-linear-gradient(to top, #cc0033 10%, #660000); /* For old Opera (11.1 to 12.0) */
-    background-image:      linear-gradient(to top, #cc0033 10%, #660000); /* Standard syntax; must be last */
+    background-color: #cc0033;
+    background-image: linear-gradient(to top, #cc0033 10%, #660000);
 }
 
 /* IE Hack */
@@ -598,11 +607,8 @@ input.shoutSubmit {
     padding: 1px;
     padding-left: 10px;
     padding-right: 10px;
-    background-color: #cc0033; /* fallback color if gradients are not supported */
-    background-image: -webkit-linear-gradient(to top, #cc0033 70%, #660000); /* For Chrome 25 and Safari 6, iOS 6.1, Android 4.3 */
-    background-image:    -moz-linear-gradient(to top, #cc0033 70%, #660000); /* For Firefox (3.6 to 15) */
-    background-image:      -o-linear-gradient(to top, #cc0033 70%, #660000); /* For old Opera (11.1 to 12.0) */
-    background-image:      linear-gradient(to top, #cc0033 70%, #660000); /* Standard syntax; must be last */
+    background-color: #cc0033;
+    background-image: linear-gradient(to top, #cc0033 70%, #660000);
     border: 1px solid #5F5F5F;
     color: #fff;
     cursor: pointer;
@@ -694,14 +700,16 @@ td.navLregContent, td.navTopdlContent, td.navTmpswitchContent, td.navPagerankCon
 
 div.navGameServer, div#navTeamspeakContent {
     position: relative;
-    width: 207px;
+    width: 100%;
+    max-width: 100%;
     overflow: auto;
     overflow-x: auto;
     overflow-y: hidden;
 }
 
 div.navGameServer {
-    width: 207px
+    width: 100%;
+    max-width: 100%;
 }
 
 div.navVote {
@@ -845,10 +853,13 @@ table.news {
     box-shadow: 0 0 3px #666666; /* CSS3 Standard */
     -moz-box-shadow: 0 0 3px #666666; /* Firefox */
     -webkit-box-shadow: 0 0 3px #666666; /* Safari, Chrome, etc. */
-    margin-left: 10px;
+    margin-left: 0;
+    margin-right: 0;
     margin-bottom: 10px;
     margin-top: 10px;
-    width: 730px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* Newsbild Positionierung */
@@ -1167,10 +1178,9 @@ td.highlight {
 td.statsBalken {
     border: 1px solid #000;
     background-image: url('../../../images/vote_bg.gif');
-    background-image: -webkit-linear-gradient(to right, #660000 70%, #FF0000); /* For Chrome 25 and Safari 6, iOS 6.1, Android 4.3 */
-    background-image:    -moz-linear-gradient(to right, #660000 70%, #FF0000); /* For Firefox (3.6 to 15) */
-    background-image:      -o-linear-gradient(to right, #660000 70%, #FF0000); /* For old Opera (11.1 to 12.0) */
-    background-image:      linear-gradient(to right, #660000 70%, #FF0000); /* Standard syntax; must be last */
+    background-image: -webkit-linear-gradient(to right, #660000 70%, #FF0000);
+    background-image:    -moz-linear-gradient(to right, #660000 70%, #FF0000);
+    background-image:      linear-gradient(to right, #660000 70%, #FF0000);
 }
 
 /* Templateswitcher dropdown e.g. menu/tmp_switch.html */
@@ -1264,7 +1274,7 @@ textarea.inputField_dis_nletter, textarea.inputField_en_nletter {
 
 /* Atrributes of (submit)buttons */
 input.submit {
-    margin: 0px;
+    margin: 0;
     padding: 1px;
     padding-left: 10px;
     padding-right: 10px;
@@ -1273,19 +1283,13 @@ input.submit {
     cursor: pointer;
     font-weight: bold;
     min-height: 20px;
-    background-color: #cc0033; /* fallback color if gradients are not supported */
-    background-image: -webkit-linear-gradient(top, #cc0033 70%, #660000); /* For Chrome 25 and Safari 6, iOS 6.1, Android 4.3 */
-    background-image:    -moz-linear-gradient(top, #cc0033 70%, #660000); /* For Firefox (3.6 to 15) */
-    background-image:      -o-linear-gradient(top, #cc0033 70%, #660000); /* For old Opera (11.1 to 12.0) */
-    background-image:      linear-gradient(to top, #cc0033 70%, #660000); /* Standard syntax; must be last */
+    background-color: #cc0033;
+    background-image: linear-gradient(to top, #cc0033 70%, #660000);
 }
 
 input.submit:hover {
-    background-color: #660000; /* fallback color if gradients are not supported */
-    background-image: -webkit-linear-gradient(top, #cc0033 10%, #660000); /* For Chrome 25 and Safari 6, iOS 6.1, Android 4.3 */
-    background-image:    -moz-linear-gradient(top, #cc0033 10%, #660000); /* For Firefox (3.6 to 15) */
-    background-image:      -o-linear-gradient(top, #cc0033 10%, #660000); /* For old Opera (11.1 to 12.0) */
-    background-image:      linear-gradient(to top, #cc0033 10%, #660000); /* Standard syntax; must be last */
+    background-color: #660000;
+    background-image: linear-gradient(to top, #cc0033 10%, #660000);
 }
 
 /*IE Hack*/
@@ -1800,17 +1804,19 @@ div.permissions br {
 
 /*  Newsticker */
 div#ticker {
-    position: absolute;
-    top: 158px;
-    left: 485px;
-    width: 512px;
+    position: static;
+    top: auto;
+    left: auto;
+    width: 100%;
+    max-width: 100%;
     overflow: hidden;
     padding: 0;
     text-align: center;
 }
 
 div#dzcpticker {
-    width: 740px;
+    width: 100%;
+    max-width: 100%;
     overflow: hidden;
     padding: 5px;
     text-align: center;
@@ -1949,37 +1955,25 @@ img.border {
     text-overflow: ellipsis;
     width: 185px;
     height: 45px;
-    background-color: #706c6b; /* fallback color if gradients are not supported */
-    background-image: -webkit-linear-gradient(top, #333333 20%, 80%, #000000); /* For Chrome 25 and Safari 6, iOS 6.1, Android 4.3 */
-    background-image:    -moz-linear-gradient(top, #333333 20%, 80%, #000000); /* For Firefox (3.6 to 15) */
-    background-image:      -o-linear-gradient(top, #333333 20%, 80%, #000000); /* For old Opera (11.1 to 12.0) */
-    background-image:         linear-gradient(to bottom, #333333 20%, #000000 80%); /* Standard syntax; must be last */
+    background-color: #333333;
+    background-image: linear-gradient(to bottom, #333333 20%, #000000 80%);
     border-radius: 3px;
     text-align: center;
 }
 
 .steam_box_avatar.in-game {
-    background-color: #9bc861; /* fallback color if gradients are not supported */
-    background-image: -webkit-linear-gradient(top, #9bc861 20%, 80%, #789e4c); /* For Chrome 25 and Safari 6, iOS 6.1, Android 4.3 */
-    background-image:    -moz-linear-gradient(top, #9bc861 20%, 80%, #789e4c); /* For Firefox (3.6 to 15) */
-    background-image:      -o-linear-gradient(top, #9bc861 20%, 80%, #789e4c); /* For old Opera (11.1 to 12.0) */
-    background-image:         linear-gradient(to bottom, #9bc861 20%, #789e4c 80%); /* Standard syntax; must be last */
+    background-color: #9bc861;
+    background-image: linear-gradient(to bottom, #9bc861 20%, #789e4c 80%);
 }
 
 .steam_box_avatar.online {
-    background-color: #7bafd6; /* fallback color if gradients are not supported */
-    background-image: -webkit-linear-gradient(top, #7bafd6 20%, 80%, #506d92); /* For Chrome 25 and Safari 6, iOS 6.1, Android 4.3 */
-    background-image:    -moz-linear-gradient(top, #7bafd6 20%, 80%, #506d92); /* For Firefox (3.6 to 15) */
-    background-image:      -o-linear-gradient(top, #7bafd6 20%, 80%, #506d92); /* For old Opera (11.1 to 12.0) */
-    background-image:         linear-gradient(to bottom, #7bafd6 20%, #506d92 80%); /* Standard syntax; must be last */
+    background-color: #7bafd6;
+    background-image: linear-gradient(to bottom, #7bafd6 20%, #506d92 80%);
 }
 
 .steam_box_avatar.offline {
-    background-color: #706c6b; /* fallback color if gradients are not supported */
-    background-image: -webkit-linear-gradient(top, #706c6b 20%, 80%, #4e4d4d); /* For Chrome 25 and Safari 6, iOS 6.1, Android 4.3 */
-    background-image:    -moz-linear-gradient(top, #706c6b 20%, 80%, #4e4d4d); /* For Firefox (3.6 to 15) */
-    background-image:      -o-linear-gradient(top, #706c6b 20%, 80%, #4e4d4d); /* For old Opera (11.1 to 12.0) */
-    background-image:         linear-gradient(to bottom, #706c6b 20%, #4e4d4d 80%); /* Standard syntax; must be last */
+    background-color: #706c6b;
+    background-image: linear-gradient(to bottom, #706c6b 20%, #4e4d4d 80%);
 }
 
 #dialog-confirm, #dialog-confirm-lock {

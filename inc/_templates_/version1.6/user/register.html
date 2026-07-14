@@ -4,6 +4,7 @@
 <tr>
     <td>
         <form name="reg" action="?action=register&amp;do=add" method="post" onsubmit="return(DZCP.submitButton())">
+                <input type="hidden" name="csrf_token" value="[csrf_token]" />
             <table class="hperc" cellspacing="1">
                 [error]
                 <tr>

@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $where = _site_serverlist;
@@ -29,13 +26,13 @@ switch ($action):
             while ($get = _fetch($qry)) {
                 $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
                 $color++;
-                $serverlist .= show($dir . "/serverliste_show", array("clanurl" => re($get['clanurl']),
+                $serverlist .= show($dir . "/serverliste_show", array("clanurl" => h($get['clanurl']),
                     "slots" => $get['slots'],
                     "class" => $class,
                     "serverip" => $get['ip'],
                     "serverport" => $get['port'],
-                    "clanname" => re($get['clanname']),
-                    "serverpwd" => re($get['pwd'])));
+                    "clanname" => h($get['clanname']),
+                    "serverpwd" => h($get['pwd'])));
             }
         } else
             $serverlist = show(_no_entrys_yet, array("colspan" => "4") . $_GET['show']);

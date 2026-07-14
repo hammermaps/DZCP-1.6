@@ -27,6 +27,7 @@ if (defined('_News')) {
     $n_kat = !$kat ? "" : "AND `kat` = '" . $kat . "'";
 
     if (($search = isset($_GET['search']) && !empty($_GET['search']) ? $_GET['search'] : false)) {
+        $search = _real_escape_string($search);
         $qry = db("SELECT `id`,`titel`,`autor`,`datum`,`kat`,`text`
                       FROM `" . $db['news'] . "`
                       WHERE `text` LIKE '%" . $search . "%'
@@ -63,14 +64,14 @@ if (defined('_News')) {
     while ($get = _fetch($qry)) {
         $getk = db("SELECT `kategorie` FROM `" . $db['newskat'] . "` WHERE `id` = '" . $get['kat'] . "';", false, true);
         $comments = cnt($db['newscomments'], " WHERE `news` = " . $get['id'] . "");
-        $titel = show(_news_show_link, array("titel" => cut(re($get['titel']), config('l_newsarchiv'), true, false), "id" => $get['id']));
+        $titel = show(_news_show_link, array("titel" => cut(h($get['titel']), config('l_newsarchiv'), true, false), "id" => $get['id']));
         $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
         $color++;
         $show .= show($dir . "/archiv_show", array("autor" => autor($get['autor']),
             "date" => date("d.m.y", $get['datum']),
             "titel" => $titel,
             "class" => $class,
-            "kat" => re($getk['kategorie']),
+            "kat" => h($getk['kategorie']),
             "comments" => $comments));
     }
 
@@ -121,7 +122,7 @@ if (defined('_News')) {
         "or" => _or,
         "kategorien" => $kategorien,
         "choose" => _news_kat_choose,
-        "search" => re($search),
+        "search" => h($search),
         "btn_search" => _button_value_search,
         "thisyear" => $ty,
         "kat" => _news_admin_kat,

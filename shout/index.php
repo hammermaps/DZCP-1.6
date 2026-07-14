@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $dir = "shout";
@@ -57,7 +54,7 @@ switch ($action):
             exit();
         }
         break;
-    case 'admin';
+    case 'admin':
         if (!permission("shoutbox")) {
             $index = error(_error_wrong_permissions, 1);
         } else {
@@ -69,7 +66,7 @@ switch ($action):
             }
         }
         break;
-    case 'archiv';
+    case 'archiv':
         $where = _site_shoutbox;
         $title = $pagetitle . " - " . $where . "";
 
@@ -83,7 +80,7 @@ switch ($action):
             $is_num = preg_match("#\d#", re($get['email']));
 
             if ($is_num && !check_email(re($get['email']))) $nick = autor(re($get['email']));
-            else $nick = '<a href="mailto:' . re($get['email']) . '" title="' . $get['nick'] . '">' . cut($get['nick'], config('l_shoutnick'), true, false) . '</a>';
+            else $nick = '<a href="mailto:' . h($get['email']) . '" title="' . h($get['nick']) . '">' . cut(h($get['nick']), config('l_shoutnick'), true, false) . '</a>';
 
             $class = ($color % 2) ? "contentMainTop" : "contentMainFirst";
             $color++;
@@ -105,7 +102,7 @@ switch ($action):
                 "del" => $del,
                 "ip" => $posted_ip,
                 "id" => $i,
-                "email" => re($get['email'])));
+                "email" => h($get['email'])));
             $i--;
         }
         $nav = nav($entrys, config('maxshoutarchiv'), "?action=archiv");

@@ -1,29 +1,47 @@
 // GLOBAL VARS
-let doc = document, ie4 = document.all, opera = window.opera;
-let innerLayer, layer, x, y, offsetX = 15, offsetY = 5, tableObj, obj, objWidth, newWidth;
-let tickerc = 0, mTimer = new Array(), tickerTo = new Array(), tickerSpeed = new Array();
-let shoutInterval = 15000; // refresh interval of the shoutbox in ms
-let teamspeakInterval = 15000; // refresh interval of the teamspeak viewer in ms
-let conjobInterval = 60000; // refresh interval of the web-conjob in ms
-let isIE = (navigator.appVersion.indexOf("MSIE") != -1) ? true : false;
-let isOpera = (navigator.userAgent.indexOf("Opera") != -1) ? true : false;
-let map = null, dzcp_config = null,layer_markers = null, membermap = new Array();
+'use strict';
 
-// DZCP JAVASCRIPT LIBARY FOR JQUERY >= V3.X
-let DZCP = {
+const doc = document;
+const ie4 = document.all;
+const opera = window.opera;
+let innerLayer, layer, x, y;
+const offsetX = 15;
+const offsetY = 5;
+let tableObj, obj, objWidth, newWidth;
+let tickerc = 0;
+const mTimer = [];
+const tickerTo = [];
+const tickerSpeed = [];
+const shoutInterval = 15000; // refresh interval of the shoutbox in ms
+const teamspeakInterval = 15000; // refresh interval of the teamspeak viewer in ms
+const conjobInterval = 60000; // refresh interval of the web-conjob in ms
+// Remove IE-specific detection as IE is no longer supported
+const isIE = false; // IE is deprecated and no longer supported
+const isOpera = (navigator.userAgent.indexOf("Opera") !== -1);
+let map = null;
+let dzcp_config = null;
+let layer_markers = null;
+const membermap = [];
+
+// DZCP JAVASCRIPT LIBRARY FOR JQUERY >= V3.X
+const DZCP = {
     //init
     init: function () {
         doc.body.id = 'dzcp-engine-1.6-1-0';
         $('body').append('<div id="infoDiv"></div>');
 
         layer = $('#infoDiv')[0];
-        doc.body.onmousemove = DZCP.trackMouse;
+        doc.body.addEventListener('mousemove', DZCP.trackMouse);
 
-        // refresh shoutbox
-        if ($('#navShout')[0]) window.setInterval("$('#navShout').load('../inc/ajax.php?i=shoutbox');", shoutInterval);
+        // refresh shoutbox - use function reference instead of string
+        if ($('#navShout')[0]) {
+            window.setInterval(() => $('#navShout').load('../inc/ajax.php?i=shoutbox'), shoutInterval);
+        }
 
-        // refresh teamspeak
-        if ($('#navTeamspeakContent')[0]) window.setInterval("$('#navTeamspeakContent').load('../inc/ajax.php?i=teamspeak');", teamspeakInterval);
+        // refresh teamspeak - use function reference instead of string
+        if ($('#navTeamspeakContent')[0]) {
+            window.setInterval(() => $('#navTeamspeakContent').load('../inc/ajax.php?i=teamspeak'), teamspeakInterval);
+        }
 
         // call webconjob
         window.setInterval(function () {

@@ -15,7 +15,7 @@ function motm()
     $member = '';
     if (_rows($qry)) {
         while ($rs = _fetch($qry)) {
-            foreach ($userpics AS $userpic) {
+            foreach ($userpics as $userpic) {
                 $tmpId = (int)($userpic);
                 if ($tmpId == $rs['id']) {
                     $temparr[] = $rs['id'];

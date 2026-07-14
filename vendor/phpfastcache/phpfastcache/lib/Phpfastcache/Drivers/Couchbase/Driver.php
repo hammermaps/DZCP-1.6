@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * This file is part of phpFastCache.
@@ -15,15 +16,18 @@ declare(strict_types=1);
 
 namespace Phpfastcache\Drivers\Couchbase;
 
-use CouchbaseCluster as CouchbaseClient;
-use Phpfastcache\Core\Pool\{
-    DriverBaseTrait, ExtendedCacheItemPoolInterface
-};
+use Couchbase\Exception as CouchbaseException;
+use Couchbase\PasswordAuthenticator;
+use Couchbase\Bucket as CouchbaseBucket;
+use Couchbase\Cluster as CouchbaseClient;
+use DateTime;
+use Phpfastcache\Cluster\AggregatablePoolInterface;
+use Phpfastcache\Core\Pool\{DriverBaseTrait, ExtendedCacheItemPoolInterface};
+use Phpfastcache\Config\ConfigurationOption;
 use Phpfastcache\Entities\DriverStatistic;
-use Phpfastcache\Exceptions\{
-    PhpfastcacheInvalidArgumentException, PhpfastcacheLogicException
-};
+use Phpfastcache\Exceptions\{PhpfastcacheDriverCheckException, PhpfastcacheInvalidArgumentException, PhpfastcacheLogicException};
 use Psr\Cache\CacheItemInterface;
+
 
 /**
  * Class Driver
@@ -32,17 +36,19 @@ use Psr\Cache\CacheItemInterface;
  * @property Config $config Config object
  * @method Config getConfig() Return the config object
  */
-class Driver implements ExtendedCacheItemPoolInterface
+class Driver implements ExtendedCacheItemPoolInterface, AggregatablePoolInterface
 {
-    use DriverBaseTrait;
+    use DriverBaseTrait {
+        __construct as __baseConstruct;
+    }
 
     /**
-     * @var \CouchbaseBucket[]
+     * @var CouchbaseBucket[]
      */
     protected $bucketInstances = [];
 
     /**
-     * @var \CouchbaseBucket
+     * @var CouchbaseBucket
      */
     protected $bucketInstance;
 
@@ -51,12 +57,38 @@ class Driver implements ExtendedCacheItemPoolInterface
      */
     protected $currentBucket = '';
 
+    public function __construct(ConfigurationOption $config, $instanceId)
+    {
+        // @todo Deprecation to enable in v8.1
+        // \trigger_error('Couchbase driver is now deprecated and will be removed in the V9, use Couchbasev3 instead which will support SDK 3.', \E_USER_DEPRECATED);
+        $this->__baseConstruct($config, $instanceId);
+    }
+
     /**
      * @return bool
      */
     public function driverCheck(): bool
     {
-        return \extension_loaded('couchbase');
+        return extension_loaded('couchbase');
+    }
+
+    /**
+     * @return DriverStatistic
+     */
+    public function getStats(): DriverStatistic
+    {
+        $info = $this->getBucket()->manager()->info();
+
+        return (new DriverStatistic())
+            ->setSize($info['basicStats']['diskUsed'])
+            ->setRawData($info)
+            ->setData(implode(', ', array_keys($this->itemInstances)))
+            ->setInfo(
+                'CouchBase version ' . $info['nodes'][0]['version'] . ', Uptime (in days): ' . round(
+                    $info['nodes'][0]['uptime'] / 86400,
+                    1
+                ) . "\n For more information see RawData."
+            );
     }
 
     /**
@@ -65,14 +97,17 @@ class Driver implements ExtendedCacheItemPoolInterface
      */
     protected function driverConnect(): bool
     {
+        if (\class_exists(\Couchbase\ClusterOptions::class)) {
+            throw new PhpfastcacheDriverCheckException('You are using the Couchbase PHP SDK 3.x so please use driver Couchbasev3');
+        }
+
         if ($this->instance instanceof CouchbaseClient) {
             throw new PhpfastcacheLogicException('Already connected to Couchbase server');
         }
 
         $clientConfig = $this->getConfig();
 
-
-        $authenticator = new \Couchbase\PasswordAuthenticator();
+        $authenticator = new PasswordAuthenticator();
         $authenticator->username($clientConfig->getUsername())->password($clientConfig->getPassword());
 
         $this->instance = new CouchbaseClient(
@@ -86,7 +121,15 @@ class Driver implements ExtendedCacheItemPoolInterface
     }
 
     /**
-     * @param \Psr\Cache\CacheItemInterface $item
+     * @param CouchbaseBucket $CouchbaseBucket
+     */
+    protected function setBucket(CouchbaseBucket $CouchbaseBucket)
+    {
+        $this->bucketInstance = $CouchbaseBucket;
+    }
+
+    /**
+     * @param CacheItemInterface $item
      * @return null|array
      */
     protected function driverRead(CacheItemInterface $item)
@@ -95,14 +138,22 @@ class Driver implements ExtendedCacheItemPoolInterface
             /**
              * CouchbaseBucket::get() returns a CouchbaseMetaDoc object
              */
-            return $this->decode($this->getBucket()->get($item->getEncodedKey())->value);
-        } catch (\CouchbaseException $e) {
+            return $this->decodeDocument((array) $this->getBucket()->get($item->getEncodedKey())->value);
+        } catch (CouchbaseException $e) {
             return null;
         }
     }
 
     /**
-     * @param \Psr\Cache\CacheItemInterface $item
+     * @return CouchbaseBucket
+     */
+    protected function getBucket(): CouchbaseBucket
+    {
+        return $this->bucketInstance;
+    }
+
+    /**
+     * @param CacheItemInterface $item
      * @return bool
      * @throws PhpfastcacheInvalidArgumentException
      */
@@ -115,10 +166,10 @@ class Driver implements ExtendedCacheItemPoolInterface
             try {
                 return (bool)$this->getBucket()->upsert(
                     $item->getEncodedKey(),
-                    $this->encode($this->driverPreWrap($item)),
+                    $this->encodeDocument($this->driverPreWrap($item)),
                     ['expiry' => $item->getTtl()]
                 );
-            } catch (\CouchbaseException $e) {
+            } catch (CouchbaseException $e) {
                 return false;
             }
         }
@@ -127,11 +178,11 @@ class Driver implements ExtendedCacheItemPoolInterface
     }
 
     /**
-     * @param \Psr\Cache\CacheItemInterface $item
+     * @param CacheItemInterface $item
      * @return bool
      * @throws PhpfastcacheInvalidArgumentException
      */
-    protected function driverDelete(CacheItemInterface $item)
+    protected function driverDelete(CacheItemInterface $item): bool
     {
         /**
          * Check for Cross-Driver type confusion
@@ -139,7 +190,7 @@ class Driver implements ExtendedCacheItemPoolInterface
         if ($item instanceof Item) {
             try {
                 return (bool)$this->getBucket()->remove($item->getEncodedKey());
-            } catch (\Couchbase\Exception $e) {
+            } catch (Exception $e) {
                 return $e->getCode() === COUCHBASE_KEY_ENOENT;
             }
         }
@@ -148,30 +199,48 @@ class Driver implements ExtendedCacheItemPoolInterface
     }
 
     /**
-     * @return bool
+     * @param array $data
+     * @return array
      */
-    protected function driverClear(): bool
+    protected function encodeDocument(array $data): array
     {
-        $this->getBucket()->manager()->flush();
-        return true;
+        $data[ExtendedCacheItemPoolInterface::DRIVER_DATA_WRAPPER_INDEX] = $this->encode($data[ExtendedCacheItemPoolInterface::DRIVER_DATA_WRAPPER_INDEX]);
+        $data[ExtendedCacheItemPoolInterface::DRIVER_EDATE_WRAPPER_INDEX] = $data[ExtendedCacheItemPoolInterface::DRIVER_EDATE_WRAPPER_INDEX]->format(\DateTime::ATOM);
+
+        if($this->getConfig()->isItemDetailedDate()){
+            $data[ExtendedCacheItemPoolInterface::DRIVER_CDATE_WRAPPER_INDEX] = $data[ExtendedCacheItemPoolInterface::DRIVER_CDATE_WRAPPER_INDEX]->format(\DateTime::ATOM);
+            $data[ExtendedCacheItemPoolInterface::DRIVER_MDATE_WRAPPER_INDEX] = $data[ExtendedCacheItemPoolInterface::DRIVER_MDATE_WRAPPER_INDEX]->format(\DateTime::ATOM);
+        }
+
+        return $data;
     }
 
     /**
-     * @return \CouchbaseBucket
+     * @param array $data
+     * @return array
      */
-    protected function getBucket(): \CouchbaseBucket
+    protected function decodeDocument(array $data): array
     {
-        return $this->bucketInstance;
-    }
+        $data[ExtendedCacheItemPoolInterface::DRIVER_DATA_WRAPPER_INDEX] = $this->decode($data[ExtendedCacheItemPoolInterface::DRIVER_DATA_WRAPPER_INDEX]);
+        $data[ExtendedCacheItemPoolInterface::DRIVER_EDATE_WRAPPER_INDEX] = \DateTime::createFromFormat(
+            \DateTime::ATOM,
+            $data[ExtendedCacheItemPoolInterface::DRIVER_EDATE_WRAPPER_INDEX]
+        );
 
-    /**
-     * @param \CouchbaseBucket $CouchbaseBucket
-     */
-    protected function setBucket(\CouchbaseBucket $CouchbaseBucket)
-    {
-        $this->bucketInstance = $CouchbaseBucket;
-    }
+        if($this->getConfig()->isItemDetailedDate()){
+            $data[ExtendedCacheItemPoolInterface::DRIVER_CDATE_WRAPPER_INDEX] = \DateTime::createFromFormat(
+                \DateTime::ATOM,
+                $data[ExtendedCacheItemPoolInterface::DRIVER_CDATE_WRAPPER_INDEX]
+            );
 
+            $data[ExtendedCacheItemPoolInterface::DRIVER_MDATE_WRAPPER_INDEX] = \DateTime::createFromFormat(
+                \DateTime::ATOM,
+                $data[ExtendedCacheItemPoolInterface::DRIVER_MDATE_WRAPPER_INDEX]
+            );
+        }
+
+        return $data;
+    }
     /********************
      *
      * PSR-6 Extended Methods
@@ -179,17 +248,11 @@ class Driver implements ExtendedCacheItemPoolInterface
      *******************/
 
     /**
-     * @return DriverStatistic
+     * @return bool
      */
-    public function getStats(): DriverStatistic
+    protected function driverClear(): bool
     {
-        $info = $this->getBucket()->manager()->info();
-
-        return (new DriverStatistic())
-            ->setSize($info['basicStats']['diskUsed'])
-            ->setRawData($info)
-            ->setData(\implode(', ', \array_keys($this->itemInstances)))
-            ->setInfo('CouchBase version ' . $info['nodes'][0]['version'] . ', Uptime (in days): ' . round($info['nodes'][0]['uptime'] / 86400,
-                    1) . "\n For more information see RawData.");
+        $this->getBucket()->manager()->flush();
+        return true;
     }
 }

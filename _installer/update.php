@@ -8,6 +8,39 @@
 if (version_compare(PHP_VERSION, '7.0', '>=') === false)
     die('DZCP required PHP 7.0 or newer!<p> Found PHP ' . PHP_VERSION);
 
+/**
+ * Gibt GUMP-Fehlermeldungen als HTML-Fehler-Tabelle zurück.
+ */
+function updater_validation_errors(array $errors): string {
+    $html = '<table width="100%" cellpadding="1" cellspacing="1" class="error">
+        <tr><td class="error_text"><b>Fehler:</b></td></tr>';
+    foreach ($errors as $error) {
+        $html .= '<tr><td class="error_text">' . htmlspecialchars($error) . '</td></tr>';
+    }
+    $html .= '</table>';
+    return $html;
+}
+
+/**
+ * Validiert Eingaben per GUMP und gibt bei Fehlern HTML zurück oder null bei Erfolg.
+ */
+function updater_validate(array $data, array $rules, array $filters = [], array $fieldNames = []): ?string {
+    $gump = new \GUMP('de');
+    if (!empty($fieldNames)) {
+        \GUMP::set_field_names($fieldNames);
+    }
+    if (!empty($filters)) {
+        $data = $gump->filter($data, $filters);
+    }
+    $gump->validation_rules($rules);
+    $result = $gump->run($data);
+    if ($result === false) {
+        $errors = $gump->get_errors_array();
+        return updater_validation_errors(array_values($errors));
+    }
+    return null;
+}
+
 ob_start();
 session_start();
 define('basePath', dirname(dirname(__FILE__) . '../'));
@@ -15,6 +48,9 @@ $action = isset($_GET['action']) ? $_GET['action'] : '';
 $do = isset($_GET['do']) ? $_GET['do'] : '';
 $installer = true;
 $updater = true;
+
+## INCLUDES ##
+include(basePath . '/vendor/autoload.php');
 
 require_once(basePath . '/inc/_version.php');
 require_once(basePath . "/inc/debugger.php");
@@ -46,9 +82,27 @@ switch ($action):
 
         include(basePath . '/_installer/html/welcome_u.php');
         break;
-    case 'prepare';
+    case 'prepare':
         if ($do == "set_chmods" && $_POST['check'] != "dont") {
-            if (function_exists('ftp_connect') && function_exists('ftp_login') && function_exists('ftp_site')) {
+            // GUMP-Validierung FTP-Daten
+            $ftpError = updater_validate($_POST, [
+                'host' => 'required',
+                'user' => 'required',
+                'pwd'  => 'required',
+                'pfad' => 'required',
+            ], [
+                'host' => 'trim|sanitize_string',
+                'user' => 'trim|sanitize_string',
+                'pfad' => 'trim|sanitize_string',
+            ], [
+                'host' => 'FTP-Host',
+                'user' => 'FTP-Benutzer',
+                'pwd'  => 'FTP-Passwort',
+                'pfad' => 'FTP-Pfad',
+            ]);
+            if ($ftpError !== null) {
+                echo $ftpError;
+            } elseif (function_exists('ftp_connect') && function_exists('ftp_login') && function_exists('ftp_site')) {
                 $host = $_POST['host'];
                 $user = $_POST['user'];
                 $pwd = $_POST['pwd'];
@@ -207,7 +261,7 @@ switch ($action):
           </table>';
         }
         break;
-    case 'autoupdate';
+    case 'autoupdate':
         if (isset($_GET['agb']) && $_GET['agb']) {
             header("Location: update.php?agb=false");
         } else {
@@ -229,7 +283,7 @@ switch ($action):
             include(basePath . '/_installer/html/autoupdate.php');
         }
         break;
-    case 'require';
+    case 'require':
         if (isset($_GET['agb']) && $_GET['agb']) {
             header("Location: update.php?agb=false");
         } else {
@@ -283,9 +337,24 @@ switch ($action):
           </table>';
         }
         break;
-    case 'database';
+    case 'database':
         if ($do == "update") {
-            if ($mysql) {
+            // GUMP-Validierung: version-Feld muss vorhanden und ein erlaubter Wert sein
+            $validVersions = ['ab 1.5.4 bis 1.5.5.4', '1.6.0.x', '1.6.0.4', '1.6.1,x'];
+            $versionError = updater_validate($_POST, [
+                'version' => 'required',
+            ], [
+                'version' => 'trim|sanitize_string',
+            ], [
+                'version' => 'Update-Version',
+            ]);
+            if ($versionError !== null) {
+                echo $versionError;
+                include basePath . '/_installer/html/update.php';
+            } elseif (!in_array($_POST['version'], $validVersions, true)) {
+                echo updater_validation_errors(['Ungültige Update-Version ausgewählt.']);
+                include basePath . '/_installer/html/update.php';
+            } elseif ($mysql) {
                 if ($_POST['version'] != "1.6.0.x") {
                     //Clanwar Screenshots verschieben
                     $files = get_files('../inc/images/clanwars');
@@ -326,11 +395,16 @@ switch ($action):
                     update_mysql_1_6();
                     update_mysql_1_6_0_4();
                     update_mysql_1_6_1_0();
+                    update_mysql_1_6_1_2();
                 } elseif ($_POST['version'] == "1.6.0.x") {
                     update_mysql_1_6_0_4();
                     update_mysql_1_6_1_0();
+                    update_mysql_1_6_1_2();
                 } elseif ($_POST['version'] == "1.6.0.4") {
                     update_mysql_1_6_1_0();
+                    update_mysql_1_6_1_2();
+                } elseif ($_POST['version'] == "1.6.1.x") {
+                    update_mysql_1_6_1_2();
                 }
 
                 header("Location: update.php?action=done");
@@ -350,7 +424,7 @@ switch ($action):
             include basePath . '/_installer/html/update.php';
         }
         break;
-    case 'done';
+    case 'done':
         include basePath . '/_installer/html/done_u.php';
         break;
 endswitch;

@@ -36,7 +36,7 @@ if (defined('_News')) {
 
         $onoff = "";
         $avatar = "";
-        $nick = show(_link_mailto, array("nick" => re($get_nick), "email" => $get_email));
+        $nick = show(_link_mailto, array("nick" => htmlspecialchars($get_nick, ENT_QUOTES, 'UTF-8'), "email" => $get_email));
     } else {
         $onoff = onlinecheck((int)$get_userid);
         $nick = cleanautor((int)$get_userid);

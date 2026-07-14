@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $where = _site_clankasse;
@@ -47,15 +44,15 @@ switch ($action):
                 $show .= show($dir . "/clankasse_show", array("betrag" => $pm,
                     "id" => $get['id'],
                     "class" => $class,
-                    "for" => re($get['member']),
-                    "transaktion" => re($get['transaktion']),
+                    "for" => h($get['member']),
+                    "transaktion" => h($get['transaktion']),
                     "delete" => $delete,
                     "edit" => $edit,
                     "datum" => date("d.m.Y", $get['datum'])));
             }
 
-            $getp = sum($db['clankasse'], ' WHERE `pm` = 0', 'betrag');
-            $getc = sum($db['clankasse'], ' WHERE `pm` = 1', 'betrag');
+            $getp = sum($db['clankasse'], 'betrag', ' WHERE `pm` = 0');
+            $getc = sum($db['clankasse'], 'betrag', ' WHERE `pm` = 1');
             $ges = $getp - $getc;
             $ges = @round($ges, 2);
             $ges = str_replace(".", ",", $ges);
@@ -134,7 +131,7 @@ switch ($action):
                 $qry = db("SELECT `kat` FROM `" . $db['c_kats'] . "`;");
                 $trans = '';
                 while ($get = _fetch($qry)) {
-                    $trans .= show(_select_field, array("value" => re($get['kat']), "sel" => "", "what" => re($get['kat'])));
+                    $trans .= show(_select_field, array("value" => h($get['kat']), "sel" => "", "what" => h($get['kat'])));
                 }
 
                 $dropdown_date = show(_dropdown_date, array("day" => dropdown("day", date("d", time())),
@@ -209,9 +206,9 @@ switch ($action):
                 $trans = '';
                 while ($getk = _fetch($qryk)) {
                     $sel = ($getk['kat'] == $get['transaktion'] ? 'selected="selected"' : '');
-                    $trans .= show(_select_field, array("value" => re($getk['kat']),
+                    $trans .= show(_select_field, array("value" => h($getk['kat']),
                         "sel" => $sel,
-                        "what" => re($getk['kat'])));
+                        "what" => h($getk['kat'])));
                 }
 
                 $index = show($dir . "/edit", array("newhead" => _clankasse_head_edit,
@@ -225,8 +222,8 @@ switch ($action):
                     "value" => _button_value_edit,
                     "trans" => $trans,
                     "w" => settings("k_waehrung"),
-                    "evonan" => re($get['member']),
-                    "sum" => re($get['betrag']),
+                    "evonan" => h($get['member']),
+                    "sum" => h($get['betrag']),
                     "einzahlung" => _clankasse_einzahlung,
                     "auszahlung" => _clankasse_auszahlung,
                     "sonstiges" => _clankasse_sonstiges,

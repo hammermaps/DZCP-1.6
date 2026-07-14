@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * This file is part of phpFastCache.
@@ -15,17 +16,13 @@ declare(strict_types=1);
 
 namespace Phpfastcache\Drivers\Couchdb;
 
-use Doctrine\CouchDB\{
-    CouchDBClient, CouchDBException
-};
-use Phpfastcache\Core\Pool\{
-    DriverBaseTrait, ExtendedCacheItemPoolInterface
-};
+use Doctrine\CouchDB\{CouchDBClient, CouchDBException, HTTP\HTTPException};
+use Phpfastcache\Cluster\AggregatablePoolInterface;
+use Phpfastcache\Core\Pool\{DriverBaseTrait, ExtendedCacheItemPoolInterface};
 use Phpfastcache\Entities\DriverStatistic;
-use Phpfastcache\Exceptions\{
-    PhpfastcacheDriverException, PhpfastcacheInvalidArgumentException, PhpfastcacheLogicException
-};
+use Phpfastcache\Exceptions\{PhpfastcacheDriverException, PhpfastcacheInvalidArgumentException, PhpfastcacheLogicException};
 use Psr\Cache\CacheItemInterface;
+
 
 /**
  * Class Driver
@@ -34,9 +31,9 @@ use Psr\Cache\CacheItemInterface;
  * @property Config $config Config object
  * @method Config getConfig() Return the config object
  */
-class Driver implements ExtendedCacheItemPoolInterface
+class Driver implements ExtendedCacheItemPoolInterface, AggregatablePoolInterface
 {
-    const COUCHDB_DEFAULT_DB_NAME = 'phpfastcache';
+    public const COUCHDB_DEFAULT_DB_NAME = 'phpfastcache'; // Public because used in config
 
     use DriverBaseTrait;
 
@@ -45,7 +42,34 @@ class Driver implements ExtendedCacheItemPoolInterface
      */
     public function driverCheck(): bool
     {
-        return \class_exists(CouchDBClient::class);
+        return class_exists(CouchDBClient::class);
+    }
+
+    /**
+     * @return string
+     */
+    public function getHelp(): string
+    {
+        return <<<HELP
+<p>
+To install the Couchdb HTTP client library via Composer:
+<code>composer require "doctrine/couchdb" "@dev"</code>
+</p>
+HELP;
+    }
+
+    /**
+     * @return DriverStatistic
+     */
+    public function getStats(): DriverStatistic
+    {
+        $info = $this->instance->getDatabaseInfo();
+
+        return (new DriverStatistic())
+            ->setSize($info['sizes']['active'] ?? 0)
+            ->setRawData($info)
+            ->setData(implode(', ', array_keys($this->itemInstances)))
+            ->setInfo('Couchdb version ' . $this->instance->getVersion() . "\n For more information see RawData.");
     }
 
     /**
@@ -70,13 +94,15 @@ class Driver implements ExtendedCacheItemPoolInterface
         }
         $url .= $clientConfig->getHost();
         $url .= ":{$clientConfig->getPort()}";
-        $url .= $clientConfig->getPath();
+        $url .= '/' . \urlencode($this->getDatabaseName());
 
-        $this->instance = CouchDBClient::create([
-            'dbname' => $this->getDatabaseName(),
-            'url' => $url,
-            'timeout' => $clientConfig->getTimeout(),
-        ]);
+        $this->instance = CouchDBClient::create(
+            [
+                'dbname' => $this->getDatabaseName(),
+                'url' => $url,
+                'timeout' => $clientConfig->getTimeout(),
+            ]
+        );
 
         $this->createDatabase();
 
@@ -84,32 +110,56 @@ class Driver implements ExtendedCacheItemPoolInterface
     }
 
     /**
-     * @param \Psr\Cache\CacheItemInterface $item
+     * @return string
+     */
+    protected function getDatabaseName(): string
+    {
+        return $this->getConfig()->getDatabase() ?: self::COUCHDB_DEFAULT_DB_NAME;
+    }
+
+    /**
+     * @return void
+     */
+    protected function createDatabase()
+    {
+        try{
+            $this->instance->getDatabaseInfo($this->getDatabaseName());
+        } catch(HTTPException $e){
+            $this->instance->createDatabase($this->getDatabaseName());
+        }
+    }
+
+    protected function getCouchDbItemKey(CacheItemInterface $item)
+    {
+        return 'pfc_' . $item->getEncodedKey();
+    }
+
+    /**
+     * @param CacheItemInterface $item
      * @return null|array
      * @throws PhpfastcacheDriverException
      */
     protected function driverRead(CacheItemInterface $item)
     {
         try {
-            $response = $this->instance->findDocument($item->getEncodedKey());
+            $response = $this->instance->findDocument($this->getCouchDbItemKey($item));
         } catch (CouchDBException $e) {
-            throw new PhpfastcacheDriverException('Got error while trying to get a document: ' . $e->getMessage(), null, $e);
+            throw new PhpfastcacheDriverException('Got error while trying to get a document: ' . $e->getMessage(), 0, $e);
         }
 
-        if ($response->status === 404 || empty($response->body['data'])) {
+        if ($response->status === 404 || empty($response->body[ExtendedCacheItemPoolInterface::DRIVER_DATA_WRAPPER_INDEX])) {
             return null;
         }
 
         if ($response->status === 200) {
-            return $this->decode($response->body['data']);
+            return $this->decode($response->body);
         }
 
         throw new PhpfastcacheDriverException('Got unexpected HTTP status: ' . $response->status);
     }
 
-
     /**
-     * @param \Psr\Cache\CacheItemInterface $item
+     * @param CacheItemInterface $item
      * @return bool
      * @throws PhpfastcacheDriverException
      * @throws PhpfastcacheInvalidArgumentException
@@ -121,10 +171,13 @@ class Driver implements ExtendedCacheItemPoolInterface
          */
         if ($item instanceof Item) {
             try {
-                $this->instance->putDocument(['data' => $this->encode($this->driverPreWrap($item))], $item->getEncodedKey(),
-                    $this->getLatestDocumentRevision($item->getEncodedKey()));
+                $this->instance->putDocument(
+                    $this->encodeDocument($this->driverPreWrap($item)),
+                    $this->getCouchDbItemKey($item),
+                    $this->getLatestDocumentRevision($this->getCouchDbItemKey($item))
+                );
             } catch (CouchDBException $e) {
-                throw new PhpfastcacheDriverException('Got error while trying to upsert a document: ' . $e->getMessage(), null, $e);
+                throw new PhpfastcacheDriverException('Got error while trying to upsert a document: ' . $e->getMessage(), 0, $e);
             }
             return true;
         }
@@ -133,7 +186,33 @@ class Driver implements ExtendedCacheItemPoolInterface
     }
 
     /**
-     * @param \Psr\Cache\CacheItemInterface $item
+     * @return string|null
+     */
+    protected function getLatestDocumentRevision($docId)
+    {
+        $path = '/' . \urlencode($this->getDatabaseName()) . '/' . urlencode($docId);
+
+        $response = $this->instance->getHttpClient()->request(
+            'HEAD',
+            $path,
+            null,
+            false
+        );
+        if (!empty($response->headers['etag'])) {
+            return trim($response->headers['etag'], " '\"\t\n\r\0\x0B");
+        }
+
+        return null;
+    }
+
+    /********************
+     *
+     * PSR-6 Extended Methods
+     *
+     *******************/
+
+    /**
+     * @param CacheItemInterface $item
      * @return bool
      * @throws PhpfastcacheDriverException
      * @throws PhpfastcacheInvalidArgumentException
@@ -145,9 +224,9 @@ class Driver implements ExtendedCacheItemPoolInterface
          */
         if ($item instanceof Item) {
             try {
-                $this->instance->deleteDocument($item->getEncodedKey(), $this->getLatestDocumentRevision($item->getEncodedKey()));
+                $this->instance->deleteDocument($this->getCouchDbItemKey($item), $this->getLatestDocumentRevision($this->getCouchDbItemKey($item)));
             } catch (CouchDBException $e) {
-                throw new PhpfastcacheDriverException('Got error while trying to delete a document: ' . $e->getMessage(), null, $e);
+                throw new PhpfastcacheDriverException('Got error while trying to delete a document: ' . $e->getMessage(), 0, $e);
             }
             return true;
         }
@@ -165,80 +244,55 @@ class Driver implements ExtendedCacheItemPoolInterface
             $this->instance->deleteDatabase($this->getDatabaseName());
             $this->createDatabase();
         } catch (CouchDBException $e) {
-            throw new PhpfastcacheDriverException('Got error while trying to delete and recreate the database: ' . $e->getMessage(), null, $e);
+            throw new PhpfastcacheDriverException('Got error while trying to delete and recreate the database: ' . $e->getMessage(), 0, $e);
         }
 
         return true;
     }
 
     /**
-     * @return string|null
+     * @param array $data
+     * @return array
      */
-    protected function getLatestDocumentRevision($docId)
+    protected function encodeDocument(array $data): array
     {
-        $path = '/' . $this->getDatabaseName() . '/' . urlencode($docId);
+        $data[ExtendedCacheItemPoolInterface::DRIVER_DATA_WRAPPER_INDEX] = $this->encode($data[ExtendedCacheItemPoolInterface::DRIVER_DATA_WRAPPER_INDEX]);
 
-        $response = $this->instance->getHttpClient()->request(
-            'HEAD',
-            $path,
-            null,
-            false
+        return $data;
+    }
+
+    /**
+     * Specific document decoder for Couchdb
+     * since we dont store encoded version
+     * for performance purposes
+     *
+     * @param $value
+     * @return mixed
+     * @throws \Exception
+     */
+    protected function decode($value)
+    {
+        $value[ExtendedCacheItemPoolInterface::DRIVER_DATA_WRAPPER_INDEX] = \unserialize($value[ExtendedCacheItemPoolInterface::DRIVER_DATA_WRAPPER_INDEX], ['allowed_classes' => true]);
+
+        $value[ExtendedCacheItemPoolInterface::DRIVER_EDATE_WRAPPER_INDEX] = new \DateTime(
+            $value[ExtendedCacheItemPoolInterface::DRIVER_EDATE_WRAPPER_INDEX]['date'],
+            new \DateTimeZone($value[ExtendedCacheItemPoolInterface::DRIVER_EDATE_WRAPPER_INDEX]['timezone'])
         );
-        if (!empty($response->headers['etag'])) {
-            return \trim($response->headers['etag'], " '\"\t\n\r\0\x0B");
+
+        if(isset($value[ExtendedCacheItemPoolInterface::DRIVER_CDATE_WRAPPER_INDEX])){
+            $value[ExtendedCacheItemPoolInterface::DRIVER_CDATE_WRAPPER_INDEX] = new \DateTime(
+                $value[ExtendedCacheItemPoolInterface::DRIVER_CDATE_WRAPPER_INDEX]['date'],
+                new \DateTimeZone($value[ExtendedCacheItemPoolInterface::DRIVER_CDATE_WRAPPER_INDEX]['timezone'])
+            );
         }
 
-        return null;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getDatabaseName(): string
-    {
-        return $this->getConfig()->getDatabase() ?: self::COUCHDB_DEFAULT_DB_NAME;
-    }
-
-    /**
-     * @return void
-     */
-    protected function createDatabase()
-    {
-        if (!\in_array($this->instance->getDatabase(), $this->instance->getAllDatabases(), true)) {
-            $this->instance->createDatabase($this->instance->getDatabase());
+        if(isset($value[ExtendedCacheItemPoolInterface::DRIVER_MDATE_WRAPPER_INDEX])){
+            $value[ExtendedCacheItemPoolInterface::DRIVER_MDATE_WRAPPER_INDEX] = new \DateTime(
+                $value[ExtendedCacheItemPoolInterface::DRIVER_MDATE_WRAPPER_INDEX]['date'],
+                new \DateTimeZone($value[ExtendedCacheItemPoolInterface::DRIVER_MDATE_WRAPPER_INDEX]['timezone'])
+            );
         }
-    }
 
-    /********************
-     *
-     * PSR-6 Extended Methods
-     *
-     *******************/
-
-    /**
-     * @return string
-     */
-    public function getHelp(): string
-    {
-        return <<<HELP
-<p>
-To install the Couchdb HTTP client library via Composer:
-<code>composer require "doctrine/couchdb" "@dev"</code>
-</p>
-HELP;
-    }
-
-    /**
-     * @return DriverStatistic
-     */
-    public function getStats(): DriverStatistic
-    {
-        $info = $this->instance->getDatabaseInfo();
-
-        return (new DriverStatistic())
-            ->setSize($info['sizes']['active'])
-            ->setRawData($info)
-            ->setData(\implode(', ', \array_keys($this->itemInstances)))
-            ->setInfo('Couchdb version ' . $this->instance->getVersion() . "\n For more information see RawData.");
+        return $value;
     }
 }

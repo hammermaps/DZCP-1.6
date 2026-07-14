@@ -38,7 +38,7 @@ if (defined('_UserMenu')) {
                 }
 
                 $index = show($dir . "/msg_show", array("answermsg" => $answermsg,
-                    "titel" => re($get['titel']),
+                    "titel" => h($get['titel']),
                     "nachricht" => bbcode(re($get['nachricht'])),
                     "answer" => $answer,
                     "sendnews" => $sendnews,
@@ -66,7 +66,7 @@ if (defined('_UserMenu')) {
                 $answer = _back;
 
                 $index = show($dir . "/msg_show", array("answermsg" => $answermsg,
-                    "titel" => re($get['titel']),
+                    "titel" => h($get['titel']),
                     "nachricht" => bbcode(re($get['nachricht'])),
                     "answer" => $answer,
                     "sendnews" => "",
@@ -78,8 +78,8 @@ if (defined('_UserMenu')) {
             $get = _fetch($qry);
 
             if ($get['von'] == $userid || $get['an'] == $userid) {
-                if (preg_match("#RE:#is", re($get['titel']))) $titel = re($get['titel']);
-                else $titel = "RE: " . re($get['titel']);
+                if (preg_match("#RE:#is", re($get['titel']))) $titel = h($get['titel']);
+                else $titel = "RE: " . h($get['titel']);
 
                 $index = show($dir . "/answer", array("von" => $userid,
                     "an" => $get['von'],
@@ -98,7 +98,7 @@ if (defined('_UserMenu')) {
             elseif ($_GET['id'] == $userid) $index = error(_error_msg_self, 1);
             else {
 
-                $titel = show(_msg_from_nick, array("nick" => re(data("nick"))));
+                $titel = show(_msg_from_nick, array("nick" => h(data("nick"))));
 
                 $index = show($dir . "/answer", array("von" => $userid,
                     "an" => $_GET['id'],
@@ -128,13 +128,13 @@ if (defined('_UserMenu')) {
 
                 $qry = db("UPDATE " . $db['userstats'] . "
                            SET `writtenmsg` = writtenmsg+1
-                           WHERE user = " . $userid);
+                           WHERE user = " . (int)$userid);
 
                 $index = info(_msg_answer_done, "?action=msg");
             }
         } elseif ($do == "delete") {
             $qry = db("SELECT * FROM " . $db['msg'] . "
-                 WHERE an = '" . $userid . "'
+                 WHERE an = '" . (int)$userid . "'
                  AND see_u = 0");
             while ($get = _fetch($qry)) {
                 if (isset($_POST['pe' . $get['id']])) {
@@ -167,7 +167,7 @@ if (defined('_UserMenu')) {
             $index = info(_msg_deleted, "?action=msg");
         } elseif ($do == "deletesended") {
             $qry = db("SELECT * FROM " . $db['msg'] . "
-                 WHERE von = '" . $userid . "'
+                 WHERE von = '" . (int)$userid . "'
                  AND see = 1");
             while ($get = _fetch($qry)) {
                 if (isset($_POST['pa' . $get['id']])) {
@@ -185,7 +185,7 @@ if (defined('_UserMenu')) {
             header("Location: ?action=msg");
         } elseif ($do == "new") {
             $users = "";
-            $qry = db("SELECT `id`,`nick` FROM `" . $db['users'] . "` WHERE `id` != " . $userid . " ORDER BY `nick`;");
+            $qry = db("SELECT `id`,`nick` FROM `" . $db['users'] . "` WHERE `id` != " . (int)$userid . " ORDER BY `nick`;");
             while ($get = _fetch($qry)) {
                 $users .= show(_to_users, array(
                     "id" => $get['id'],
@@ -194,7 +194,7 @@ if (defined('_UserMenu')) {
             }
 
             $buddys = "";
-            $qry = db("SELECT `id`,`user`,`buddy` FROM `" . $db['buddys'] . "` WHERE `user` = " . $userid . " ORDER BY `user`;");
+            $qry = db("SELECT `id`,`user`,`buddy` FROM `" . $db['buddys'] . "` WHERE `user` = " . (int)$userid . " ORDER BY `user`;");
             while ($get = _fetch($qry)) {
                 $buddys .= show(_to_buddys, array(
                     "id" => $get['buddy'],
@@ -221,14 +221,14 @@ if (defined('_UserMenu')) {
                 && $_POST['users'] != "-" || $_POST['users'] == $userid || $_POST['buddys'] == $userid) {
                 if (empty($_POST['titel'])) $error = _empty_titel;
                 elseif (empty($_POST['eintrag'])) $error = _empty_eintrag;
-                elseif ($_POST['buddys'] == "-" AND $_POST['users'] == "-") $error = _empty_to;
-                elseif ($_POST['buddys'] != "-" AND $_POST['users'] != "-") $error = _msg_to_just_1;
-                elseif ($_POST['buddys'] OR $_POST['users'] == $userid) $error = _msg_not_to_me;
+                elseif ($_POST['buddys'] == "-" and $_POST['users'] == "-") $error = _empty_to;
+                elseif ($_POST['buddys'] != "-" and $_POST['users'] != "-") $error = _msg_to_just_1;
+                elseif ($_POST['buddys'] or $_POST['users'] == $userid) $error = _msg_not_to_me;
 
                 $error = show("errors/errortable", array("error" => $error));
 
                 $qry = db("SELECT id FROM " . $db['users'] . "
-                   WHERE id != '" . $userid . "'
+                   WHERE id != '" . (int)$userid . "'
                    ORDER BY nick");
                 while ($get = _fetch($qry)) {
                     if ($get['id'] == $_POST['users']) $selected = 'selected="selected"';
@@ -240,7 +240,7 @@ if (defined('_UserMenu')) {
                 }
 
                 $qry = db("SELECT id,user,buddy FROM " . $db['buddys'] . "
-                                 WHERE user = " . $userid);
+                                 WHERE user = " . (int)$userid);
                 while ($get = _fetch($qry)) {
                     if ($get['buddy'] == $_POST['buddys']) $selected = 'selected="selected"';
                     else $selected = "";
@@ -253,7 +253,7 @@ if (defined('_UserMenu')) {
                 $index = show($dir . "/new", array("von" => $userid,
                     "an" => _to,
                     "or" => _or,
-                    "posttitel" => re($_POST['titel']),
+                    "posttitel" => htmlspecialchars($_POST['titel'], ENT_QUOTES, 'UTF-8'),
                     "posteintrag" => re_bbcode(re($_POST['eintrag'], true)),
                     "postto" => $_POST['buddys'] . "" . $_POST['users'],
                     "buddys" => $buddys,
@@ -279,13 +279,13 @@ if (defined('_UserMenu')) {
 
                 $qry = db("UPDATE " . $db['userstats'] . "
                                  SET `writtenmsg` = writtenmsg+1
-                                 WHERE user = " . $userid);
+                                 WHERE user = " . (int)$userid);
 
                 $index = info(_msg_answer_done, "?action=msg");
             }
         } else {
             $qry = db("SELECT * FROM " . $db['msg'] . "
-                               WHERE an = " . $userid . "
+                               WHERE an = " . (int)$userid . "
                  AND see_u = '0'
                                ORDER BY datum DESC");
             $posteingang = '';
@@ -294,7 +294,7 @@ if (defined('_UserMenu')) {
                     if ($get['von'] == 0) $absender = _msg_bot;
                     else $absender = autor($get['von']);
 
-                    $titel = show(_msg_in_title, array("titel" => re($get['titel'])));
+                    $titel = show(_msg_in_title, array("titel" => h($get['titel'])));
 
                     $delete = _delete;
                     $date = date("d.m.Y H:i", $get['datum']) . _uhr;
@@ -324,12 +324,12 @@ if (defined('_UserMenu')) {
             }
 
             $qry = db("SELECT * FROM " . $db['msg'] . "
-                               WHERE von = " . $userid . "
+                               WHERE von = " . (int)$userid . "
                                AND see = 1
                                ORDER BY datum DESC");
             $postausgang = '';
             while ($get = _fetch($qry)) {
-                $titel = show(_msg_out_title, array("titel" => re($get['titel'])));
+                $titel = show(_msg_out_title, array("titel" => h($get['titel'])));
                 $delete = _msg_delete_sended;
                 $date = date("d.m.Y H:i", $get['datum']) . _uhr;
 

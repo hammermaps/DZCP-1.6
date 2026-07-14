@@ -15,14 +15,14 @@ if ($do == "add") {
     while ($get = _fetch($qry)) {
         if ($thiskat != $get['kat']) {
             $position .= '
-              <option class="dropdownKat" value="lazy">' . re($get['katname']) . '</option>
-              <option value="' . re($get['placeholder']) . '-1">-> ' . _admin_first . '</option>
+              <option class="dropdownKat" value="lazy">' . h($get['katname']) . '</option>
+              <option value="' . h($get['placeholder']) . '-1">-> ' . _admin_first . '</option>
             ';
         }
         $thiskat = $get['kat'];
         $sel = ($get['editor'] == $_GET['id']) ? 'selected="selected"' : '';
 
-        $position .= empty($get['name']) ? '' : '<option value="' . re($get['placeholder']) . '-' . ($get['pos'] + 1) . '" ' . $sel . '>' . _nach . ' -> ' . navi_name(re($get['name'])) . '</option>';
+        $position .= empty($get['name']) ? '' : '<option value="' . h($get['placeholder']) . '-' . ($get['pos'] + 1) . '" ' . $sel . '>' . _nach . ' -> ' . navi_name(h($get['name'])) . '</option>';
     }
 
     $show = show($dir . "/form_editor", array("head" => _editor_add_head,
@@ -63,15 +63,15 @@ if ($do == "add") {
         while ($get = _fetch($qry)) {
             if ($thiskat != $get['kat']) {
                 $position .= '
-                <option class="dropdownKat" value="lazy">' . re($get['katname']) . '</option>
-                <option value="' . re($get['placeholder']) . '-1">-> ' . _admin_first . '</option>
+                <option class="dropdownKat" value="lazy">' . h($get['katname']) . '</option>
+                <option value="' . h($get['placeholder']) . '-1">-> ' . _admin_first . '</option>
               ';
             }
 
             $thiskat = $get['kat'];
             $sel = ($get['kat'] == $kat_ && ($get['pos'] + 1) == $pos_) ? 'selected="selected"' : '';
 
-            $position .= empty($get['name']) ? '' : '<option value="' . re($get['placeholder']) . '-' . ($get['pos'] + 1) . '" ' . $sel . '>' . _nach . ' -> ' . navi_name(re($get['name'])) . '</option>';
+            $position .= empty($get['name']) ? '' : '<option value="' . h($get['placeholder']) . '-' . ($get['pos'] + 1) . '" ' . $sel . '>' . _nach . ' -> ' . navi_name(h($get['name'])) . '</option>';
         }
 
         $show = show($dir . "/form_editor", array("head" => _editor_add_head,
@@ -85,10 +85,10 @@ if ($do == "add") {
             "nein" => _no,
             "name" => _editor_linkname,
             "position" => $position,
-            "n_name" => re($_POST['name']),
+            "n_name" => htmlspecialchars($_POST['name'], ENT_QUOTES, 'UTF-8'),
             "wichtig" => _navi_wichtig,
             "titel" => _titel,
-            "e_titel" => re($_POST['titel']),
+            "e_titel" => htmlspecialchars($_POST['titel'], ENT_QUOTES, 'UTF-8'),
             "e_inhalt" => re_bbcode(re($_POST['inhalt'], true)),
             "allow_html" => _editor_allow_html,
             "inhalt" => _inhalt,
@@ -135,14 +135,14 @@ if ($do == "add") {
     while ($get = _fetch($qry)) {
         if ($thiskat != $get['kat']) {
             $position .= '
-              <option class="dropdownKat" value="lazy">' . re($get['katname']) . '</option>
-              <option value="' . re($get['placeholder']) . '-1">-> ' . _admin_first . '</option>
+              <option class="dropdownKat" value="lazy">' . h($get['katname']) . '</option>
+              <option value="' . h($get['placeholder']) . '-1">-> ' . _admin_first . '</option>
             ';
         }
         $thiskat = $get['kat'];
         $sel = ($get['editor'] == $_GET['id']) ? 'selected="selected"' : '';
 
-        $position .= empty($get['name']) ? '' : '<option value="' . re($get['placeholder']) . '-' . ($get['pos'] + 1) . '" ' . $sel . '>' . _nach . ' -> ' . navi_name(re($get['name'])) . '</option>';
+        $position .= empty($get['name']) ? '' : '<option value="' . h($get['placeholder']) . '-' . ($get['pos'] + 1) . '" ' . $sel . '>' . _nach . ' -> ' . navi_name(h($get['name'])) . '</option>';
     }
 
     $qryn = db("SELECT * FROM " . $db['navi'] . "
@@ -156,12 +156,12 @@ if ($do == "add") {
         "bbcode" => _bbcode,
         "preview" => _preview,
         "titel" => _titel,
-        "e_titel" => re($gets['titel']),
+        "e_titel" => h($gets['titel']),
         "e_inhalt" => re_bbcode(re($gets['text'])),
         "checked" => $checked,
         "pos" => _position,
         "name" => _editor_linkname,
-        "n_name" => re($getn['name']),
+        "n_name" => h($getn['name']),
         "position" => $position,
         "ja" => _yes,
         "nein" => _no,
@@ -186,14 +186,14 @@ if ($do == "add") {
         while ($get = _fetch($qry)) {
             if ($thiskat != $get['kat']) {
                 $position .= '
-                <option class="dropdownKat" value="lazy">' . re($get['katname']) . '</option>
-                <option value="' . re($get['placeholder']) . '-1">-> ' . _admin_first . '</option>
+                <option class="dropdownKat" value="lazy">' . h($get['katname']) . '</option>
+                <option value="' . h($get['placeholder']) . '-1">-> ' . _admin_first . '</option>
               ';
             }
             $thiskat = $get['kat'];
             $sel = ($get['editor'] == $_GET['id']) ? 'selected="selected"' : '';
 
-            $position .= empty($get['name']) ? '' : '<option value="' . re($get['placeholder']) . '-' . ($get['pos'] + 1) . '" ' . $sel . '>' . _nach . ' -> ' . navi_name(re($get['name'])) . '</option>';
+            $position .= empty($get['name']) ? '' : '<option value="' . h($get['placeholder']) . '-' . ($get['pos'] + 1) . '" ' . $sel . '>' . _nach . ' -> ' . navi_name(h($get['name'])) . '</option>';
         }
 
         $show = show($dir . "/form_editor", array("head" => _editor_edit_head,
@@ -207,10 +207,10 @@ if ($do == "add") {
             "nein" => _no,
             "name" => _editor_linkname,
             "position" => $position,
-            "n_name" => re($_POST['name']),
+            "n_name" => htmlspecialchars($_POST['name'], ENT_QUOTES, 'UTF-8'),
             "wichtig" => _navi_wichtig,
             "titel" => _titel,
-            "e_titel" => re($_POST['titel']),
+            "e_titel" => htmlspecialchars($_POST['titel'], ENT_QUOTES, 'UTF-8'),
             "e_inhalt" => re_bbcode(re($_POST['inhalt'], true)),
             "allow_html" => _editor_allow_html,
             "inhalt" => _inhalt,
@@ -262,7 +262,7 @@ if ($do == "add") {
             "title" => _button_title_del,
             "del" => convSpace(_confirm_del_site)));
 
-        $show_ .= show($dir . "/editor_show", array("name" => "<a href='../sites/?show=" . $get['id'] . "'>" . re($get['titel']) . "</a>",
+        $show_ .= show($dir . "/editor_show", array("name" => "<a href='../sites/?show=" . $get['id'] . "'>" . h($get['titel']) . "</a>",
             "del" => $delete,
             "edit" => $edit,
             "class" => $class));

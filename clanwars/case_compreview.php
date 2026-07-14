@@ -46,7 +46,7 @@ if (defined('_Clanwars')) {
         if ($get_email) $email = '<br />' . show(_emailicon_forum, array("email" => eMailAddr($get_email)));
         $onoff = "";
         $avatar = "";
-        $nick = show(_link_mailto, array("nick" => re($get_nick),
+        $nick = show(_link_mailto, array("nick" => htmlspecialchars($get_nick, ENT_QUOTES, 'UTF-8'),
             "email" => $get_email));
     } else {
         $hp = "";
@@ -72,7 +72,7 @@ if (defined('_Clanwars')) {
         "rank" => getrank($get_userid),
         "ip" => $userip . _only_for_admins));
 
-    echo utf8_encode('<table class="mainContent" cellspacing="1">' . $index . '</table>');
+    echo mb_convert_encoding('<table class="mainContent" cellspacing="1">' . $index . '</table>', 'UTF-8', 'ISO-8859-1');
 
     if (!mysqli_persistconns)
         $mysql->close(); //MySQL

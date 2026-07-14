@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $dir = "sites";
@@ -28,7 +25,7 @@ switch ($action):
             if ($get['internal'] == 1 && ($chkMe == 1 || !$chkMe))
                 $index = error(_error_wrong_permissions, 1);
             else {
-                $where = re($get['titel']);
+                $where = h($get['titel']);
                 $title = $pagetitle . " - " . $where . "";
 
                 if ($get['html'])
@@ -36,19 +33,19 @@ switch ($action):
                 else
                     $inhalt = bbcode(re($get['text']));
 
-                $index = show($dir . "/sites", array("titel" => re($get['titel']),
+                $index = show($dir . "/sites", array("titel" => h($get['titel']),
                     "inhalt" => $inhalt));
             }
         } else $index = error(_sites_not_available, 1);
         break;
-    case 'preview';
+    case 'preview':
         header("Content-type: text/html; charset=utf-8");
         if ($_POST['html'])
             $inhalt = bbcode_html(re($_POST['inhalt'], true), true);
         else
             $inhalt = bbcode(re($_POST['inhalt'], true), true);
 
-        $index = show($dir . "/sites", array("titel" => re($_POST['titel']),
+        $index = show($dir . "/sites", array("titel" => htmlspecialchars($_POST['titel'], ENT_QUOTES, 'UTF-8'),
             "inhalt" => $inhalt));
 
         echo '<table class="mainContent" cellspacing="1"' . $index . '</table>';

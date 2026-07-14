@@ -5,30 +5,31 @@
  * @param bool $reload
  * @return array
  */
-function show_dzcp_version(bool $reload=false) {
+function show_dzcp_version(bool $reload = false)
+{
     global $api;
     $dzcp_version_info = 'onmouseover="DZCP.showInfo(\'<tr><td colspan=2 align=center padding=3 class=infoTop>DZCP Versions Checker</td></tr><tr><td>' . _dzcp_vcheck . '</td></tr>\')" onmouseout="DZCP.hideInfo()"';
     $return = array();
     if (dzcp_version_checker && api_enabled) {
-        $json = $api->getDzcpVersion(true, 60 , $reload);
-        if($reload) {
+        $json = $api->getDzcpVersion(true, 60, $reload);
+        if ($reload) {
             header("Location: " . GetServerVars('HTTP_REFERER'));
         }
 
-        if(strpos(GetServerVars('HTTP_REFERER'), '?') === false) {
+        if (strpos(GetServerVars('HTTP_REFERER'), '?') === false) {
             $href = '../admin/?version_reload=true';
         } else {
-            $href = '?'.GetServerVars('QUERY_STRING').'&version_reload=true';
+            $href = '?' . GetServerVars('QUERY_STRING') . '&version_reload=true';
         }
         if (empty($json) || is_bool($json) || (!is_array($json) && !is_object($json))) {
-            $return['version'] = '<b><a href="'.$href.'" [info]>' . _akt_version . ': <span style="color:#FFFF00">' . _version . '</span> / Release: <span style="color:#FFFF00">' . _release . '</span> / Build: <span style="color:#FFFF00">' . _build . '</span></a></b>';
+            $return['version'] = '<b><a href="' . $href . '" [info]>' . _akt_version . ': <span style="color:#FFFF00">' . _version . '</span> / Release: <span style="color:#FFFF00">' . _release . '</span> / Build: <span style="color:#FFFF00">' . _build . '</span></a></b>';
             $return['version'] = show($return['version'], array('info' => $dzcp_version_info));
             $return['version_img'] = '<img src="../inc/images/admin/version.gif" align="absmiddle" width="111" height="14" />';
             return $return;
         }
 
         if ($json['error']) {
-            $return['version'] = '<b><a href="'.$href.'" [info]>' . _akt_version . ': <span style="color:#7783ff">' . _version . '</span> / Release: <span style="color:#7783ff">' . _release . '</span> / Build: <span style="color:#7783ff">' . _build . '</span> / <span style="color:#FF0000">== API ERROR ==</span></a></b>';
+            $return['version'] = '<b><a href="' . $href . '" [info]>' . _akt_version . ': <span style="color:#7783ff">' . _version . '</span> / Release: <span style="color:#7783ff">' . _release . '</span> / Build: <span style="color:#7783ff">' . _build . '</span> / <span style="color:#FF0000">== API ERROR ==</span></a></b>';
             $return['version'] = show($return['version'], array('info' => $dzcp_version_info));
             $return['version_img'] = '<img src="../inc/images/admin/version.gif" align="absmiddle" width="111" height="14" />';
             return $return;
@@ -42,7 +43,7 @@ function show_dzcp_version(bool $reload=false) {
             $return['version'] = '<a href="https://www.dzcp.de/" target="_blank" title="external Link: www.dzcp.de"><b>' . _akt_version . ':</b> <span style="color:#FF0000">' . _version . '</span> / Update Version: <span style="color:#17D427">' . $json['results']['version'] . '</span> / Release: <span style="color:#17D427">' . $json['results']['release'] . '</span> / Build: <span style="color:#17D427">' . $json['results']['build'] . '</span></a>';
             $return['version_img'] = '<img src="../inc/images/admin/version_old.gif" align="absmiddle" width="111" height="14" />';
         } else {
-            $return['version'] = '<b><a href="'.$href.'" [info]>' . _akt_version . ': <span style="color:#17D427">' . _version . '</span> / Release: <span style="color:#17D427">' . _release . '</span> / Build: ' . $_build . '</b></a>';
+            $return['version'] = '<b><a href="' . $href . '" [info]>' . _akt_version . ': <span style="color:#17D427">' . _version . '</span> / Release: <span style="color:#17D427">' . _release . '</span> / Build: ' . $_build . '</b></a>';
             $return['version'] = show($return['version'], array('info' => $dzcp_version_info));
             $return['version_img'] = '<img src="../inc/images/admin/version.gif" align="absmiddle" width="111" height="14" />';
         }
@@ -72,7 +73,7 @@ function parsePHPInfo()
         if (preg_match('/<h2[^>]*>([^<]+)<\/h2>/', $vTmp[$i], $vMat)) {
             $vName = trim($vMat[1]);
             $vTmp2 = explode("\n", $vTmp[$i + 1]);
-            foreach ($vTmp2 AS $vOne) {
+            foreach ($vTmp2 as $vOne) {
                 $vPat = '<info>([^<]+)<\/info>';
                 $vPat3 = "/$vPat\s*$vPat\s*$vPat/";
                 $vPat2 = "/$vPat\s*$vPat/";

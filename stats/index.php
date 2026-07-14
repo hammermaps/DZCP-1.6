@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 include(basePath . "/stats/helper.php");
 
 ## SETTINGS ##
@@ -20,14 +17,14 @@ $dir = "stats";
 
 ## SECTIONS ##
 if ($action == "gb") {
-    $get = db("SELECT `email`,`reg`,`nick`,`datum` FROM `" . $db['gb'] . "` ORDER BY `datum` ASC LIMIT 1;",false,true);
+    $get = db("SELECT `email`,`reg`,`nick`,`datum` FROM `" . $db['gb'] . "` ORDER BY `datum` ASC LIMIT 1;", false, true);
 
     if ($get['reg'])
         $first = date("d.m.Y H:i", $get['datum']) . "h " . _from . " " . autor($get['reg']);
     else
         $first = date("d.m.Y H:i", $get['datum']) . "h " . _from . " " . autor(0, '', re($get['nick']), re($get['email']));
 
-    $get = db("SELECT `email`,`reg`,`nick`,`datum` FROM `" . $db['gb'] . "` ORDER BY `datum` DESC LIMIT 1;",false,true);
+    $get = db("SELECT `email`,`reg`,`nick`,`datum` FROM `" . $db['gb'] . "` ORDER BY `datum` DESC LIMIT 1;", false, true);
 
     if ($get['reg'])
         $last = date("d.m.Y H:i", $get['datum']) . "h " . _from . " " . autor($get['reg']);
@@ -46,15 +43,17 @@ if ($action == "gb") {
 } elseif ($action == "forum") {
     $allthreads = cnt($db['f_threads']);
     $allposts = cnt($db['f_posts']);
-    $ppert = 0; $pperd = 0; $topposter = "-";
+    $ppert = 0;
+    $pperd = 0;
+    $topposter = "-";
     if ($allthreads > 0 && $allposts >= 0) {
         $ppert = round($allposts / $allthreads, 2);
 
-        $get = db("SELECT `id`,`forumposts` FROM `" . $db['userstats'] . "` ORDER BY `forumposts` DESC;",false,true);
+        $get = db("SELECT `id`,`forumposts` FROM `" . $db['userstats'] . "` ORDER BY `forumposts` DESC;", false, true);
 
         $topposter = autor($get['id']) . " (" . $get['forumposts'] . " Posts)";
 
-        $get = db("SELECT `t_date` FROM `" . $db['f_threads'] . "` ORDER BY `t_date` ASC;",false,true);
+        $get = db("SELECT `t_date` FROM `" . $db['f_threads'] . "` ORDER BY `t_date` ASC;", false, true);
 
         $time = time() - $get['t_date'];
         $days = @round($time / 86400);
@@ -80,11 +79,11 @@ if ($action == "gb") {
         "member" => _stats_users_regged_member,
         "nmember" => cnt($db['users'], " WHERE level != 1"),
         "logins" => _stats_users_logins,
-        "nlogins" => sum($db['userstats'], "", "logins"),
+        "nlogins" => sum($db['userstats'], "logins", ""),
         "msg" => _stats_users_msg,
-        "nmsg" => sum($db['userstats'], "", "writtenmsg"),
+        "nmsg" => sum($db['userstats'], "writtenmsg", ""),
         "votes" => _stats_users_votes,
-        "nvotes" => sum($db['userstats'], "", "votes"),
+        "nvotes" => sum($db['userstats'], "votes", ""),
         "aktmsg" => _stats_users_aktmsg,
         "naktmsg" => cnt($db['msg'], " WHERE `von` != '0'"),
         "buddys" => _stats_users_buddys,
@@ -102,8 +101,8 @@ if ($action == "gb") {
         $dr_p = @round($draw * 100 / $ges, 1);
     }
 
-    $allp = '<span class="CwWon">' . sum($db['cw'], '', "punkte") . '</span>' . ' : ' . '
-             <span class="CwLost">' . sum($db['cw'], '', "gpunkte") . '</span>';
+    $allp = '<span class="CwWon">' . sum($db['cw'], "punkte", '') . '</span>' . ' : ' . '
+             <span class="CwLost">' . sum($db['cw'], "gpunkte", '') . '</span>';
 
     $stats = show($dir . "/cw", array("head" => _site_clanwars,
         "played" => _stats_cw_played,
@@ -195,7 +194,7 @@ if ($action == "gb") {
         if ($i == $allkats) $end = "";
         else $end = ",";
 
-        $kats .= re($get['kategorie']) . $end . " ";
+        $kats .= h($get['kategorie']) . $end . " ";
         $i++;
     }
     $qry = db("SELECT datum FROM " . $db['news'] . "

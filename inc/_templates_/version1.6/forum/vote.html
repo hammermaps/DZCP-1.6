@@ -4,6 +4,7 @@
         <td>
             <form id="navAjaxFVote" name="navAjaxFVote" action="../votes/?action=do&amp;what=fvote&amp;id=[vid]"
                   method="post" onsubmit="return(DZCP.ajaxFVote([vid]))">
+                <input type="hidden" name="csrf_token" value="[csrf_token]" />
                 <input name="fid" type="hidden" id="fid" value="[fid]"/>
                 <input name="kid" type="hidden" id="kid" value="[kid]"/>
                 <table class="navContent" cellspacing="2">

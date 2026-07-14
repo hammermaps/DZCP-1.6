@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $where = _site_taktiken;
@@ -49,7 +46,7 @@ switch ($action):
 
                 $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
                 $color++;
-                $show .= show($dir . "/taktiken_show", array("map" => re($get['map']),
+                $show .= show($dir . "/taktiken_show", array("map" => h($get['map']),
                     "id" => $get['id'],
                     "class" => $class,
                     "standard_t" => $standardt,
@@ -95,7 +92,7 @@ switch ($action):
                 "datum" => date("d.m.Y", $get['datum'])));
 
             $headline = show(_taktik_headline, array("what" => $what,
-                "map" => re($get['map'])));
+                "map" => h($get['map'])));
 
             $index = show($dir . "/taktik", array("id" => $_GET['id'],
                 "posted" => $posted,
@@ -123,7 +120,7 @@ switch ($action):
                 "datum" => date("d.m.Y", $get['datum'])));
 
             $headline = show(_taktik_headline, array("what" => $what,
-                "map" => re($get['map'])));
+                "map" => h($get['map'])));
 
             $index = show($dir . "/taktik", array("id" => $_GET['id'],
                 "posted" => $posted,
@@ -194,7 +191,7 @@ switch ($action):
                 }
 
                 $index = show($dir . "/edit", array("id" => $_GET['id'],
-                    "map" => re($get['map']),
+                    "map" => h($get['map']),
                     "autor" => autor($get['autor']),
                     "value" => _button_value_edit,
                     "tautor" => _autor,
@@ -207,10 +204,10 @@ switch ($action):
                     "standard_tt" => _taktik_tstandard_t,
                     "standard_tct" => _taktik_tstandard_ct,
                     "edit_head" => _taktik_edit_head,
-                    "standard_t" => re($get['standardt']),
-                    "standard_ct" => re($get['standardct']),
-                    "spar_ct" => re($get['sparct']),
-                    "spar_t" => re($get['spart'])));
+                    "standard_t" => h($get['standardt']),
+                    "standard_ct" => h($get['standardct']),
+                    "spar_ct" => h($get['sparct']),
+                    "spar_t" => h($get['spart'])));
 
             } elseif ($_GET['what'] == "update" && $_POST['id']) {
                 if (!$_POST['map']) {

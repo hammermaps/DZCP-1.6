@@ -15,9 +15,9 @@ if (defined('_Forum')) {
                     "nickhead" => _nick,
                     "emailhead" => _email,
                     "hphead" => _hp,
-                    "postemail" => re($get['email']),
-                    "posthp" => re($get['hp']),
-                    "postnick" => re($get['nick'])));
+                    "postemail" => h($get['email']),
+                    "posthp" => h($get['hp']),
+                    "postnick" => h($get['nick'])));
             }
 
             $dowhat = show(_forum_dowhat_edit_post, array(
@@ -94,8 +94,8 @@ if (defined('_Forum')) {
                     "kid" => $_GET['kid'],
                     "br1" => "<!--",
                     "br2" => "-->",
-                    "postemail" => re($get['email']),
-                    "postnick" => re($get['nick']),
+                    "postemail" => h($get['email']),
+                    "postnick" => h($get['nick']),
                     "posteintrag" => re_bbcode(re($_POST['eintrag'], true)),
                     "error" => $error,
                     "eintraghead" => _eintrag));
@@ -203,7 +203,7 @@ if (defined('_Forum')) {
 
                     $dowhat = show(_forum_dowhat_add_post, array("id" => $_GET['id'], "kid" => $_GET['kid']));
 
-                    $qry_posts = db("SELECT * FROM `".$db['f_posts']."` WHERE `kid` = ".(int)($_GET['kid'])." AND `sid` = ".(int)($_GET['id'])." ORDER BY `date` DESC;");
+                    $qry_posts = db("SELECT * FROM `" . $db['f_posts'] . "` WHERE `kid` = " . (int)($_GET['kid']) . " AND `sid` = " . (int)($_GET['id']) . " ORDER BY `date` DESC;");
                     if (_rows($qry_posts)) {
                         $get_posts = _fetch($qry_posts);
                         $gett = db("SELECT `topic` FROM `" . $db['f_threads'] . "` WHERE `id` = " . (int)($get_posts['sid']) . ";", false, true);
@@ -347,7 +347,7 @@ if (defined('_Forum')) {
                             "hphead" => _hp));
                     }
 
-                    $title = re($gett['topic']) . ' - ' . $title;
+                    $title = h($gett['topic']) . ' - ' . $title;
                     $index = show($dir . "/post", array("titel" => _forum_new_post_head,
                         "nickhead" => _nick,
                         "emailhead" => _email,
@@ -511,7 +511,7 @@ if (defined('_Forum')) {
                                 $text = bbcode(re($ftxt['text']));
                         }
 
-                        $posted_ip = ($chkMe == 4 ? re($gett['ip']) : _logged);
+                        $posted_ip = ($chkMe == 4 ? h($gett['ip']) : _logged);
                         if ($gett['t_reg'] != 0) {
                             $getu = db("SELECT `nick`,`hp`,`email` FROM `" . $db['users'] . "` WHERE `id` = " . $gett['t_reg'] . ";", false, true);
 
@@ -522,7 +522,8 @@ if (defined('_Forum')) {
                             if (!empty($getu['hp']))
                                 $hp = show(_hpicon_forum, array("hp" => links(re($getu['hp']))));
                         } else {
-                            $pn = ""; $hp = "";
+                            $pn = "";
+                            $hp = "";
                             $email = show(_emailicon_forum, array("email" => eMailAddr(re($gett['t_email']))));
                             if (!empty($gett['t_hp']))
                                 $hp = show(_hpicon_forum, array("hp" => links(re($gett['t_hp']))));
@@ -575,9 +576,9 @@ if (defined('_Forum')) {
                         "id" => $_GET['id'],
                         "ip" => _iplog_info,
                         "kid" => $_GET['kid'],
-                        "postemail" => re($_POST['email']),
-                        "posthp" => re($_POST['hp']),
-                        "postnick" => re($_POST['nick']),
+                        "postemail" => htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8'),
+                        "posthp" => htmlspecialchars($_POST['hp'], ENT_QUOTES, 'UTF-8'),
+                        "postnick" => htmlspecialchars($_POST['nick'], ENT_QUOTES, 'UTF-8'),
                         "posteintrag" => re_bbcode(re($_POST['eintrag'], true)),
                         "error" => $error,
                         "eintraghead" => _eintrag));
@@ -690,7 +691,7 @@ if (defined('_Forum')) {
         }
     } elseif ($do == "delete") {
         $get = db("SELECT `reg`,`sid`,`kid` FROM `" . $db['f_posts'] . "` WHERE `id` = " . (int)($_GET['id']) . ";", false, true);
-        if ($get['reg'] == $userid OR permission("forum")) {
+        if ($get['reg'] == $userid or permission("forum")) {
             db("DELETE FROM `" . $db['f_posts'] . "` WHERE `id` = " . (int)($_GET['id']) . ";");
 
             $fposts = userstats("forumposts", $get['reg']) - 1;

@@ -22,7 +22,10 @@ if (defined('_UserMenu')) {
                         if (!empty($get['language'])) {
                             $_SESSION['language'] = re($get['language']);
                         }
-
+                        DzcpLogger::security()->notice('Login blockiert: DSGVO-Sperre aktiv', [
+                            'user_id' => $get['id'],
+                            'ip'      => $userip,
+                        ]);
                         header("Location: ?action=userlock");
                     } else {
                         $permanent_key = '';
@@ -32,6 +35,9 @@ if (defined('_UserMenu')) {
                             cookie::put('pkey', $permanent_key);
                             cookie::save();
                         }
+
+                        // Regenerate session ID on login to prevent session fixation attacks
+                        session_regenerate_id(true);
 
                         ## Aktualisiere Datenbank ##
                         db("UPDATE `" . $db['users'] . "` SET `online` = 1, `sessid` = '" . session_id() . "', `ip` = '" . $userip . "', `pkey` = '" . $permanent_key . "' WHERE `id` = " . $get['id'] . ";");
@@ -46,18 +52,39 @@ if (defined('_UserMenu')) {
 
                         db("UPDATE `" . $db['userstats'] . "` SET `logins` = (logins+1) WHERE `user` = " . $get['id'] . ";");
                         db("UPDATE `" . $db['users'] . "` SET `online` = 1, `sessid` = '" . session_id() . "', `ip` = '" . $userip . "', `pkey` = '" .
-                            $permanent_key . "', `time` = ".time()." WHERE `id` = " . $get['id'] . ";");
+                            $permanent_key . "', `time` = " . time() . " WHERE `id` = " . $get['id'] . ";");
                         setIpcheck("login(" . $get['id'] . ")");
+
+                        DzcpLogger::app()->info('Login erfolgreich', [
+                            'user_id'   => $get['id'],
+                            'ip'        => $userip,
+                            'permanent' => (bool)$validator['input']['permanent'],
+                        ]);
 
                         header("Location: ?action=userlobby");
                     }
-                } else
+                } else {
+                    DzcpLogger::security()->warning('Login verweigert: User gesperrt', [
+                        'user_id' => $get['id'],
+                        'ip'      => $userip,
+                    ]);
                     $index = error(_login_banned);
+                }
             } else {
                 $qry = db("SELECT `id` FROM `" . $db['users'] . "` WHERE `user` = '" . up($validator['input']['user']) . "';");
                 if (_rows($qry)) {
                     $get = _fetch($qry);
                     setIpcheck("trylogin(" . $get['id'] . ")");
+                    DzcpLogger::security()->warning('Login fehlgeschlagen: falsches Passwort', [
+                        'user_id'  => $get['id'],
+                        'username' => re($validator['input']['user'], true),
+                        'ip'       => $userip,
+                    ]);
+                } else {
+                    DzcpLogger::security()->notice('Login fehlgeschlagen: unbekannter Username', [
+                        'username' => re($validator['input']['user'], true),
+                        'ip'       => $userip,
+                    ]);
                 }
 
                 cookie::put('id', '');

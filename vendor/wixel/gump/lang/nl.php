@@ -1,0 +1,94 @@
+<?php
+
+return [
+    'required'             => 'Het veld {field} is verplicht',
+    'valid_email'          => 'Het veld {field} moet een geldige e-mail zijn',
+    'max_len'              => 'Het veld {field} moet een aantal tekens van {param} of minder hebben',
+    'min_len'              => 'Het veld {field} moet een tekennummer van {param} of meer hebben',
+    'exact_len'            => 'Het veld {field} moet een tekennummer van {param} hebben',
+    'alpha'                => 'Het veld {field} mag alleen alfa (a-z) tekens bevatten',
+    'alpha_numeric'        => 'Het veld {field} mag alleen alfanumerieke tekens bevatten (a-z)',
+    'alpha_dash'           => 'Het veld {field} mag alleen alfa (a-z) en streepjes tekens bevatten',
+    'alpha_space'          => 'Het veld {field} mag alleen alfa (a-z) tekens en spatie bevatten',
+    'numeric'              => 'Het veld {field} mag alleen numerieke tekens bevatten',
+    'integer'              => 'Het veld {field} moet een numerieke waarde zijn',
+    'boolean'              => 'Het veld {field} moet waar of onwaar zijn',
+    'float'                => 'Het veld {field} moet een decimale waarde zijn',
+    'valid_url'            => 'Het veld {field} moet een geldige URL zijn',
+    'url_exists'           => 'De {field} URL bestaat niet',
+    'valid_ip'             => 'Het veld {field} moet een geldig IP-adres bevatten',
+    'valid_ipv4'           => 'Het veld {field} moet een geldig IPv4-adres bevatten',
+    'valid_ipv6'           => 'Het veld {field} moet een geldig IPv6-adres bevatten',
+    'guidv4'               => 'Het veld {field} moet een geldige GUID bevatten',
+    'valid_cc'             => 'Het veld {field} moet een geldig creditcardnummer bevatten',
+    'valid_name'           => 'Het veld {field} moet een geldige naam bevatten',
+    'contains'             => 'Het veld {field} moet een van deze waarden bevatten: {param}',
+    'contains_list'        => 'Het veld {field} moet een waarde uit het vervolgkeuzemenu bevatten',
+    'doesnt_contain_list'  => 'Het veld {field} bevat een waarde die niet acceptabel is',
+    'street_address'       => 'Het veld {field} moet een geldig postadres zijn',
+    'date'                 => 'Het veld {field} moet een geldige datum zijn',
+    'min_numeric'          => 'Het veld {field} moet een numerieke waarde gelijk aan of groter zijn dan {param}',
+    'max_numeric'          => 'Het veld {field} moet een numerieke waarde gelijk aan of kleiner zijn dan {param}',
+    'min_age'              => 'Het veld {field} moet gelijk zijn aan of groter zijn dan {param}',
+    'starts'               => 'Het veld {field} moet beginnen met {param}',
+    'extension'            => 'Het veld {field} moet de volgende extensies hebben {parameter}',
+    'required_file'        => 'Het veld {field} is verplicht',
+    'equalsfield'          => 'Het veld {field} is niet gelijk aan het veld {param}',
+    'iban'                 => 'Het veld {field} moet een geldige IBAN bevatten',
+    'phone_number'         => 'Het veld {field} moet een geldig telefoonnummer bevatten',
+    'regex'                => 'Het veld {field} moet een geldige waarde bevatten',
+    'valid_json_string'    => 'Het veld {field} moet een JSON-indeling hebben',
+    'between_len'          => 'Het veld {field} moet tussen de {param1} en {param2} tekens bevatten',
+    'alpha_numeric_dash'   => 'Het veld {field} mag alleen alfanumerieke tekens en streepjes bevatten',
+    'alpha_numeric_space'  => 'Het veld {field} mag alleen alfanumerieke tekens, spaties en cijfers bevatten',
+    'valid_array_size_greater' => 'Het veld {field} moet een array bevatten met meer dan {param} elementen',
+    'valid_array_size_lesser'  => 'Het veld {field} moet een array bevatten met minder dan {param} elementen',
+    'valid_array_size_equal'   => 'Het veld {field} moet een array bevatten met precies {param} elementen',
+
+    // Security validators
+    'strong_password'          => 'Het veld {field} moet ten minste 8 tekens bevatten met hoofdletters, kleine letters, cijfers en speciale tekens',
+    'jwt_token'                => 'Het veld {field} moet een geldig JWT token formaat zijn',
+    'hash'                     => 'Het veld {field} moet een geldige {param} hash zijn',
+    'no_sql_injection'         => 'Het veld {field} bevat potentiële SQL injection patronen',
+    'no_xss'                   => 'Het veld {field} bevat potentiële XSS patronen',
+
+    // Modern web validators
+    'uuid'                     => 'Het veld {field} moet een geldige UUID zijn',
+    'base64'                   => 'Het veld {field} moet geldige base64 gecodeerde data zijn',
+    'hex_color'                => 'Het veld {field} moet een geldige hexadecimale kleurcode zijn (bijv. #FF0000)',
+    'rgb_color'                => 'Het veld {field} moet een geldig RGB kleurformaat zijn (bijv. rgb(255,0,0))',
+    'timezone'                 => 'Het veld {field} moet een geldige tijdzone identifier zijn',
+    'language_code'            => 'Het veld {field} moet een geldige taalcode zijn (bijv. nl, nl-NL)',
+    'country_code'             => 'Het veld {field} moet een geldige landcode zijn (bijv. NL, BE)',
+    'currency_code'            => 'Het veld {field} moet een geldige valutacode zijn (bijv. USD, EUR)',
+
+    // Network validators
+    'mac_address'              => 'Het veld {field} moet een geldig MAC adres formaat zijn',
+    'domain_name'              => 'Het veld {field} moet een geldige domeinnaam zijn',
+    'port_number'              => 'Het veld {field} moet een geldig poortnummer zijn (1-65535)',
+    'social_handle'            => 'Het veld {field} moet een geldig social media handle formaat zijn',
+
+    // Geographic validators
+    'latitude'                 => 'Het veld {field} moet een geldige breedtegraad zijn (-90 tot 90)',
+    'longitude'                => 'Het veld {field} moet een geldige lengtegraad zijn (-180 tot 180)',
+    'postal_code'              => 'Het veld {field} moet een geldige postcode zijn voor {param}',
+    'coordinates'              => 'Het veld {field} moet geldige coördinaten zijn in lat,lng formaat',
+
+    // Enhanced date/time validators
+    'future_date'              => 'Het veld {field} moet een toekomstige datum zijn',
+    'past_date'                => 'Het veld {field} moet een datum in het verleden zijn',
+    'business_day'             => 'Het veld {field} moet op een werkdag vallen (maandag-vrijdag)',
+    'valid_time'               => 'Het veld {field} moet een geldig tijdformaat zijn (HH:MM of HH:MM:SS)',
+    'date_range'               => 'Het veld {field} moet een datum zijn tussen {param[0]} en {param[1]}',
+
+    // Mathematical validators
+    'even'                     => 'Het veld {field} moet een even getal zijn',
+    'odd'                      => 'Het veld {field} moet een oneven getal zijn',
+    'prime'                    => 'Het veld {field} moet een priemgetal zijn',
+
+    // Content validators
+    'word_count'               => 'Het veld {field} voldoet niet aan de woordaantal vereisten',
+    'camel_case'               => 'Het veld {field} moet in camelCase formaat zijn',
+    'snake_case'               => 'Het veld {field} moet in snake_case formaat zijn',
+    'url_slug'                 => 'Het veld {field} moet een geldig URL slug formaat zijn',
+];

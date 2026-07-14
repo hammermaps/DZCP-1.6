@@ -4,14 +4,13 @@
  * http://www.dzcp.de
  */
 
-ob_start();
-define('basePath', dirname(__FILE__));
-$thumbgen = true;
-include(basePath . '/vendor/autoload.php');
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
+if (!defined('basePath'))
+    define('basePath', dirname(__FILE__));
 
-use GUMP\GUMP;
+$thumbgen = true;
+
+require_once(basePath . '/inc/buffer.php');
+
 use Phpfastcache\CacheManager;
 
 $gump = GUMP::get_instance();
@@ -37,7 +36,7 @@ if (!file_exists(basePath . '/' . $_GET['img'])) {
     imagesavealpha($neuesBild, true);
     imagecopyresampled($neuesBild, $altesBild, 0, 0, 0, 0, $neueBreite, $neueHoehe, $breite, $hoehe);
     ob_start();
-        imagepng($neuesBild);
+    imagepng($neuesBild);
     $bild = ob_get_contents();
     ob_end_clean();
 
@@ -53,18 +52,22 @@ $hoehe = $size[1];
 
 $neueBreite = empty($_GET['width']) ? 100 : (int)($_GET['width']);
 $neueHoehe = (int)($hoehe * $neueBreite / $breite);
-$cachehash = str_replace(['/','\\'],'_',$file_exp[0]) . '_minimize_' . $neueBreite . 'x' . $neueHoehe;
+$cachehash = str_replace(['/', '\\'], '_', $file_exp[0]) . '_minimize_' . $neueBreite . 'x' . $neueHoehe;
 $picture_build = false;
 
 // Cache
-$cache = CacheManager::getInstance($config_cache['storage'], $config_cache['config'],'default');
+$cache = CacheManager::getInstance($config_cache['storage'], $config_cache['config'], 'default');
 
 switch ($size[2]) {
     case 1: ## GIF ##
         header("Content-Type: image/gif");
         $cachehash = md5($cachehash . '_gif');
-        $CachedString = $cache->getItem($cachehash);
-        if ($rebuild || !thumbgen_cache || is_null($CachedString->get())) {
+        try {
+            $CachedString = $cache->getItem($cachehash);
+        } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
+            $CachedString = null;
+        }
+        if ($rebuild || !thumbgen_cache || is_null($CachedString) || is_null($CachedString->get())) {
             $altesBild = imagecreatefromgif(basePath . '/' . $_GET['img']);
             $neuesBild = imagecreatetruecolor($neueBreite, $neueHoehe);
             $CT = imagecolortransparent($altesBild);
@@ -74,10 +77,10 @@ switch ($size[2]) {
             imagecopyresampled($neuesBild, $altesBild, 0, 0, 0, 0, $neueBreite, $neueHoehe, $breite, $hoehe);
             ob_start();
             imagegif($neuesBild);
-                $bild = ob_get_contents();
+            $bild = ob_get_contents();
             ob_end_clean();
 
-            if(thumbgen_cache) {
+            if (thumbgen_cache && !is_null($CachedString)) {
                 $CachedString->set(bin2hex($bild))->expiresAfter(thumbgen_cache_time);
             }
 
@@ -91,17 +94,21 @@ switch ($size[2]) {
     case 2: ## JPEG ##
         header("Content-Type: image/jpeg");
         $cachehash = md5($cachehash . '_jpg');
-        $CachedString = $cache->getItem($cachehash);
-        if ($rebuild || !thumbgen_cache || is_null($CachedString->get())) {
+        try {
+            $CachedString = $cache->getItem($cachehash);
+        } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
+            $CachedString = null;
+        }
+        if ($rebuild || !thumbgen_cache || is_null($CachedString) || is_null($CachedString->get())) {
             $altesBild = imagecreatefromjpeg(basePath . '/' . $_GET['img']);
             $neuesBild = imagecreatetruecolor($neueBreite, $neueHoehe);
             imagecopyresampled($neuesBild, $altesBild, 0, 0, 0, 0, $neueBreite, $neueHoehe, $breite, $hoehe);
             ob_start();
             imagejpeg($neuesBild, null, 100);
-                $bild = ob_get_contents();
+            $bild = ob_get_contents();
             ob_end_clean();
 
-            if(thumbgen_cache) {
+            if (thumbgen_cache && !is_null($CachedString)) {
                 $CachedString->set(bin2hex($bild))->expiresAfter(thumbgen_cache_time);
             }
 
@@ -114,8 +121,12 @@ switch ($size[2]) {
     case 3: ## PNG ##
         header("Content-Type: image/png");
         $cachehash = md5($cachehash . '_png');
-        $CachedString = $cache->getItem($cachehash);
-        if ($rebuild || !thumbgen_cache || is_null($CachedString->get())) {
+        try {
+            $CachedString = $cache->getItem($cachehash);
+        } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
+            $CachedString = null;
+        }
+        if ($rebuild || !thumbgen_cache || is_null($CachedString) || is_null($CachedString->get())) {
             header("Content-Type: image/png");
             $altesBild = imagecreatefrompng(basePath . '/' . $_GET['img']);
             $neuesBild = imagecreatetruecolor($neueBreite, $neueHoehe);
@@ -124,10 +135,10 @@ switch ($size[2]) {
             imagecopyresampled($neuesBild, $altesBild, 0, 0, 0, 0, $neueBreite, $neueHoehe, $breite, $hoehe);
             ob_start();
             imagepng($neuesBild);
-                $bild = ob_get_contents();
+            $bild = ob_get_contents();
             ob_end_clean();
 
-            if(thumbgen_cache) {
+            if (thumbgen_cache && !is_null($CachedString)) {
                 $CachedString->set(bin2hex($bild))->expiresAfter(thumbgen_cache_time);
             }
 
@@ -139,7 +150,7 @@ switch ($size[2]) {
         break;
 }
 
-if(thumbgen_cache && $picture_build) {
+if (thumbgen_cache && $picture_build && !is_null($CachedString)) {
     $cache->save($CachedString);
 }
 

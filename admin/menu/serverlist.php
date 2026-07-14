@@ -22,18 +22,18 @@ while ($get = _fetch($qry)) {
         "del" => convSpace(_confirm_del_server)));
 
     if (empty($get['clanurl'])) {
-        $clanname = show(_slist_clanname_without_url, array("name" => re($get['clanname'])));
+        $clanname = show(_slist_clanname_without_url, array("name" => h($get['clanname'])));
     } else {
-        $clanname = show(_slist_clanname_with_url, array("name" => re($get['clanname']),
-            "url" => re($get['clanurl'])));
+        $clanname = show(_slist_clanname_with_url, array("name" => h($get['clanname']),
+            "url" => h($get['clanurl'])));
     }
 
     $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
     $color++;
     $show_ .= show($dir . "/slist_show", array("id" => $get['id'],
         "clanname" => $clanname,
-        "serverip" => re($get['ip']),
-        "serverpwd" => re($get['pwd']),
+        "serverip" => h($get['ip']),
+        "serverpwd" => h($get['pwd']),
         "class" => $class,
         "delete" => $delete,
         "selected" => $selected,

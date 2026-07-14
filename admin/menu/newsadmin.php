@@ -13,7 +13,7 @@ switch ($do) {
         $qryk = db("SELECT id,kategorie FROM " . $db['newskat'] . "");
         $kat = '';
         while ($getk = _fetch($qryk)) {
-            $kat .= show(_select_field, array("value" => $getk['id'], "sel" => "", "what" => re($getk['kategorie'])));
+            $kat .= show(_select_field, array("value" => $getk['id'], "sel" => "", "what" => h($getk['kategorie'])));
         }
 
         $dropdown_date = show(_dropdown_date, array("day" => dropdown("day", date("d")),
@@ -87,7 +87,7 @@ switch ($do) {
                 $sel = ($_POST['kat'] == $getk['id'] ? 'selected="selected"' : '');
                 $kat .= show(_select_field, array("value" => $getk['id'],
                     "sel" => $sel,
-                    "what" => re($getk['kategorie'])));
+                    "what" => h($getk['kategorie'])));
             }
 
             $int = isset($_POST['intern']) ? 'checked="checked"' : '';
@@ -124,16 +124,16 @@ switch ($do) {
                 "preview" => _preview,
                 "do" => "insert",
                 "ntitel" => _titel,
-                "titel" => re($_POST['titel']),
+                "titel" => htmlspecialchars($_POST['titel'], ENT_QUOTES, 'UTF-8'),
                 "newstext" => re_bbcode(re($_POST['newstext'], true)),
                 "morenews" => re_bbcode(re($_POST['morenews'], true)),
-                "link1" => re($_POST['link1']),
-                "link2" => re($_POST['link2']),
-                "link3" => re($_POST['link3']),
+                "link1" => htmlspecialchars($_POST['link1'], ENT_QUOTES, 'UTF-8'),
+                "link2" => htmlspecialchars($_POST['link2'], ENT_QUOTES, 'UTF-8'),
+                "link3" => htmlspecialchars($_POST['link3'], ENT_QUOTES, 'UTF-8'),
                 "url1" => $_POST['url1'],
                 "url2" => $_POST['url2'],
                 "url3" => $_POST['url3'],
-                "klapplink" => re($_POST['klapptitel']),
+                "klapplink" => htmlspecialchars($_POST['klapptitel'], ENT_QUOTES, 'UTF-8'),
                 "ntext" => _eintrag,
                 "button" => _button_value_add,
                 "error" => $error,
@@ -202,7 +202,7 @@ switch ($do) {
             $sel = ($get['kat'] == $getk['id'] ? 'selected="selected"' : '');
             $kat .= show(_select_field, array("value" => $getk['id'],
                 "sel" => $sel,
-                "what" => re($getk['kategorie'])));
+                "what" => h($getk['kategorie'])));
         }
 
         $do = show(_news_edit_link, array("id" => $_GET['id']));
@@ -257,16 +257,16 @@ switch ($do) {
             "do" => $do,
             "preview" => _preview,
             "ntitel" => _titel,
-            "titel" => re($get['titel']),
+            "titel" => h($get['titel']),
             "newstext" => re_bbcode(re($get['text'])),
             "morenews" => re_bbcode(re($get['klapptext'])),
-            "link1" => re($get['link1']),
-            "link2" => re($get['link2']),
-            "link3" => re($get['link3']),
+            "link1" => h($get['link1']),
+            "link2" => h($get['link2']),
+            "link3" => h($get['link3']),
             "url1" => $get['url1'],
             "url2" => $get['url2'],
             "url3" => $get['url3'],
-            "klapplink" => re($get['klapplink']),
+            "klapplink" => h($get['klapplink']),
             "dropdown_date" => $dropdown_date,
             "dropdown_time" => $dropdown_time,
             "timeshift_date" => $timeshift_date,
@@ -418,7 +418,7 @@ switch ($do) {
                 "title" => _button_title_del,
                 "del" => convSpace(_confirm_del_news)));
 
-            $titel = show(_news_show_link, array("titel" => cut(re($get['titel']), config('l_newsadmin')), "id" => $get['id']));
+            $titel = show(_news_show_link, array("titel" => cut(h($get['titel']), config('l_newsadmin')), "id" => $get['id']));
             $intern = ($get['intern'] ? _votes_intern : '');
             $sticky = ($get['sticky'] ? _news_sticky : '');
             $datum = empty($get['datum']) ? _no_public : date("d.m.y H:i", $get['datum']) . _uhr;

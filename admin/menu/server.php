@@ -58,9 +58,9 @@ switch ($do) {
 
         $show = show($dir . "/server_edit", array("edithead" => _admin_server_edit,
             "ip" => _server_ip,
-            "sip" => re($get['ip']),
+            "sip" => h($get['ip']),
             "name" => _server_name,
-            "sname" => re($get['name']),
+            "sname" => h($get['name']),
             "id" => $_GET['id'],
             "sport" => $get['port'],
             "port" => _server_admin_qport,
@@ -147,7 +147,7 @@ switch ($do) {
         $qry = db("SELECT * FROM " . $db['server'] . " ORDER BY id");
         $show_ = '';
         while ($get = _fetch($qry)) {
-            $gameicon = show(_gameicon, array("icon" => re($get['game'])));
+            $gameicon = show(_gameicon, array("icon" => h($get['game'])));
             $edit = show("page/button_edit_single", array("id" => $get['id'],
                 "action" => "admin=server&amp;do=edit",
                 "title" => _button_title_edit));
@@ -165,11 +165,11 @@ switch ($do) {
             $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
             $color++;
             $show .= show($dir . "/server_show", array("gameicon" => $gameicon,
-                "serverip" => re($get['ip']) . ":" . $get['port'],
-                "serverpwd" => re($get['pwd']),
+                "serverip" => h($get['ip']) . ":" . $get['port'],
+                "serverpwd" => h($get['pwd']),
                 "menu" => $menu,
                 "edit" => $edit,
-                "name" => re($get['name']),
+                "name" => h($get['name']),
                 "class" => $class,
                 "delete" => $delete));
         }

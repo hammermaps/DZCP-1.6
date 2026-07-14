@@ -8,9 +8,9 @@
 //-> DZCP Settings Start
 #########################################
 
-define('view_error_reporting', false); // Zeigt alle Fehler und Notices etc.
+define('view_error_reporting', true); // Zeigt alle Fehler und Notices etc.
 define('debug_all_sql_querys', false);
-define('debug_save_to_file', false);
+define('debug_save_to_file', true);
 define('debug_dzcp_handler', true);
 define('fsockopen_support_bypass', false); //Umgeht die fsockopen pruefung
 define('use_curl_support', true); //Soll CURL verwendet werden
@@ -72,25 +72,97 @@ define('phpmailer_smtp_password', '');//Password to use for SMTP authentication
 define('phpmailer_smtp_secure', 'tls');//Enable TLS encryption, `ssl` also accepted
 
 /*
+ * =========================================================
+ * Logging Configuration (Monolog)
+ * =========================================================
+ *
+ * Kanäle (werden als separate Logdateien angelegt):
+ *   app      – Allgemeine Anwendungs-Events (Login, Logout, Session, Navigation)
+ *   security – CSRF-Fehler, fehlgeschlagene Logins, Bans, Brute-Force-Schutz
+ *   sql      – SQL-Queries (nur wenn debug_all_sql_querys = true) und DB-Fehler
+ *   error    – PHP-Fehler, Exceptions, fatale Abbrüche
+ *   access   – Besucher-Counter, Spider-/Bot-Erkennung, User-Agents
+ *   cache    – Cache-Hits, Misses, Fallbacks (phpfastcache / dbc_index)
+ *
+ * Log-Level Hierarchie (aufsteigend):
+ *   debug → info → notice → warning → error → critical → alert → emergency
+ *
+ * =========================================================
+ */
+$config_logging = [
+    // ── Globaler Schalter ──────────────────────────────────────────────────
+    'log_enabled'            => true,   // false = kein Logging (NullHandler)
+
+    // ── Mindest-Level für alle Kanäle ─────────────────────────────────────
+    // Im Produktionsbetrieb empfohlen: 'warning'
+    // Im Entwicklungsbetrieb empfohlen: 'debug'
+    'log_level'              => 'debug',
+
+    // ── Kanalspezifische Level-Überschreibung ──────────────────────────────
+    // Überschreibt 'log_level' für einzelne Kanäle
+   /* 'log_channel_levels'     => [
+        'app'      => 'info',
+        'security' => 'debug',   // Sicherheits-Events immer vollständig loggen
+        'sql'      => 'warning', // SQL nur Fehler (debug_all_sql_querys steuert SQL-Queries)
+        'error'    => 'debug',
+        'access'   => 'info',
+        'cache'    => 'debug',
+    ],*/
+    'log_channel_levels'     => [
+        'app'      => 'debug',
+        'security' => 'debug',   // Sicherheits-Events immer vollständig loggen
+        'sql'      => 'debug', // SQL nur Fehler (debug_all_sql_querys steuert SQL-Queries)
+        'error'    => 'debug',
+        'access'   => 'debug',
+        'cache'    => 'debug',
+    ],
+
+    // ── Ausgabe-Ziele ──────────────────────────────────────────────────────
+    'log_to_file'            => true,   // In rotierende Dateien schreiben
+    'log_errors_separately'  => true,   // error/security: zusätzlich *_critical.log anlegen
+    'log_to_browser_console' => false,  // Browser-Console (nur wenn view_error_reporting = true)
+    'log_to_firephp'         => false,  // FirePHP (nur wenn view_error_reporting = true)
+
+    // ── Datei-Einstellungen ────────────────────────────────────────────────
+    'log_path'               => basePath . '/inc/_logs',  // Speicherort der Logdateien
+    'log_max_files'          => 30,     // Maximale Anzahl rotierter Tagesdateien
+    'log_file_permissions'   => 0664,   // Datei-Berechtigungen (octal)
+
+    // ── Format ────────────────────────────────────────────────────────────
+    // 'line' = lesbare Textzeilen | 'json' = JSON (für Log-Aggregatoren wie Graylog)
+    'log_format'             => 'line',
+
+    // ── Processors ────────────────────────────────────────────────────────
+    'log_with_web_processor'    => true,  // IP, URL, HTTP-Method, Referrer zu jedem Eintrag
+    'log_with_introspection'    => false, // Datei/Zeile des Aufrufers (nur Dev, kostet Performance)
+    'log_bubble'                => false, // Handler-Bubbling (false = nach erstem Handler stopp)
+];
+
+/*
  * Cache Configuration
  */
+
 use Phpfastcache\Config\Config;
-$config_cache = array(
-    //auto ,apc, apcu, cassandra, cookie, couchbase, couchdb, files, leveldb, memcache, memcached, memstatic, mongodb, predis
-    //redis, riak, sqlite, ssdb, wincache, xcache, zenddisk, zendshm
-    "storage" => "files",
-    "config" => new Config([
-        "autoTmpFallback" => true,
-        "defaultTtl" => 10,
-        "defaultChmod" => 0775,
-        "fallback" => 'files',
-        "compressData" => true,
-        "cacheFileExtension" => 'pfc',
-        "path" => basePath . "/inc/_cache_/"
-    ]),
-    "dbc" => true,  //use database query caching * only use with memory cache
-    "tpl" => false  //use template caching * only use with memory cache
-);
+use Phpfastcache\Exceptions\PhpfastcacheInvalidConfigurationException;
+
+try {
+    $config_cache = array(
+        //auto ,apc, apcu, cassandra, cookie, couchbase, couchdb, files, leveldb, memcache, memcached, memstatic, mongodb, predis
+        //redis, riak, sqlite, ssdb, wincache, xcache, zenddisk, zendshm
+        "storage" => "files",
+        "config" => new Config([
+            "autoTmpFallback" => true,
+            "defaultTtl" => 10,
+            "defaultChmod" => 0775,
+            "compressData" => true,
+            "path" => basePath . "/inc/_cache_/"
+        ]),
+        "dbc" => true,  //use database query caching * only use with memory cache
+        "tpl" => false  //use template caching * only use with memory cache
+    );
+} catch (PhpfastcacheInvalidConfigurationException|ReflectionException $e) {
+    exit('Fehler in der Cache-Konfiguration: ' . $e->getMessage());
+}
 
 //-> Legt die UserID des Rootadmins fest
 //-> (dieser darf bestimmte Dinge, den normale Admins nicht duerfen, z.B. andere Admins editieren)
@@ -142,29 +214,45 @@ if (!isset($sql_host) || !isset($sql_user) || !isset($sql_pass) || !isset($sql_d
 if (file_exists(basePath . "/inc/mysql.php"))
     require_once(basePath . "/inc/mysql.php");
 
+require_once(basePath . "/inc/logger.php");
+
 if (!isset($installation)) $installation = false;
 if (!isset($updater)) $updater = false;
 if (!isset($global_index)) $global_index = false;
 
-function show($tpl = "", $array = array(), $array_lang_constant = array(), $array_block = array()) {
+function show($tpl = "", $array = array(), $array_lang_constant = array(), $array_block = array())
+{
     global $tmpdir, $chkMe, $cache, $config_cache;
     if (!empty($tpl) && $tpl != null) {
+        // Prüfen ob $tpl ein echter Dateipfad ist (nur a-z, 0-9, /, _, -)
+        // oder ein direkter Template-String (Sprachkonstante mit Leerzeichen/HTML/Platzhaltern)
+        $is_file_path = !preg_match('#[\s<>\[\]"\'&]#', $tpl);
+
         $template = basePath . "/inc/_templates_/" . $tmpdir . "/" . $tpl;
         $array['dir'] = '../inc/_templates_/' . $tmpdir;
 
-        $CachedString = $cache->getItem(md5('tpl_' . $tmpdir . $template));
-        if (is_null($CachedString->get())) {
-            if(strlen($template . ".html") <= 128) {
+        $CachedString = null;
+        try {
+            $CachedString = $cache->getItem(md5('tpl_' . $tmpdir . $template));
+        } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
+        }
+        if (is_null($CachedString) || is_null($CachedString->get())) {
+            if ($is_file_path && strlen($template . ".html") <= 256) {
                 if (file_exists($template . ".html")) {
                     $tpl = file_get_contents($template . ".html");
-                    if (!view_error_reporting && $config_cache['tpl'] && dbc_index::MemSetIndex()) {
+                    if (!is_null($CachedString) && !view_error_reporting && $config_cache['tpl'] && dbc_index::MemSetIndex()) {
                         $CachedString->set(base64_encode($tpl))->expiresAfter(60);
                         $cache->save($CachedString);
+                        DzcpLogger::cache()->debug('Template gecacht', ['template' => $template . '.html']);
                     }
+                } else {
+                    DzcpLogger::cache()->warning('Template nicht gefunden', ['template' => $template . '.html']);
                 }
             }
+            // Kein else: Wenn $tpl kein Dateipfad ist, wird er direkt als Template-String verwendet
         } else {
             $tpl = base64_decode($CachedString->get());
+            DzcpLogger::cache()->debug('Template aus Cache geladen', ['template' => $template . '.html']);
         }
 
         //put placeholders in array
@@ -194,6 +282,11 @@ function show($tpl = "", $array = array(), $array_lang_constant = array(), $arra
             foreach ($array as $value => $code) {
                 $tpl = str_replace('[' . $value . ']', $code, $tpl);
             }
+        }
+
+        // Auto-inject CSRF token for any [csrf_token] placeholder in templates
+        if (function_exists('csrf_token') && strpos($tpl, '[csrf_token]') !== false) {
+            $tpl = str_replace('[csrf_token]', htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8'), $tpl);
         }
     }
 
@@ -280,10 +373,39 @@ if ($db['host'] != '' && $db['user'] != '' && $db['pass'] != '' && $db['db'] != 
     if ($mysql->connect_error) {
         die("<b>Fehler beim Zugriff auf die Datenbank!");
     }
+
+    // ── Auto-Migration: fehlende Spalten nachträglich hinzufügen ─────────
+    $migrations = [
+        // [ Tabelle, Spaltenname, Spaltendefinition ]
+        // gmaps_koord wurde durch geolocation (TEXT) ersetzt
+        [$db['users'], 'geolocation', "TEXT NULL DEFAULT NULL AFTER `city`"],
+    ];
+    foreach ($migrations as [$mig_table, $mig_col, $mig_def]) {
+        $mig_check = $mysql->query("SHOW COLUMNS FROM `{$mig_table}` LIKE '{$mig_col}';");
+        if ($mig_check && $mig_check->num_rows === 0) {
+            $mysql->query("ALTER TABLE `{$mig_table}` ADD `{$mig_col}` {$mig_def};");
+        }
+    }
+    unset($migrations, $mig_table, $mig_col, $mig_def, $mig_check);
+
+    // ── Initialize Nette Database (new database abstraction layer) ───────
+    require_once(basePath . '/inc/database.php');
+    initNetteDatabase($db);
 }
 
 // Start session if no headers were sent
 if (!headers_sent()) {
+    // Harden session cookie parameters before starting the session
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.use_strict_mode', 1);
+    ini_set('session.cookie_samesite', 'Lax');
+    if ((isset($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) === 'on' || $_SERVER['HTTPS'] === '1')) ||
+        (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] === '443') ||
+        (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https') ||
+        (isset($_SERVER['HTTP_X_FORWARDED_SSL']) && strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) === 'on')) {
+        ini_set('session.cookie_secure', 1);
+    }
+
     session_start();
 
     if (!isset($_SESSION['PHPSESSID'])) {
@@ -295,38 +417,129 @@ if (!headers_sent()) {
     exit("Die Session konnte nicht gestartet werden! ( headers has already sent )<p> STOP!");
 }
 
-//MySQLi-Funktionen
+// ── Monolog Logger initialisieren ────────────────────────────────────────────
+DzcpLogger::init($config_logging);
+
+//MySQLi-Funktionen (Legacy - wird durch Nette\Database ersetzt)
+/**
+ * Get number of rows from query result
+ * @deprecated Use Nette\Database\Explorer methods instead
+ * @param mixed $rows
+ * @return int
+ */
 function _rows($rows)
 {
-    return array_key_exists('_stmt_rows_', $rows) ? $rows['_stmt_rows_'] : $rows->num_rows;
+    if ($rows === true || $rows === false || $rows === null) return 0;
+    if (is_array($rows)) return array_key_exists('_stmt_rows_', $rows) ? $rows['_stmt_rows_'] : 0;
+    if ($rows instanceof NetteResultWrapper) return $rows->getNumRows();
+    return $rows->num_rows;
 }
 
+/**
+ * Fetch a single row from query result
+ * @deprecated Use Nette\Database\Explorer methods instead
+ * @param mixed $fetch
+ * @return array|null
+ */
 function _fetch($fetch)
 {
-    return array_key_exists('_stmt_rows_', $fetch) ? $fetch[0] : $fetch->fetch_assoc();
+    if ($fetch === true || $fetch === false || $fetch === null) return null;
+    if (is_array($fetch)) return array_key_exists('_stmt_rows_', $fetch) ? $fetch[0] : null;
+    if ($fetch instanceof NetteResultWrapper) return $fetch->fetch_assoc();
+    return $fetch->fetch_assoc();
 }
 
+/**
+ * Escape string for SQL injection prevention
+ * @deprecated Use Nette\Database\Explorer with parameters instead
+ * @param string $string
+ * @return string
+ */
 function _real_escape_string($string = '')
 {
     global $mysql;
+
+    // Try to use Nette Database for escaping if available
+    $netteDb = getNetteDb();
+    if ($netteDb !== null && !empty($string)) {
+        try {
+            // Use PDO quote and remove quotes
+            $connection = $netteDb->getConnection();
+            $quoted = $connection->getPdo()->quote($string);
+            return substr($quoted, 1, -1); // Remove surrounding quotes
+        } catch (Exception $e) {
+            // Fall back to mysqli
+        }
+    }
+
     return !empty($string) ? $mysql->real_escape_string($string) : '';
 }
 
+/**
+ * Execute SQL query
+ * @deprecated Use Nette\Database\Explorer methods instead
+ * @param string $query
+ * @param bool $rows
+ * @param bool $fetch
+ * @return mixed
+ */
 function db($query = '', $rows = false, $fetch = false)
 {
     global $mysql, $updater, $db;
 
-    if (debug_all_sql_querys) DebugConsole::wire_log('debug', 9, 'SQL_Query', $query);
+    if (debug_all_sql_querys) {
+        DebugConsole::wire_log('debug', 9, 'SQL_Query', $query);
+        DzcpLogger::sql()->debug('SQL Query', ['query' => $query]);
+    }
+
+    // Use Nette Database only for read (SELECT) queries.
+    // Write queries (INSERT, UPDATE, DELETE, ALTER, …) must go through the
+    // shared mysqli connection so that $mysql->insert_id, affected_rows,
+    // active transactions, and connection-level session variables stay
+    // consistent for all callers.
+    $netteDb = getNetteDb();
+    if ($netteDb !== null && !$updater && !isWriteQuery($query)) {
+        try {
+            $result = executeNetteQuery($query);
+
+            if ($result === null) {
+                throw new Exception('Query execution failed');
+            }
+
+            if ($rows && !$fetch)
+                return _rows($result);
+            else if ($fetch && $rows)
+                return $result->fetch_array(MYSQLI_NUM);
+            else if ($fetch && !$rows)
+                return _fetch($result);
+
+            return $result;
+
+        } catch (Exception $e) {
+            DzcpLogger::sql()->error('Nette Database error, falling back to mysqli', [
+                'query' => $query,
+                'error' => $e->getMessage()
+            ]);
+            // Fall through to mysqli fallback
+        }
+    }
+
+    // Legacy mysqli – used for all write queries and as fallback for reads
     if ($updater) {
         $qry = $mysql->query($query);
     } else {
         if (!$qry = $mysql->query($query)) {
+            DzcpLogger::sql()->critical('SQL-Fehler', [
+                'query'    => $query,
+                'errno'    => $mysql->errno,
+                'error'    => $mysql->error,
+            ]);
             DebugConsole::sql_error_handler($query);
             $language_text = [];
-            include_once(basePath.'/inc/lang/languages/english.php');
+            include_once(basePath . '/inc/lang/languages/english.php');
             $get = _fetch($mysql->query("SELECT `clanname` FROM `" . $db['settings'] . "`;"));
-            die('<img src="../inc/images/dberror.png" align="absmiddle"/>&nbsp;&nbsp;<b>Upps...</b><br /><br />Entschuldige bitte! Das h&auml;tte nicht passieren d&uuml;rfen.<p>'.
-                'Wir k&uuml;mmern uns so schnell wie m&ouml;glich darum.<br><br>' . utf8_decode($get['clanname']) . '<br><br>' . $language_text['_back']);
+            die('<img src="../inc/images/dberror.png" align="absmiddle"/>&nbsp;&nbsp;<b>Upps...</b><br /><br />Entschuldige bitte! Das h&auml;tte nicht passieren d&uuml;rfen.<p>' .
+                'Wir k&uuml;mmern uns so schnell wie m&ouml;glich darum.<br><br>' . mb_convert_encoding($get['clanname'] ?? '', 'ISO-8859-1', 'UTF-8') . '<br><br>' . $language_text['_back']);
         }
     }
 
@@ -345,6 +558,7 @@ function db($query = '', $rows = false, $fetch = false)
  *  d     corresponding variable has type double
  *  s     corresponding variable has type string
  *  b     corresponding variable is a blob and will be sent in packets
+ * @deprecated Use Nette\Database\Explorer with parameters instead
  * @param $query
  * @param array $params
  * @param bool $rows
@@ -354,16 +568,80 @@ function db($query = '', $rows = false, $fetch = false)
 function db_stmt($query, $params = array('si', 'hallo', '4'), $rows = false, $fetch = false)
 {
     global $prefix, $mysql;
-    if (!$statement = $mysql->prepare($query)) die('<b>MySQL-Query failed:</b><br /><br /><ul>' .
-    '<li><b>ErrorNo</b> = ' . !empty($prefix) ? str_replace($prefix, '', $mysql->connect_errno) : $mysql->connect_errno .
-    '<li><b>Error</b>   = ' . !empty($prefix) ? str_replace($prefix, '', $mysql->connect_error) : $mysql->connect_error .
-    '<li><b>Query</b>   = ' . !empty($prefix) ? str_replace($prefix, '', $query) . '</ul>' : $query);
+
+    if (debug_all_sql_querys) {
+        DzcpLogger::sql()->debug('SQL Prepared Query', ['query' => $query, 'params' => array_slice($params, 1)]);
+    }
+
+    // Use Nette Database only for read (SELECT) queries.
+    // Write queries must go through mysqli to keep insert_id / transactions
+    // consistent across the rest of the application.
+    $netteDb = getNetteDb();
+    if ($netteDb !== null && !isWriteQuery($query)) {
+        try {
+            // Convert mysqli parameter format to PDO format
+            $types = $params[0] ?? '';
+            $values = array_slice($params, 1);
+
+            // Replace ? with named parameters for Nette
+            $paramCount = strlen($types);
+            $netteQuery = $query;
+
+            // Execute using Nette with positional parameters
+            $result = $netteDb->query($netteQuery, ...$values);
+
+            // Convert to array format for compatibility
+            $results = [];
+            $results['_stmt_rows_'] = 0;
+
+            if ($result instanceof Nette\Database\ResultSet) {
+                foreach ($result as $row) {
+                    $results[] = $row->toArray();
+                    $results['_stmt_rows_']++;
+                }
+            }
+
+            if ($rows && !$fetch)
+                return _rows($results);
+            else if ($fetch && !$rows)
+                return _fetch($results);
+
+            return $results;
+
+        } catch (Exception $e) {
+            DzcpLogger::sql()->error('Nette prepared statement error, falling back to mysqli', [
+                'query' => $query,
+                'error' => $e->getMessage()
+            ]);
+            // Fall through to mysqli fallback
+        }
+    }
+
+    // Legacy mysqli prepared statement – used for all write queries and as fallback for reads
+    if (!$statement = $mysql->prepare($query)) {
+        DzcpLogger::sql()->critical('SQL Prepared-Statement Fehler (prepare)', [
+            'query' => $query,
+            'errno' => $mysql->connect_errno,
+            'error' => $mysql->connect_error,
+        ]);
+        die('<b>MySQL-Query failed:</b><br /><br /><ul>' .
+        '<li><b>ErrorNo</b> = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_errno) : $mysql->connect_errno) .
+        '<li><b>Error</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_error) : $mysql->connect_error) .
+        '<li><b>Query</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $query) . '</ul>' : $query));
+    }
 
     call_user_func_array(array($statement, 'bind_param'), refValues($params));
-    if (!$statement->execute()) die('<b>MySQL-Query failed:</b><br /><br /><ul>' .
-    '<li><b>ErrorNo</b> = ' . !empty($prefix) ? str_replace($prefix, '', $mysql->connect_errno) : $mysql->connect_errno .
-    '<li><b>Error</b>   = ' . !empty($prefix) ? str_replace($prefix, '', $mysql->connect_error) : $mysql->connect_error .
-    '<li><b>Query</b>   = ' . !empty($prefix) ? str_replace($prefix, '', $query) . '</ul>' : $query);
+    if (!$statement->execute()) {
+        DzcpLogger::sql()->critical('SQL Prepared-Statement Fehler (execute)', [
+            'query' => $query,
+            'errno' => $mysql->connect_errno,
+            'error' => $mysql->connect_error,
+        ]);
+        die('<b>MySQL-Query failed:</b><br /><br /><ul>' .
+        '<li><b>ErrorNo</b> = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_errno) : $mysql->connect_errno) .
+        '<li><b>Error</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_error) : $mysql->connect_error) .
+        '<li><b>Query</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $query) . '</ul>' : $query));
+    }
 
     $meta = mysqli_stmt_result_metadata($statement);
     if (!$meta || empty($meta)) {

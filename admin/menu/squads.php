@@ -19,12 +19,12 @@ switch ($do) {
         $thiskat = '';
         while ($getnav = _fetch($qrynav)) {
             if ($thiskat != $getnav['kat']) {
-                $navigation .= '<option class="dropdownKat" value="lazy">' . re($getnav['katname']) . '</option>
-                                <option value="' . re($getnav['placeholder']) . '-1">-> ' . _admin_first . '</option>';
+                $navigation .= '<option class="dropdownKat" value="lazy">' . h($getnav['katname']) . '</option>
+                                <option value="' . h($getnav['placeholder']) . '-1">-> ' . _admin_first . '</option>';
             }
 
             $thiskat = $getnav['kat'];
-            $navigation .= empty($getnav['name']) ? '' : '<option value="' . re($getnav['placeholder']) . '-' . ($getnav['pos'] + 1) . '">' . _nach . ' -> ' . navi_name(re($getnav['name'])) . '</option>';
+            $navigation .= empty($getnav['name']) ? '' : '<option value="' . h($getnav['placeholder']) . '-' . ($getnav['pos'] + 1) . '">' . _nach . ' -> ' . navi_name(h($getnav['name'])) . '</option>';
         }
 
         $qry = db("SELECT * FROM " . $db['squads'] . " ORDER BY pos");
@@ -32,7 +32,7 @@ switch ($do) {
         while ($get = _fetch($qry)) {
             $positions .= show(_select_field, array("value" => $get['pos'] + 1,
                 "sel" => "",
-                "what" => _nach . ' ' . re($get['name'])));
+                "what" => _nach . ' ' . h($get['name'])));
         }
 
         $files = get_files('../inc/images/gameicons/', false, true, array('gif', 'png', 'jpg'));
@@ -231,7 +231,7 @@ switch ($do) {
 
             if (!empty($tmp)) {
                 $img = getimagesize($tmp);
-                foreach ($picformat AS $end1) {
+                foreach ($picformat as $end1) {
                     if (file_exists(basePath . '/inc/images/squads/' . (int)($_GET['id']) . '.' . $end1)) {
                         @unlink(basePath . '/inc/images/squads/' . (int)($_GET['id']) . '.' . $end1);
                         break;
@@ -250,7 +250,7 @@ switch ($do) {
 
             if (!empty($tmp)) {
                 $img = getimagesize($tmp);
-                foreach ($picformat AS $end1) {
+                foreach ($picformat as $end1) {
                     if (file_exists(basePath . '/inc/images/squads/' . (int)($_GET['id']) . '_logo.' . $end1)) {
                         @unlink(basePath . '/inc/images/squads/' . (int)($_GET['id']) . '_logo.' . $end1);
                         break;
@@ -314,7 +314,7 @@ switch ($do) {
 
                 $sel = $getpos['pos'] == $mp['pos'] ? 'selected="selected"' : '';
                 $positions .= show(_select_field, array("value" => $getpos['pos'] + 1,
-                    "what" => _nach . ' ' . re($getpos['name']),
+                    "what" => _nach . ' ' . h($getpos['name']),
                     "sel" => $sel));
             }
         }
@@ -326,13 +326,13 @@ switch ($do) {
         $navigation = '';
         while ($getnav = _fetch($qrynav)) {
             if ($thiskat != $getnav['kat']) {
-                $navigation .= '<option class="dropdownKat" value="lazy">' . re($getnav['katname']) . '</option>
-                <option value="' . re($getnav['placeholder']) . '-1">-> ' . _admin_first . '</option>';
+                $navigation .= '<option class="dropdownKat" value="lazy">' . h($getnav['katname']) . '</option>
+                <option value="' . h($getnav['placeholder']) . '-1">-> ' . _admin_first . '</option>';
             }
 
             $thiskat = $getnav['kat'];
             $sel[$i] = ($getnav['url'] == '../squads/?action=shows&amp;id=' . (int)($_GET['id'])) ? 'selected="selected"' : '';
-            $navigation .= empty($getnav['name']) ? '' : '<option value="' . re($getnav['placeholder']) . '-' . ($getnav['pos'] + 1) . '" ' . $sel[$i] . '>' . _nach . ' -> ' . navi_name(re($getnav['name'])) . '</option>';
+            $navigation .= empty($getnav['name']) ? '' : '<option value="' . h($getnav['placeholder']) . '-' . ($getnav['pos'] + 1) . '" ' . $sel[$i] . '>' . _nach . ' -> ' . navi_name(h($getnav['name'])) . '</option>';
             $i++;
         }
 
@@ -354,14 +354,14 @@ switch ($do) {
 
         $image = '';
         $logoimage = '';
-        foreach ($picformat AS $end) {
+        foreach ($picformat as $end) {
             if (file_exists(basePath . '/inc/images/squads/' . (int)($_GET['id']) . '.' . $end)) {
                 $image = '<img src="../inc/images/squads/' . (int)($_GET['id']) . '.' . $end . '" width="200" alt="" onmouseover="DZCP.showInfo(\'<tr><td><img src=../inc/images/squads/' . (int)($_GET['id']) . '.' . $end . ' alt= /></tr></td>\')" onmouseout="DZCP.hideInfo()" /><br />';
                 break;
             }
         }
 
-        foreach ($picformat AS $end) {
+        foreach ($picformat as $end) {
             if (file_exists(basePath . '/inc/images/squads/' . (int)($_GET['id']) . '_logo.' . $end)) {
                 $logoimage = '<img src="../inc/images/squads/' . (int)($_GET['id']) . '_logo.' . $end . '" height="60" alt="" onmouseover="DZCP.showInfo(\'<tr><td><img src=../inc/images/squads/' . (int)($_GET['id']) . '_logo.' . $end . ' alt= /></tr></td>\')" onmouseout="DZCP.hideInfo()" /><br />';
                 break;
@@ -401,14 +401,14 @@ switch ($do) {
             "teams" => _admin_squads_teams,
             "show" => _show,
             "dontshow" => _dont_show,
-            "ssquad" => re($get['name']),
+            "ssquad" => h($get['name']),
             "selj" => $team_joinus,
             "self" => $team_fightus,
             "allow" => _allow,
             "deny" => _deny,
             "squads_joinus" => _squads_joinus,
             "squads_fightus" => _squads_fightus,
-            "sgame" => re($get['game']),
+            "sgame" => h($get['game']),
             "positions" => $positions,
             "check_show" => _button_value_show,
             "game" => _member_admin_game));
@@ -430,8 +430,8 @@ switch ($do) {
             $icon = show(_gameicon, array("icon" => $get['icon']));
             $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
             $color++;
-            $squads .= show($dir . "/squads_show", array("squad" => '<a href="../squads/?action=shows&amp;id=' . $get['id'] . '" style="display:block">' . re($get['name']) . '</a>',
-                "game" => re($get['game']),
+            $squads .= show($dir . "/squads_show", array("squad" => '<a href="../squads/?action=shows&amp;id=' . $get['id'] . '" style="display:block">' . h($get['name']) . '</a>',
+                "game" => h($get['game']),
                 "icon" => $icon,
                 "edit" => $edit,
                 "class" => $class,

@@ -81,7 +81,9 @@ if (defined('_Forum')) {
                     "edit" => $edit,
                     "delete" => $delete));
 
-                $hp = ""; $pn = ""; $email = "";
+                $hp = "";
+                $pn = "";
+                $email = "";
                 if ($getp['reg']) {
                     $getu = db("SELECT `nick`,`hp`,`email` FROM `" . $db['users'] . "` WHERE `id` = " . $getp['reg'] . ";", false, true);
 
@@ -141,9 +143,9 @@ if (defined('_Forum')) {
 
             $kat = db("SELECT `name` FROM `" . $db['f_kats'] . "` WHERE `id` = " . $getw['sid'] . ";", false, true);
 
-            $wheres = show(_forum_post_where, array("wherepost" => re($getw['topic']),
-                "wherekat" => re($getw['kattopic']),
-                "mainkat" => re($kat['name']),
+            $wheres = show(_forum_post_where, array("wherepost" => h($getw['topic']),
+                "wherekat" => h($getw['kattopic']),
+                "mainkat" => h($kat['name']),
                 "tid" => $_GET['id'],
                 "kid" => $getw['kid']));
 
@@ -197,11 +199,11 @@ if (defined('_Forum')) {
                     $qryo = db("SELECT * FROM " . $db['f_skats'] . " WHERE sid = '" . $getok['id'] . "' ORDER BY kattopic;");
                     while ($geto = _fetch($qryo)) {
                         $skat .= show(_forum_select_field_skat, array("value" => $geto['id'],
-                            "what" => re($geto['kattopic'])));
+                            "what" => h($geto['kattopic'])));
                     }
 
                     $move .= show(_forum_select_field_kat, array("value" => "lazy",
-                        "what" => re($getok['name']),
+                        "what" => h($getok['name']),
                         "skat" => $skat));
                 }
 
@@ -246,7 +248,8 @@ if (defined('_Forum')) {
                 "edit" => $editt,
                 "delete" => $deletet));
 
-            $hp = ""; $pn = "";
+            $hp = "";
+            $pn = "";
             if ($get['t_reg'] != 0) {
                 $getu = db("SELECT `nick`,`hp`,`email` FROM `" . $db['users'] . "` WHERE `id` = " . $get['t_reg'] . ";", false, true);
                 $email = show(_emailicon_forum, array("email" => eMailAddr(re($getu['email']))));
@@ -296,43 +299,43 @@ if (defined('_Forum')) {
                 $add = '';
             }
 
-            $title = re($getw['topic']) . ' - ' . $title;
+            $title = h($getw['topic']) . ' - ' . $title;
             $email = ($chkMe >= 1 ? $email : '');
             $fastreply = "";
 
-            if($chkMe){
-                if(!$get['closed']) {
-                    $fastreply=show($dir."/forum_fastreply",array(
-                        "fasttext"=>'',
-                        "id"=>$get['id'],
-                        "kid"=>((int)$getw['kid']),
-                        "action"=>'?action=showthread&id='.$_GET['id'].'&do=fastreply',
-                        "what"=>_button_value_add));
+            if ($chkMe) {
+                if (!$get['closed']) {
+                    $fastreply = show($dir . "/forum_fastreply", array(
+                        "fasttext" => '',
+                        "id" => $get['id'],
+                        "kid" => ((int)$getw['kid']),
+                        "action" => '?action=showthread&id=' . $_GET['id'] . '&do=fastreply',
+                        "what" => _button_value_add));
                 }
             }
 
-            if($do == "fastreply") {
-                db("INSERT INTO `".$db['f_posts']."` SET `kid` = ".((int)$getw['kid']).
-                    ",`sid` = ".((int)$_GET['id']).
-                    ",`date` = ".time().
-                    ",`nick` = '".up($_POST['nick']).
-                    "',`email` = '".up($_POST['email']).
-                    "',`hp` = '".links(strval($_POST['hp'])).
-                    "',`reg` = '".up($userid).
-                    "',`text` = '".up($_POST['eintrag'],true).
-                    "',`ip` = '".up($userip)."';");
+            if ($do == "fastreply") {
+                db("INSERT INTO `" . $db['f_posts'] . "` SET `kid` = " . ((int)$getw['kid']) .
+                    ",`sid` = " . ((int)$_GET['id']) .
+                    ",`date` = " . time() .
+                    ",`nick` = '" . up($_POST['nick']) .
+                    "',`email` = '" . up($_POST['email']) .
+                    "',`hp` = '" . links(strval($_POST['hp'])) .
+                    "',`reg` = '" . up($userid) .
+                    "',`text` = '" . up($_POST['eintrag'], true) .
+                    "',`ip` = '" . up($userip) . "';");
 
-                db("UPDATE ".$db['f_threads']." SET `lp`=".time().", `first` = 0 WHERE `id` = ".(int)$_GET['id'].";");
-                setIpcheck("fid(".((int)$getw['kid']).")");
-                db("UPDATE `".$db['userstats']."` SET `forumposts`= (forumposts+1) WHERE `user` = ".$userid.";");
+                db("UPDATE " . $db['f_threads'] . " SET `lp`=" . time() . ", `first` = 0 WHERE `id` = " . (int)$_GET['id'] . ";");
+                setIpcheck("fid(" . ((int)$getw['kid']) . ")");
+                db("UPDATE `" . $db['userstats'] . "` SET `forumposts`= (forumposts+1) WHERE `user` = " . $userid . ";");
 
-                $entrys= cnt($db['f_posts'],"WHERE `sid`=".(int)$_GET['id']);
-                if($entrys == "0")
+                $entrys = cnt($db['f_posts'], "WHERE `sid`=" . (int)$_GET['id']);
+                if ($entrys == "0")
                     $pagenr = "1";
                 else
-                    $pagenr = ceil($entrys/config('m_fposts'));
+                    $pagenr = ceil($entrys / config('m_fposts'));
 
-                $lpost=show(_forum_add_lastpost,array("id"=>$entrys+1, "tid"=>$_GET['id'], "page"=>$pagenr));
+                $lpost = show(_forum_add_lastpost, array("id" => $entrys + 1, "tid" => $_GET['id'], "page" => $pagenr));
                 $index = info(_forum_newpost_successful, $lpost);
             } else {
                 $index = show($dir . "/forum_posts", array(
@@ -340,7 +343,7 @@ if (defined('_Forum')) {
                     "where" => $wheres,
                     "admin" => $admin,
                     "nick" => $nick,
-                    "threadhead" => re($getw['topic']),
+                    "threadhead" => h($getw['topic']),
                     "titel" => $titel,
                     "postnr" => "1",
                     "class" => $ftxt['class'],

@@ -15,13 +15,11 @@ switch ($do) {
                 $addfile .= show($dir . "/form_gallery_addfile", array("file" => _gallery_image, "i" => $i));
             }
 
-            db("INSERT INTO " . $db['gallery'] . " SET `kat` = '" . up($_POST['gallery']) . "',
-                                                   `intern`   = " . (isset($_POST['intern']) ? (int)($_POST['intern']) : 0) . ",
-                                                   `beschreibung`   = '" . up($_POST['beschreibung']) . "',
-                                                   `datum`          = '" . time() . "'");
+            db_stmt("INSERT INTO " . $db['gallery'] . " SET `kat` = ?, `intern` = ?, `beschreibung` = ?, `datum` = ?",
+                array('sisi', up($_POST['gallery']), (isset($_POST['intern']) ? (int)($_POST['intern']) : 0), up($_POST['beschreibung']), time()));
 
             $show = show($dir . "/form_gallery_step2", array("head" => _gallery_admin_head,
-                "what" => re($_POST['gallery']),
+                "what" => htmlspecialchars($_POST['gallery'], ENT_QUOTES, 'UTF-8'),
                 "addfile" => $addfile,
                 "id" => mysqli_insert_id($mysql),
                 "do" => "add",
@@ -49,13 +47,13 @@ switch ($do) {
         $show = info(_gallery_added, "?admin=gallery");
         break;
     case 'delgal':
-        db("DELETE FROM " . $db['gallery'] . " WHERE id = '" . (int)($_GET['id']) . "'");
+        db_stmt("DELETE FROM " . $db['gallery'] . " WHERE id = ?", array('i', (int)($_GET['id'])));
         $files = get_files("../gallery/images/", false, true, $picformat);
         foreach ($files as $file) {
-            if (preg_match("#" . $_GET['id'] . "_(.*?).(gif|jpg|jpeg|png)#", strtolower($file)) != FALSE) {
-                $res = preg_match("#" . $_GET['id'] . "_(.*)#", $file, $match);
-                if (file_exists(basePath . "/gallery/images/" . $_GET['id'] . "_" . $match[1]))
-                    @unlink(basePath . "/gallery/images/" . $_GET['id'] . "_" . $match[1]);
+            if (preg_match("#" . (int)($_GET['id']) . "_(.*?).(gif|jpg|jpeg|png)#", strtolower($file)) != FALSE) {
+                $res = preg_match("#" . (int)($_GET['id']) . "_(.*)#", $file, $match);
+                if (file_exists(basePath . "/gallery/images/" . (int)($_GET['id']) . "_" . $match[1]))
+                    @unlink(basePath . "/gallery/images/" . (int)($_GET['id']) . "_" . $match[1]);
             }
         }
 
@@ -83,9 +81,9 @@ switch ($do) {
             "beschr" => _beschreibung,
             "value" => _button_value_edit,
             "id" => $get['id'],
-            "e_gal" => re($get['kat']),
+            "e_gal" => h($get['kat']),
             "e_intern" => $get['intern'] ? 'checked="checked"' : '',
-            "e_beschr" => re($get['beschreibung'])));
+            "e_beschr" => h($get['beschreibung'])));
         break;
     case 'editgallery':
         db("UPDATE " . $db['gallery'] . " SET `kat` = '" . up($_POST['gallery']) . "',
@@ -106,7 +104,7 @@ switch ($do) {
             "count" => _gallery_count_new,
             "gallery" => _subgallery_head,
             "value" => _error_fwd,
-            "gal" => re($get['kat']),
+            "gal" => h($get['kat']),
             "id" => $get['id'],
             "option" => $option));
         break;
@@ -118,7 +116,7 @@ switch ($do) {
         }
 
         $show = show($dir . "/form_gallery_step2", array("head" => _gallery_admin_edit,
-            "what" => re($get['kat']),
+            "what" => h($get['kat']),
             "do" => "editpics",
             "addfile" => $addfile,
             "id" => $get['id'],
@@ -192,7 +190,7 @@ switch ($do) {
 
             $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
             $color++;
-            $show .= show($dir . "/gallery_show", array("link" => re($get['kat']),
+            $show .= show($dir . "/gallery_show", array("link" => h($get['kat']),
                 "class" => $class,
                 "del" => $del,
                 "edit" => $edit,

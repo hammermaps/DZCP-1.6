@@ -12,7 +12,7 @@ if ($do == "add") {
                     WHERE status = '1'
                     ORDER BY game ASC");
     while ($gets = _fetch($qrys)) {
-        $squads .= show(_select_field_ranking_add, array("what" => re($gets['name']),
+        $squads .= show(_select_field_ranking_add, array("what" => h($gets['name']),
             "value" => $gets['id'],
             "icon" => $gets['icon'],
             "sel" => ""));
@@ -54,7 +54,7 @@ if ($do == "add") {
     while ($gets = _fetch($qrys)) {
         if ($get['squad'] == $gets['id']) $sel = 'selected="selected"';
         else $sel = "";
-        $squads .= show(_select_field_ranking_add, array("what" => re($gets['name']),
+        $squads .= show(_select_field_ranking_add, array("what" => h($gets['name']),
             "value" => $gets['id'],
             "icon" => $gets['icon'],
             "sel" => $sel));
@@ -66,9 +66,9 @@ if ($do == "add") {
         "league" => _rankings_league,
         "rank" => _rankings_admin_place,
         "squads" => $squads,
-        "e_league" => re($get['league']),
+        "e_league" => h($get['league']),
         "e_rank" => $get['rank'],
-        "e_url" => re($get['url']),
+        "e_url" => h($get['url']),
         "url" => _rankings_teamlink));
 } elseif ($do == "editranking") {
     if (empty($_POST['league']) || empty($_POST['url']) || empty($_POST['rank'])) {
@@ -113,8 +113,8 @@ if ($do == "add") {
         $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
         $color++;
 
-        $show_ .= show($dir . "/rankings_show", array("squad" => re($get['name']),
-            "league" => re($get['league']),
+        $show_ .= show($dir . "/rankings_show", array("squad" => h($get['name']),
+            "league" => h($get['league']),
             "id" => $get['sqid'],
             "class" => $class,
             "edit" => $edit,

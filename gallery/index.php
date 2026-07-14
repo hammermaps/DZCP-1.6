@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $where = _site_gallery;
@@ -27,7 +24,7 @@ switch ($action):
                 $imgArr = array();
                 $files = get_files("images/", false, true, $picformat, false, array(), 'minimize');
 
-                foreach ($files AS $file) {
+                foreach ($files as $file) {
                     if ((int)($file) == $get['id'])
                         array_push($imgArr, $file);
                 }
@@ -41,7 +38,7 @@ switch ($action):
                 $cntpics = $cnt == 1 ? _gallery_image : _gallery_images;
                 $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
                 $color++;
-                $show .= show($dir . "/gallery_show", array("link" => re($get['kat']),
+                $show .= show($dir . "/gallery_show", array("link" => h($get['kat']),
                     "class" => $class,
                     "images" => $cntpics,
                     "image" => $imgArr[0],
@@ -55,7 +52,7 @@ switch ($action):
 
         $index = show($dir . "/gallery", array("show" => $show, "head" => _gallery_head));
         break;
-    case 'show';
+    case 'show':
         $get = db("SELECT * FROM " . $db['gallery'] . " WHERE id = '" . (int)($_GET['id']) . "'", false, true);
         if (!permission('galleryintern') && $get['intern']) {
             $index = error(_error_no_access);
@@ -108,7 +105,7 @@ switch ($action):
             $end = $end . "</tr>";
         }
 
-        $index = show($dir . "/show", array("gallery" => re($get['kat']),
+        $index = show($dir . "/show", array("gallery" => h($get['kat']),
             "show" => $show,
             "beschreibung" => bbcode(re($get['beschreibung'])),
             "end" => $end,

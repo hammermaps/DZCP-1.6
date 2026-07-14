@@ -58,7 +58,7 @@ if ($do == "add") {
         "beschreibung" => _beschreibung,
         "what" => _button_value_edit,
         "do" => "editevent&amp;id=" . $_GET['id'],
-        "k_event" => re($get['title']),
+        "k_event" => h($get['title']),
         "k_beschreibung" => re_bbcode(re($get['event'])),
         "head" => _kalender_admin_head_edit));
 } elseif ($do == "editevent") {
@@ -97,7 +97,7 @@ if ($do == "add") {
         $color++;
 
         $show_ .= show($dir . "/kalender_show", array("datum" => date("d.m.y H:i", $get['datum']) . _uhr,
-            "event" => re($get['title']),
+            "event" => h($get['title']),
             "time" => $get['datum'],
             "id" => $get['sqid'],
             "class" => $class,

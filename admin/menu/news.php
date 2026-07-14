@@ -17,11 +17,11 @@ while ($get = _fetch($qry)) {
         "action" => "admin=news&amp;do=delete",
         "title" => _button_title_del,
         "del" => convSpace(_confirm_del_kat)));
-    $img = show(_config_newskats_img, array("img" => re($get['katimg'])));
+    $img = show(_config_newskats_img, array("img" => h($get['katimg'])));
 
     $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
     $color++;
-    $kats .= show($dir . "/newskats_show", array("mainkat" => re($get['kategorie']),
+    $kats .= show($dir . "/newskats_show", array("mainkat" => h($get['kategorie']),
         "class" => $class,
         "img" => $img,
         "delete" => $delete,
@@ -93,7 +93,7 @@ if ($do == "delete") {
 
     $show = show($dir . "/newskatform", array("head" => _config_newskats_edit_head,
         "nkat" => _config_katname,
-        "kat" => re($get['kategorie']),
+        "kat" => h($get['kategorie']),
         "value" => _button_value_edit,
         "id" => $_GET['id'],
         "nothing" => _nothing,

@@ -55,13 +55,13 @@ if (defined('_UserMenu')) {
                     "form" => $form,
                     "postemail" => $_POST['email'],
                     "posthp" => $_POST['hp'],
-                    "postnick" => re($_POST['nick']),
+                    "postnick" => htmlspecialchars($_POST['nick'], ENT_QUOTES, 'UTF-8'),
                     "posteintrag" => re_bbcode(re($_POST['eintrag'], true)),
                     "error" => $error,
                     "ip" => _iplog_info,
                     "eintraghead" => _eintrag));
             } else {
-                $qryperm = db("SELECT `perm_gb` FROM `" . $db['users'] . "` WHERE `id` = " . $_GET['id'].";", false, true);
+                $qryperm = db("SELECT `perm_gb` FROM `" . $db['users'] . "` WHERE `id` = " . $_GET['id'] . ";", false, true);
                 if ($qryperm['perm_gb']) {
                     $qry = db("INSERT INTO " . $db['usergb'] . "
                                          SET `user`       = '" . ((int)$_GET['id']) . "',

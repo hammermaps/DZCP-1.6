@@ -30,7 +30,7 @@ if ($do == 'preview') {
 
             $squads .= show(_to_squads, array("id" => $get['id'],
                 "sel" => $selsq,
-                "name" => re($get['name'])));
+                "name" => h($get['name'])));
         }
 
         if ($_POST['to'] == "reg")
@@ -64,12 +64,12 @@ if ($do == 'preview') {
         $sendTO = isset($_POST['to']) ? strtolower($_POST['to']) : '';
         if ($sendTO == "reg") {
             $message = show(bbcode_email(re(settings('eml_nletter'))),
-                array("text" => bbcode_nletter(re($_POST['eintrag'],true))));
+                array("text" => bbcode_nletter(re($_POST['eintrag'], true))));
             $subject = re(settings('eml_nletter_subj'));
 
             $qry = db("SELECT `email` FROM `" . $db['users'] . "` WHERE `nletter` = 1 AND `dsgvo_lock` = 0;");
             while ($get = _fetch($qry)) {
-                sendMail(re($get['email']), $subject, $message);
+                sendMail(h($get['email']), $subject, $message);
             }
 
             db("UPDATE " . $db['userstats'] . " SET `writtenmsg` = (writtenmsg+1) WHERE `user` = " . (int)($userid));
@@ -80,7 +80,7 @@ if ($do == 'preview') {
 
             $qry = db("SELECT `email` FROM `" . $db['users'] . "` WHERE `level` >= 2 AND `dsgvo_lock` = 0;");
             while ($get = _fetch($qry)) {
-                sendMail(re($get['email']), $subject, $message);
+                sendMail(h($get['email']), $subject, $message);
             }
 
             db("UPDATE " . $db['userstats'] . " SET `writtenmsg` = (writtenmsg+1) WHERE user = " . (int)($userid));
@@ -92,7 +92,7 @@ if ($do == 'preview') {
             $qry = db("SELECT s2.`email` FROM `" . $db['squaduser'] . "` AS `s1` LEFT JOIN " . $db['users'] . " AS `s2`" .
                 " ON s1.`user` = s2.`id` WHERE s1.`squad` = '" . $_POST['to'] . "' AND s2.`dsgvo_lock` = 0;");
             while ($get = _fetch($qry)) {
-                sendMail(re($get['email']), $subject, $message);
+                sendMail(h($get['email']), $subject, $message);
             }
 
             db("UPDATE " . $db['userstats'] . " SET `writtenmsg` = writtenmsg+1 WHERE user = " . (int)($userid));
@@ -105,7 +105,7 @@ if ($do == 'preview') {
     while ($get = _fetch($qry)) {
         $squads .= show(_to_squads, array("id" => $get['id'],
             "sel" => "",
-            "name" => re($get['name'])));
+            "name" => h($get['name'])));
     }
 
     $show = show($dir . "/nletter", array("von" => $userid,

@@ -5,7 +5,6 @@
  * Menu: Teamspeak
  * @param int $js
  * @return bool|mixed|null|string|string[]
- * @throws \phpFastCache\Exceptions\phpFastCacheInvalidArgumentException
  */
 function teamspeak($js = 0)
 {
@@ -30,11 +29,17 @@ function teamspeak($js = 0)
         $ts_sport = settings('ts_sport');
         $ts_port = settings('ts_port');
         if (!empty($ts_ip) && !empty($ts_sport) && !empty($ts_port)) {
-            $CachedString = $cache->getItem('teamspeak_' . $_SESSION['language']);
-            if (is_null($CachedString->get()) || isset($_GET['cID'])) {
+            try {
+                $CachedString = $cache->getItem('teamspeak_' . $_SESSION['language']);
+            } catch (\Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException $e) {
+                $CachedString = null;
+            }
+            if (is_null($CachedString) || is_null($CachedString->get()) || isset($_GET['cID'])) {
                 $teamspeak = teamspeak3();
-                $CachedString->set($teamspeak)->expiresAfter(config('cache_teamspeak'));
-                $cache->save($CachedString);
+                if (!is_null($CachedString)) {
+                    $CachedString->set($teamspeak)->expiresAfter(config('cache_teamspeak'));
+                    $cache->save($CachedString);
+                }
             } else {
                 $teamspeak = $CachedString->get();
             }

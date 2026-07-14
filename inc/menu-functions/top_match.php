@@ -22,7 +22,7 @@ function top_match()
         if ($get = _fetch($qry)) {
             $squad = '_defaultlogo.jpg';
             $gegner = '_defaultlogo.jpg';
-            foreach ($picformat AS $end) {
+            foreach ($picformat as $end) {
                 if (file_exists(basePath . '/inc/images/clanwars/' . $get['id'] . '_logo.' . $end))
                     $gegner = $get['id'] . '_logo.' . $end;
 
@@ -34,9 +34,9 @@ function top_match()
                 $hover = 'onmouseover="DZCP.showInfo(\'' . up(re($get['name'])) . ' vs. ' . jsconvert(re($get['gegner'])) . '\', \'' . _played_at . ';' . _cw_xonx . ';' . _result . ';' . _comments_head . '\', \'' . date("d.m.Y H:i", $get['datum']) . _uhr . ';' . jsconvert(re($get['xonx'])) . ';' . cw_result_nopic_nocolor($get['punkte'], $get['gpunkte']) . ';' . cnt($db['cw_comments'], "WHERE cw = '" . $get['id'] . "'") . '\')" onmouseout="DZCP.hideInfo()"';
 
             $topmatch .= show("menu/top_match", array("id" => $get['id'],
-                "clantag" => re(cut(re($get['clantag']), config('l_lwars'), true, false)),
-                "team" => re(cut(re($get['name']), config('l_lwars'), true, false)),
-                "game" => substr(strtoupper(str_replace('.' . re($get['icon']), '', re($get['icon']))), 0, 5),
+                "clantag" => h(cut($get['clantag'], config('l_lwars'), true, false)),
+                "team" => h(cut($get['name'], config('l_lwars'), true, false)),
+                "game" => h(substr(strtoupper(str_replace('.' . $get['icon'], '', $get['icon'])), 0, 5)),
                 "gegner" => $gegner,
                 "squad" => $squad,
                 "hover" => $hover,

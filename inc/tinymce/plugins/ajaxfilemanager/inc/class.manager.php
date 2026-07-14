@@ -299,7 +299,7 @@ class manager
     /**
      * Get the extension of a file name
      *
-     * @param  string $file
+     * @param string $file
      * @return string
      * @copyright this function originally come from Andy's php
      */

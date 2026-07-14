@@ -22,7 +22,7 @@ while ($get = _fetch($qry)) {
 
     $show_ .= show($dir . "/dlkats_show", array("gameicon" => $gameicon,
         "edit" => $edit,
-        "name" => re($get['name']),
+        "name" => h($get['name']),
         "class" => $class,
         "delete" => $delete));
 }
@@ -42,7 +42,7 @@ if ($do == "edit") {
 
     $show = show($dir . "/dlkats_form", array("newhead" => _dl_edit_head,
         "do" => "editkat&amp;id=" . $_GET['id'] . "",
-        "kat" => re($get['name']),
+        "kat" => h($get['name']),
         "what" => _button_value_edit,
         "dlkat" => _dl_dlkat));
 } elseif ($do == "editkat") {

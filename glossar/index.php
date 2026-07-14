@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $dir = "glossar";
@@ -36,7 +33,7 @@ while ($get = _fetch($qry)) {
     if (isset($_GET['word']) && $_GET['word'] == $get['word'])
         $class = 'highlightSearchTarget';
 
-    $show .= show($dir . "/glossar_show", array("word" => re($get['word']),
+    $show .= show($dir . "/glossar_show", array("word" => h($get['word']),
         "class" => $class,
         "glossar" => bbcode(re($get['glossar']))));
 }

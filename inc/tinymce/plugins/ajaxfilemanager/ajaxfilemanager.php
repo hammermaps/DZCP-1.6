@@ -149,7 +149,7 @@ if (!empty($_GET['view'])) {
                     }
                     ;
                 });
-                if (typeof(cancelSelectFile) != 'undefined') {
+                if (typeof (cancelSelectFile) != 'undefined') {
                     $('#linkClose').show();
                 }
                 $('input[@name=view]').each(

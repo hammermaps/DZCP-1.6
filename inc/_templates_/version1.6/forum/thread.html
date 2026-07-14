@@ -8,6 +8,7 @@
             </script>
             <form id="forumForm" name="forumForm" action="?action=thread&amp;do=[dowhat]" method="post"
                   onsubmit="return(DZCP.submitButton())">
+                <input type="hidden" name="csrf_token" value="[csrf_token]" />
                 <input type="hidden" name="reg" value="[reg]"/>
                 <table class="hperc" cellspacing="1">
                     <tr>

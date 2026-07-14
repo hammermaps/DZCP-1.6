@@ -71,9 +71,9 @@ if (defined('_Forum')) {
                   WHERE id = '" . $getw['sid'] . "'");
         $kat = _fetch($qrykat);
 
-        $wheres = show(_forum_post_where_preview, array("wherepost" => re($_POST['topic']),
-            "wherekat" => re($getw['kattopic']),
-            "mainkat" => re($kat['name']),
+        $wheres = show(_forum_post_where_preview, array("wherepost" => htmlspecialchars($_POST['topic'], ENT_QUOTES, 'UTF-8'),
+            "wherekat" => h($getw['kattopic']),
+            "mainkat" => h($kat['name']),
             "tid" => $_GET['id'],
             "kid" => $getw['kid']));
 
@@ -88,7 +88,7 @@ if (defined('_Forum')) {
             "admin" => "",
             "class" => 'class="commentsRight"',
             "nick" => cleanautor($pUId, '', re($_POST['nick'], true), re($_POST['email'], true)),
-            "threadhead" => re($_POST['topic']),
+            "threadhead" => htmlspecialchars($_POST['topic'], ENT_QUOTES, 'UTF-8'),
             "titel" => $titel,
             "postnr" => "1",
             "pn" => $pn,
@@ -113,7 +113,7 @@ if (defined('_Forum')) {
             "f_abo" => "",
             "show" => $show));
 
-        echo utf8_encode('<table class="mainContent" cellspacing="1" style="margin-top:17px">' . $index . '</table>');
+        echo mb_convert_encoding('<table class="mainContent" cellspacing="1" style="margin-top:17px">' . $index . '</table>', 'UTF-8', 'ISO-8859-1');
 
         if (!mysqli_persistconns)
             $mysql->close(); //MySQL
@@ -192,7 +192,7 @@ if (defined('_Forum')) {
             "zitat" => _forum_zitat_preview,
             "onoff" => $onoff));
 
-        echo utf8_encode('<table class="mainContent" cellspacing="1" style="margin-top:17px">' . $index . '</table>');
+        echo mb_convert_encoding('<table class="mainContent" cellspacing="1" style="margin-top:17px">' . $index . '</table>', 'UTF-8', 'ISO-8859-1');
 
         if (!mysqli_persistconns)
             $mysql->close(); //MySQL

@@ -1,5 +1,5 @@
 ### Drivers descriptions
-* Apc
+* Apc **(REMOVED in V8)**
   * The Alternative Php Cache (APC) driver. A memory cache for regular performances.
 * Apcu
   * The Alternative Php User Cache (APCU) driver. A memory cache for regular performances.
@@ -9,6 +9,8 @@
   * A cookie driver to store non-sensitive scalar (only) data. Limited storage up to 4Ko.
 * Couchbase
   * A very high-performance NoSQL driver using a key-value pair system
+* Couchbasev3 **(Added in V8.0.8)**
+  * Same as Couchbase but for Couchbase PHP-SDK 3.0 support
 * Couchdb
   * A very high-performance NoSQL driver using a key-value pair system
 * Devfalse
@@ -33,7 +35,7 @@
   * A high-performance memory driver using a in-memory data structure storage. Less efficient than Redis driver as it is an embedded library
 * Redis
   * A very high-performance memory driver using a in-memory data structure storage. More efficient than Predis driver as it is an compiled library
-* Riak
+* Riak **(REMOVED in V8.0.6)**
   * A very high-performance NoSQL driver using a key-value pair system
 * Sqlite
   * A Sqlite driver that use serialization for storing data for regular performances. A _$path_ config must be specified, else the system temporary directory will be used.
@@ -41,7 +43,7 @@
   * A very high-performance NoSQL driver using a key-value pair system
 * Wincache
   * The Wincache driver. A memory cache for regular performances on Windows platforms.
-* Xcache
+* Xcache **(REMOVED in V8)**
   * The Xcache driver. A memory cache for regular performances.
 * Zend Disk Cache ( * Requires ZendServer Version 4 or higher * )
   * The Zend Data Cache is a by ZendServer supported file cache. The cache is for regular performance.

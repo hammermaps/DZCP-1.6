@@ -16,7 +16,7 @@ function fvote($id, $ajax = false)
         $qryv = db("SELECT `id`,`stimmen`,`sel` FROM " . $db['vote_results'] . " WHERE `vid` = '" . $get['id'] . "' ORDER BY id ASC");
         if (_rows($qryv)) {
             while ($getv = _fetch($qryv)) {
-                $stimmen = sum($db['vote_results'], " WHERE `vid` = '" . $get['id'] . "'", "stimmen");
+                $stimmen = sum($db['vote_results'], "stimmen", " WHERE `vid` = '" . $get['id'] . "'");
                 if ($stimmen != 0) {
                     if (ipcheck("vid_" . $get['id']) || cookie::get('vid_' . $get['id']) != false || $get['closed'] == 1) {
                         $percent = round($getv['stimmen'] / $stimmen * 100, 1);
@@ -24,7 +24,7 @@ function fvote($id, $ajax = false)
                         $balken = show(_votes_balken, array("width" => $rawpercent));
 
                         $votebutton = "";
-                        $results .= show("forum/vote_results", array("answer" => re($getv['sel']),
+                        $results .= show("forum/vote_results", array("answer" => h($getv['sel']),
                             "percent" => $percent,
                             "stimmen" => $getv['stimmen'],
                             "balken" => $balken));
@@ -40,7 +40,7 @@ function fvote($id, $ajax = false)
         }
 
         $getf = db("SELECT `id`,`kid` FROM " . $db['f_threads'] . " WHERE `vote` = '" . $get['id'] . "'", false, true);
-        $vote = show("forum/vote", array("titel" => re($get['titel']),
+        $vote = show("forum/vote", array("titel" => h($get['titel']),
             "vid" => $get['id'],
             "fid" => $getf['id'],
             "kid" => $getf['kid'],

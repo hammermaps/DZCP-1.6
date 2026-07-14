@@ -49,8 +49,8 @@ if (defined('_Forum')) {
                 $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
                 $color++;
 
-                $showt .= show($dir . "/kats_show", array("topic" => re($gets['kattopic']),
-                    "subtopic" => re($gets['subtopic']),
+                $showt .= show($dir . "/kats_show", array("topic" => h($gets['kattopic']),
+                    "subtopic" => h($gets['subtopic']),
                     "lpost" => $lpost,
                     "new" => (check_new((int)$lpdate) ? _newicon : ''),
                     "threads" => $threads,
@@ -61,8 +61,8 @@ if (defined('_Forum')) {
             }
         }
 
-        if ($get['intern'] == 1) $katname = show(_forum_katname_intern, array("katname" => re($get['name'])));
-        else $katname = re($get['name']);
+        if ($get['intern'] == 1) $katname = show(_forum_katname_intern, array("katname" => h($get['name'])));
+        else $katname = h($get['name']);
 
         if (!empty($showt)) {
             $show .= show($dir . "/kats", array("katname" => $katname,

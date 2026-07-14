@@ -10,7 +10,7 @@ if (defined('_News')) {
 
     $klapp = "";
     if ($_POST['klapptitel']) {
-        $klapp = show(_news_klapplink, array("klapplink" => re($_POST['klapptitel']),
+        $klapp = show(_news_klapplink, array("klapplink" => htmlspecialchars($_POST['klapptitel'], ENT_QUOTES, 'UTF-8'),
             "which" => "collapse",
             "id" => 0));
     }
@@ -19,21 +19,21 @@ if (defined('_News')) {
     $rel = "";
     if (!empty($_POST['url1'])) {
         $rel = _related_links;
-        $links1 = show(_news_link, array("link" => re($_POST['link1']),
+        $links1 = show(_news_link, array("link" => htmlspecialchars($_POST['link1'], ENT_QUOTES, 'UTF-8'),
             "url" => links(re($_POST['url1'], true))));
     }
 
     $links2 = "";
     if (!empty($_POST['url2'])) {
         $rel = _related_links;
-        $links2 = show(_news_link, array("link" => re($_POST['link2']),
+        $links2 = show(_news_link, array("link" => htmlspecialchars($_POST['link2'], ENT_QUOTES, 'UTF-8'),
             "url" => links(re($_POST['url2'], true))));
     }
 
     $links3 = "";
     if (!empty($_POST['url3'])) {
         $rel = _related_links;
-        $links3 = show(_news_link, array("link" => re($_POST['link3']),
+        $links3 = show(_news_link, array("link" => htmlspecialchars($_POST['link3'], ENT_QUOTES, 'UTF-8'),
             "url" => links(re($_POST['url3'], true))));
     }
 
@@ -55,7 +55,7 @@ if (defined('_News')) {
 
     $newsimage = '../inc/images/newskat/' . re($getkat['katimg']);
     $viewed = show(_news_viewed, array("viewed" => '0'));
-    $index = show($dir . "/news_show_full", array("titel" => re($_POST['titel']),
+    $index = show($dir . "/news_show_full", array("titel" => htmlspecialchars($_POST['titel'], ENT_QUOTES, 'UTF-8'),
         "kat" => $newsimage,
         "id" => '_prev',
         "comments" => _news_comments_prev,
@@ -76,7 +76,7 @@ if (defined('_News')) {
         "links" => $links,
         "autor" => autor($userid)));
 
-    echo utf8_encode('<table class="mainContent" cellspacing="1">' . $index . '</table>');
+    echo mb_convert_encoding('<table class="mainContent" cellspacing="1">' . $index . '</table>', 'UTF-8', 'ISO-8859-1');
 
     if (!mysqli_persistconns)
         $mysql->close(); //MySQL

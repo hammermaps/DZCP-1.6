@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $where = _site_contact;
@@ -64,7 +61,7 @@ switch ($action):
             "head" => _news_send));
 
         break;
-    case 'do';
+    case 'do':
         if ($_GET['what'] == "sendnews") {
             if (HasDSGVO()) {
                 if (!array_key_exists('sec_sendnews', $_SESSION) || (!$userid && (empty($_POST['nick']))) || (!$userid && empty($_POST['email']) || $_POST['email'] == "E-Mail") ||

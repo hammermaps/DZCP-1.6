@@ -180,12 +180,12 @@ class file
 
     /**
      * Copy a file, or recursively copy a folder and its contents
+     * @param string $source Source path
+     * @param string $dest Destination path
+     * @return      bool     Returns TRUE on success, FALSE on failure
      * @author      Aidan Lister <aidan@php.net>
      * @author      Paul Scott
      * @version     1.0.1
-     * @param       string $source Source path
-     * @param       string $dest Destination path
-     * @return      bool     Returns TRUE on success, FALSE on failure
      */
     function copyTo($source, $dest)
     {

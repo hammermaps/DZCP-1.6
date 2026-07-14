@@ -21,13 +21,14 @@ if (defined('_Forum')) {
                  ORDER BY global DESC, sticky DESC, lp DESC, t_date DESC
                  LIMIT " . ($page - 1) * config('m_fthreads') . "," . config('m_fthreads') . ";");
         } else {
+            $search = _real_escape_string($_POST['suche']);
             $qry = db("SELECT s1.global,s1.topic,s1.subtopic,s1.t_text,s1.t_email,s1.hits,s1.t_reg,s1.t_date,s1.closed,s1.sticky,s1.id
                  FROM " . $db['f_threads'] . " AS s1
-                 WHERE s1.topic LIKE '%" . $_POST['suche'] . "%'
+                 WHERE s1.topic LIKE '%" . $search . "%'
                  AND s1.kid = '" . (int)($_GET['id']) . "'
-                 OR s1.subtopic LIKE '%" . $_POST['suche'] . "%'
+                 OR s1.subtopic LIKE '%" . $search . "%'
                  AND s1.kid = '" . (int)($_GET['id']) . "'
-                 OR s1.t_text LIKE '%" . $_POST['suche'] . "%'
+                 OR s1.t_text LIKE '%" . $search . "%'
                  AND s1.kid = '" . (int)($_GET['id']) . "'
                  ORDER BY s1.global DESC, s1.sticky DESC, s1.lp DESC, s1.t_date DESC
                  LIMIT " . ($page - 1) * config('m_fthreads') . "," . config('m_fthreads') . ";");
@@ -57,7 +58,7 @@ if (defined('_Forum')) {
                     WHERE id = '" . (int)($_GET['id']) . "'", false, true);
 
                 $threadlink = show(_forum_thread_link, array(
-                    "topic" => cut(re($get['topic']), config('l_forumtopic')),
+                    "topic" => h(cut(re($get['topic']), config('l_forumtopic'))),
                     "id" => $get['id'],
                     "kid" => $gets['id'],
                     "sticky" => $sticky,
@@ -67,7 +68,7 @@ if (defined('_Forum')) {
                     "page" => $pagenr));
             } else {
                 $threadlink = show(_forum_thread_search_link, array(
-                    "topic" => cut(re($get['topic']), config('l_forumtopic')),
+                    "topic" => h(cut(re($get['topic']), config('l_forumtopic'))),
                     "id" => $get['id'],
                     "sticky" => $sticky,
                     "hl" => $_POST['suche'],
@@ -93,7 +94,7 @@ if (defined('_Forum')) {
             $color++;
             $threads .= show($dir . "/forum_show_threads", array("new" => (check_new((int)$get['lp']) ? _newicon : ''),
                 "topic" => $threadlink,
-                "subtopic" => cut(re($get['subtopic']), config('l_forumsubtopic')),
+                "subtopic" => h(cut(re($get['subtopic']), config('l_forumsubtopic'))),
                 "hits" => $get['hits'],
                 "replys" => cnt($db['f_posts'], " WHERE sid = '" . $get['id'] . "'"),
                 "class" => $class,
@@ -107,7 +108,7 @@ if (defined('_Forum')) {
 
         $search = show($dir . "/forum_skat_search", array("head_search" => _forum_head_skat_search,
             "id" => $_GET['id'],
-            "suchwort" => isset($_POST['suche']) ? re($_POST['suche']) : ''));
+            "suchwort" => isset($_POST['suche']) ? htmlspecialchars($_POST['suche'], ENT_QUOTES, 'UTF-8') : ''));
         $nav = nav($entrys, config('m_fthreads'), "?action=show&amp;id=" . $_GET['id'] . "");
 
         if (!empty($_POST['suche'])) {
@@ -142,12 +143,12 @@ if (defined('_Forum')) {
         $kat = db("SELECT name FROM " . $db['f_kats'] . "
                 WHERE id = '" . $subkat['sid'] . "'", false, true);
 
-        $wheres = show(_forum_subkat_where, array("where" => re($gets['kattopic']),
+        $wheres = show(_forum_subkat_where, array("where" => h($gets['kattopic']),
             "id" => $gets['id']));
 
         $index = show($dir . "/forum_show", array("head" => _forum_head,
             "where" => $wheres,
-            "mainkat" => re($kat['name']),
+            "mainkat" => h($kat['name']),
             "what" => $what,
             "search" => $search));
     }

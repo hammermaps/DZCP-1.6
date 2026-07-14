@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $dir = "linkus";
@@ -26,7 +23,7 @@ switch ($action):
                 $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
                 $color++;
                 $banner = show(_linkus_bannerlink, array("id" => $get['id'],
-                    "banner" => re($get['text'])));
+                    "banner" => h($get['text'])));
                 $edit = "";
                 $delete = "";
                 if (permission("links")) {
@@ -40,11 +37,11 @@ switch ($action):
                 }
 
                 $show .= show($dir . "/linkus_show", array("class" => $class,
-                    "beschreibung" => re($get['beschreibung']),
+                    "beschreibung" => h($get['beschreibung']),
                     "cnt" => $color,
                     "banner" => $banner,
-                    "besch" => re($get['beschreibung']),
-                    "url" => $get['url']));
+                    "besch" => h($get['beschreibung']),
+                    "url" => h($get['url'])));
             }
         }
 
@@ -54,7 +51,7 @@ switch ($action):
         $index = show($dir . "/linkus", array("head" => _linkus_head,
             "show" => $show));
         break;
-    case 'link';
+    case 'link':
         $get = db("SELECT `url` FROM " . $db['linkus'] . " WHERE `id` = '" . (int)($_GET['id']) . "'", false, true);
         header("Location: " . $get['url']);
         break;

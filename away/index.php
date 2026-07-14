@@ -8,9 +8,6 @@
 include("../inc/buffer.php");
 
 ## INCLUDES ##
-include(basePath . "/inc/debugger.php");
-include(basePath . "/inc/config.php");
-include(basePath . "/inc/bbcode.php");
 
 ## SETTINGS ##
 $dir = "away";
@@ -57,7 +54,7 @@ switch ($action):
                     "status" => $status,
                     "von" => date("d.m.y", $get['start']),
                     "bis" => date("d.m.y", $get['end']),
-                    "grund" => re($get["titel"]),
+                    "grund" => h($get["titel"]),
                     "value" => $value,
                     "del" => $delete,
                     "nick" => autor($get['userid']),
@@ -85,7 +82,7 @@ switch ($action):
                 "nav" => $nav));
         }
         break;
-    case 'new';
+    case 'new':
         $where = $where . ' - ' . _away_new;
         if (!$chkMe || $chkMe < 2) {
             $index = error(_error_wrong_permissions, 1);
@@ -146,8 +143,8 @@ switch ($action):
                         "date1" => $date1,
                         "date2" => $date2,
                         "comment" => _news_kommentar,
-                        "titel" => $_POST['titel'],
-                        "text" => re($_POST['reason'], true),
+                        "titel" => htmlspecialchars($_POST['titel'], ENT_QUOTES, 'UTF-8'),
+                        "text" => htmlspecialchars(re($_POST['reason'], true), ENT_QUOTES, 'UTF-8'),
                         "submit" => _button_value_add));
                 } else {
                     $time = mktime(23, 59, 59, $_POST['monat'], $_POST['tag'], $_POST['jahr']);
@@ -161,7 +158,7 @@ switch ($action):
             }
         }
         break;
-    case 'info';
+    case 'info':
         $where = $where . ' - ' . _info;
         if (!$chkMe || $chkMe < 2) {
             $index = error(_error_wrong_permissions, 1);
@@ -190,14 +187,14 @@ switch ($action):
                 "von" => date("d.m.Y", $get['start']),
                 "bis" => date("d.m.Y", $get['end']),
                 "text" => bbcode(re($get['reason'])),
-                "titel" => re($get['titel']),
+                "titel" => h($get['titel']),
                 "edit" => $edit,
                 "status" => $status,
                 "addnew" => date("d.m.Y", $get['date']) . " " . _away_on . " " .
                     date("H:i", $get['date']) . _uhr));
         }
         break;
-    case 'del';
+    case 'del':
         if (!$chkMe || $chkMe < 2) {
             $index = error(_error_wrong_permissions, 1);
         } else {
@@ -205,7 +202,7 @@ switch ($action):
             $index = info(_away_successful_del, "../away/");
         }
         break;
-    case 'edit';
+    case 'edit':
         if (!$chkMe || $chkMe < 2) {
             $index = error(_error_wrong_permissions, 1);
         } else {
@@ -227,8 +224,8 @@ switch ($action):
                 "date1" => $date1,
                 "date2" => $date2,
                 "comment" => _news_kommentar,
-                "titel" => $get['titel'],
-                "text" => $get['reason'],
+                "titel" => h($get['titel']),
+                "text" => h($get['reason']),
                 "submit" => _button_value_edit));
 
             $abdata = mktime(0, 0, 0,
@@ -263,8 +260,8 @@ switch ($action):
                         "date1" => $date1,
                         "date2" => $date2,
                         "comment" => _news_kommentar,
-                        "titel" => $_POST['titel'],
-                        "text" => $_POST['reason'],
+                        "titel" => htmlspecialchars($_POST['titel'], ENT_QUOTES, 'UTF-8'),
+                        "text" => htmlspecialchars($_POST['reason'], ENT_QUOTES, 'UTF-8'),
                         "submit" => _button_value_add));
 
                 } else {

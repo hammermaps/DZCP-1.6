@@ -17,14 +17,14 @@ while ($getsq = _fetch($qrysq)) {
     $qrypos = db("SELECT id,position FROM " . $db['pos'] . " ORDER BY pid");
     $posi = "";
     while ($getpos = _fetch($qrypos)) {
-        $posi .= show(_select_field_posis, array("value" => $getpos['id'], "sel" => '', "what" => re($getpos['position'])));
+        $posi .= show(_select_field_posis, array("value" => $getpos['id'], "sel" => '', "what" => h($getpos['position'])));
     }
 
     $esquads .= show(_checkfield_squads, array("id" => $getsq['id'],
         "check" => '',
         "eposi" => $posi,
         "noposi" => _user_noposi,
-        "squad" => re($getsq['name'])));
+        "squad" => h($getsq['name'])));
 }
 
 $show = show($dir . "/register", array("registerhead" => _useradd_head,
@@ -92,7 +92,7 @@ if ($do == "add") {
         else
             $mkpwd = $_POST['pwd'];
 
-        $pwd = hash('sha256', $mkpwd);
+        $pwd = password_hash($mkpwd, PASSWORD_DEFAULT);
         $bday = ($_POST['t'] && $_POST['m'] && $_POST['j'] ? cal($_POST['t']) . "." . cal($_POST['m']) . "." . $_POST['j'] : 0);
         $qry = db("INSERT INTO `" . $db['users'] . "`
                              SET `user`     = '" . up($_POST['user']) . "',
@@ -115,24 +115,24 @@ if ($do == "add") {
         $insert_id = mysqli_insert_id($mysql);
         setIpcheck("createuser(" . $userid . "_" . $insert_id . ")");
 
-        if(isset($_POST['land']) && isset($_POST['city'])) {
-            if(empty($_POST['land'])) {
+        if (isset($_POST['land']) && isset($_POST['city'])) {
+            if (empty($_POST['land'])) {
                 $geo = $api->getGeoLocation(strtolower($_POST['city']));
-            } else if(empty($_POST['land'])) {
+            } else if (empty($_POST['land'])) {
                 $geo = $api->getGeoLocation(strtolower(getCountryName($_POST['land'])));
             } else {
-                $geo = $api->getGeoLocation(strtolower($_POST['city']).','.strtolower(getCountryName($_POST['land'])));
+                $geo = $api->getGeoLocation(strtolower($_POST['city']) . ',' . strtolower(getCountryName($_POST['land'])));
             }
 
-            if(!$geo['error'] && array_key_exists('lat',$geo['results']) && array_key_exists('lng',$geo['results']) &&
+            if (!$geo['error'] && array_key_exists('lat', $geo['results']) && array_key_exists('lng', $geo['results']) &&
                 !empty($geo['results']['lat']) && $geo['results']['lat'] != 0 && !empty($geo['results']['lng']) && $geo['results']['lng'] != 0) {
-                db("UPDATE `" . $db['users'] . "` SET `gmaps_koord` = '".$geo['results']['lat'].",".$geo['results']['lng']."' WHERE `id` = " . $insert_id . ";");
+                db("UPDATE `" . $db['users'] . "` SET `gmaps_koord` = '" . $geo['results']['lat'] . "," . $geo['results']['lng'] . "' WHERE `id` = " . $insert_id . ";");
             }
         }
 
         // permissions
         if (!empty($_POST['perm'])) {
-            foreach ($_POST['perm'] AS $v => $k) $p .= "`" . substr($v, 2) . "` = '" . (int)($k) . "',";
+            foreach ($_POST['perm'] as $v => $k) $p .= "`" . substr($v, 2) . "` = '" . (int)($k) . "',";
             if (!empty($p)) $p = ', ' . substr($p, 0, strlen($p) - 1);
 
             db("INSERT INTO " . $db['permissions'] . " SET `user` = " . (int)($insert_id) . $p);
@@ -141,7 +141,7 @@ if ($do == "add") {
 
         // internal boardpermissions
         if (!empty($_POST['board'])) {
-            foreach ($_POST['board'] AS $v)
+            foreach ($_POST['board'] as $v)
                 db("INSERT INTO " . $db['f_access'] . " SET `user` = " . (int)($insert_id) . ", `forum` = '" . $v . "'");
         }
         ////////////////////

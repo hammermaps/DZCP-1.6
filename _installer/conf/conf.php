@@ -33,9 +33,9 @@ define('_link_update_done', '<span class="enabled">&raquo; Done</span>');
 define('_link_update_done_1', '<span class="disabled">6. Done</span>');
 
 //Set Build
-$_build = str_replace('.','',_version);
+$_build = str_replace('.', '', _version);
 $_release = substr(_release, 0, -5);
-define('_build', $_build.'.'.$_release);
+define('_build', $_build . '.' . $_release);
 
 ################
 ## Funktionen ##
@@ -103,13 +103,13 @@ function up($txt, $bbcode = 0)
 
 function spChars($txt)
 {
-    $txt = str_replace("Ä", "&Auml;", $txt);
-    $txt = str_replace("ä", "&auml;", $txt);
-    $txt = str_replace("Ü", "&Uuml;", $txt);
-    $txt = str_replace("ü", "&uuml;", $txt);
-    $txt = str_replace("Ö", "&Ouml;", $txt);
-    $txt = str_replace("ö", "&ouml;", $txt);
-    $txt = str_replace("ß", "&szlig;", $txt);
+    $txt = str_replace("ï¿½", "&Auml;", $txt);
+    $txt = str_replace("ï¿½", "&auml;", $txt);
+    $txt = str_replace("ï¿½", "&Uuml;", $txt);
+    $txt = str_replace("ï¿½", "&uuml;", $txt);
+    $txt = str_replace("ï¿½", "&Ouml;", $txt);
+    $txt = str_replace("ï¿½", "&ouml;", $txt);
+    $txt = str_replace("ï¿½", "&szlig;", $txt);
     return str_replace("?", "&euro;", $txt);
 }
 

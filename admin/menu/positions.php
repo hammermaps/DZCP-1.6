@@ -22,7 +22,7 @@ while ($get = _fetch($qry)) {
 
     $show_ .= show($dir . "/dlkats_show", array("gameicon" => $gameicon,
         "edit" => $edit,
-        "name" => re($get['position']),
+        "name" => h($get['position']),
         "class" => $class,
         "delete" => $delete));
 }
@@ -40,7 +40,7 @@ if ($do == "edit") {
                     ORDER BY pid");
     while ($get1 = _fetch($qry1)) {
         $positions .= show(_select_field, array("value" => $get1['pid'] + 1,
-            "what" => _nach . ' ' . re($get1['position']),
+            "what" => _nach . ' ' . h($get1['position']),
             "sel" => ""));
     }
 
@@ -84,7 +84,7 @@ if ($do == "edit") {
         // permissions
         db("DELETE FROM " . $db['permissions'] . " WHERE `pos` = '" . (int)($_GET['id']) . "'");
         if (!empty($_POST['perm'])) {
-            foreach ($_POST['perm'] AS $v => $k) $p .= "`" . substr($v, 2) . "` = '" . (int)($k) . "',";
+            foreach ($_POST['perm'] as $v => $k) $p .= "`" . substr($v, 2) . "` = '" . (int)($k) . "',";
             if (!empty($p)) $p = ', ' . substr($p, 0, strlen($p) - 1);
 
             db("INSERT INTO " . $db['permissions'] . " SET `pos` = '" . (int)($_GET['id']) . "'" . $p);
@@ -94,7 +94,7 @@ if ($do == "edit") {
         // internal boardpermissions
         db("DELETE FROM " . $db['f_access'] . " WHERE `pos` = '" . (int)($_GET['id']) . "'");
         if (!empty($_POST['board'])) {
-            foreach ($_POST['board'] AS $v)
+            foreach ($_POST['board'] as $v)
                 db("INSERT INTO " . $db['f_access'] . " SET `pos` = '" . (int)($_GET['id']) . "', `forum` = '" . $v . "'");
         }
         ////////////////////
@@ -112,7 +112,7 @@ if ($do == "edit") {
                    ORDER BY pid");
     while ($get = _fetch($qry)) {
         $positions .= show(_select_field, array("value" => $get['pid'] + 1,
-            "what" => _nach . ' ' . re($get['position']),
+            "what" => _nach . ' ' . h($get['position']),
             "sel" => ""));
     }
     $show = show($dir . "/form_pos", array("newhead" => _pos_new_head,
@@ -143,7 +143,7 @@ if ($do == "edit") {
                          `position`  = '" . up($_POST['kat']) . "'");
         $posID = mysqli_insert_id($mysql);
         // permissions
-        foreach ($_POST['perm'] AS $v => $k) $p .= "`" . substr($v, 2) . "` = '" . (int)($k) . "',";
+        foreach ($_POST['perm'] as $v => $k) $p .= "`" . substr($v, 2) . "` = '" . (int)($k) . "',";
         if (!empty($p)) $p = ', ' . substr($p, 0, strlen($p) - 1);
 
         db("INSERT INTO " . $db['permissions'] . " SET `pos` = '" . $posID . "'" . $p);
@@ -151,7 +151,7 @@ if ($do == "edit") {
 
         // internal boardpermissions
         if (!empty($_POST['board'])) {
-            foreach ($_POST['board'] AS $v)
+            foreach ($_POST['board'] as $v)
                 db("INSERT INTO " . $db['f_access'] . " SET `pos` = '" . $posID . "', `forum` = '" . $v . "'");
         }
         ////////////////////

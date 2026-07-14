@@ -12,7 +12,7 @@ if ($do == "new") {
                    ORDER BY name");
     while ($get = _fetch($qry)) {
         $kats .= show(_select_field, array("value" => $get['id'],
-            "what" => re($get['name']),
+            "what" => h($get['name']),
             "sel" => ""));
     }
 
@@ -76,14 +76,14 @@ if ($do == "new") {
         else $sel = "";
 
         $kats .= show(_select_field, array("value" => $getk['id'],
-            "what" => re($getk['name']),
+            "what" => h($getk['name']),
             "sel" => $sel));
     }
 
     $show = show($dir . "/form_dl", array("admin_head" => _downloads_admin_head_edit,
-        "ddownload" => re($get['download']),
+        "ddownload" => h($get['download']),
         "dintern" => $get['intern'] ? 'checked="checked"' : '',
-        "durl" => re($get['url']),
+        "durl" => h($get['url']),
         "file" => $dl,
         "lokal" => _downloads_lokal,
         "exist" => _downloads_exist,
@@ -139,7 +139,7 @@ if ($do == "new") {
         $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
         $color++;
         $show_ .= show($dir . "/downloads_show", array("id" => $get['id'],
-            "dl" => re($get['download']),
+            "dl" => h($get['download']),
             "class" => $class,
             "edit" => $edit,
             "delete" => $delete
