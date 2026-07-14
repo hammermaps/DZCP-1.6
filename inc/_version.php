@@ -4,6 +4,6 @@
  * http://www.dzcp.de
  */
 
-define('_version', '1.6.1.2');
-define('_release', '06.03.2026');
+define('_version', '1.6.2.0');
+define('_release', '14.07.2026');
 define('_edition', 'dev');

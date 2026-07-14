@@ -6,19 +6,29 @@ Diese Datei dient als lebendiger Fortschrittsplan für die nächsten Arbeiten an
 
 ## Aktueller Stand
 
-- Version: **1.6.1.4** (08.03.2026)
-- Letzte größere Änderung: Datenbank-Layer auf Nette\Database modernisiert (siehe `inc/DATABASE_MIGRATION.md` und `inc/DATABASE_REFACTORING_SUMMARY.md`)
+- Version: **1.6.2.0-dev** (14.07.2026)
+- Letzte größere Änderung: Moderne Service-Architektur aufgebaut (Services, Repository, Models, Container, Security, Utilities, Config) und PSR-4 Autoloading konfiguriert
 
 ---
 
 ## Geplante Arbeiten
 
 ### Phase 1: Dokumentation & Planung
-- [x] Vorhandene Dokumentation lesen (`README.md`, `changelog.md`, `inc/DATABASE_MIGRATION.md`, `inc/DATABASE_REFACTORING_SUMMARY.md`)
+- [x] Vorhandene Dokumentation lesen (`README.md`, `changelog.md`, `docs/*`)
 - [x] Routemap erstellen (`ROUTEMAP.md`)
 - [x] Changelog um geplante Änderungen erweitern
 
-### Phase 2: Datenbank-Layer abschließen
+### Phase 2: Service-Architektur aufbauen
+- [x] Verzeichnisstruktur für `Services`, `Repository`, `Models`, `Container`, `Security`, `Utilities`, `Config`, `Handlers`, `Middleware` anlegen
+- [x] `DatabaseService` als Wrapper für Nette\Database erstellen
+- [x] `CacheService` für Multi-Backend-Support erstellen
+- [x] `ServiceContainer` für Dependency Injection erstellen
+- [x] `UserService`, `AuthService`, `PermissionService` implementieren
+- [x] `BaseRepository` und `UserRepository` implementieren
+- [x] `User` Model und `StringHelper`, `XssProtection`, `CsrfProtection` Utilities erstellen
+- [x] `inc/bootstrap.php` als zentrale Service-Verdrahtung
+
+### Phase 3: Datenbank-Layer abschließen
 - [ ] Runtime-Tests der Nette\Database-Integration durchführen
   - Einfache SELECT/INSERT/UPDATE/DELETE Queries
   - Prepared Statements mit `db_stmt()`
@@ -29,15 +39,17 @@ Diese Datei dient als lebendiger Fortschrittsplan für die nächsten Arbeiten an
 - [ ] SQL-Logging über `DzcpLogger::sql()` prüfen
 - [ ] Cache-Layer (`/inc/dbc.php`) auf Kompatibilität mit `NetteResultWrapper` testen
 
-### Phase 3: Code-Modernisierung (empfohlen)
+### Phase 4: Code-Modernisierung (empfohlen)
 - [ ] Kritische Bereiche schrittweise auf Nette\Database\Explorer umstellen
 - [ ] Veraltete `db()`-Aufrufe in neuem Code vermeiden
 - [ ] PHPDoc und Typisierung in neuen Funktionen verbessern
 
-### Phase 4: Qualitätssicherung
-- [ ] PHP-Syntax-Validierung für geänderte Dateien
-- [ ] Bestehende Tests ausführen
-- [ ] Changelog und Routemap aktualisieren
+### Phase 5: Qualitätssicherung
+- [x] PHP-Syntax-Validierung für neue Dateien
+- [x] PHPUnit-Grundgerüst unter `tests/` erstellt
+- [x] PHPStan- und PHPCS-Konfiguration hinzugefügt
+- [ ] Bestehende Tests ausführen (nach `composer install` der Dev-Dependencies)
+- [x] Changelog und Routemap aktualisieren
 
 ---
 

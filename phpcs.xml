@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<ruleset name="DZCP">
+    <description>DZCP 1.6.2 coding standard</description>
+    <file>inc</file>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/tinymce/*</exclude-pattern>
+    <rule ref="PSR12"/>
+</ruleset>

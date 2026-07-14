@@ -8,9 +8,15 @@ All notable changes to this project are documented here.
 ### Added
 - Created `ROUTEMAP.md` to track upcoming work and project progress
 - Added summary of database migration documentation to the project roadmap
+- Modern service architecture for 1.6.2: `DatabaseService`, `CacheService`, `UserService`, `AuthService`, `PermissionService`
+- PSR-4 autoloading namespaces (`DZCP\*`) and lightweight `ServiceContainer` for dependency injection
+- New directories: `inc/Services`, `inc/Repository`, `inc/Models`, `inc/Container`, `inc/Security`, `inc/Utilities`, `inc/Config`, `inc/Handlers`, `inc/Middleware`
+- PHPUnit test skeleton under `tests/` with sample unit tests
+- PHPStan and PHP_CodeSniffer configuration files
 
 ### Changed
 - Extended `changelog.md` with planned next steps for the Nette\Database integration
+- Bumped version to `1.6.2.0-dev`
 
 ---
 
