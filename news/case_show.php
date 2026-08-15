@@ -290,7 +290,7 @@ if (defined('_News')) {
                         $index = error(_error_edit_post, 1);
                     break;
                 case 'edit':
-                    $get = db("SELECT `reg`,`comment` FROM " . $db['newscomments'] . " WHERE `id` = '" . (int)($_GET['cid']) . "'", false, true);
+                    $get = db("SELECT `reg`,`comment`,`nick`,`email`,`hp` FROM " . $db['newscomments'] . " WHERE `id` = '" . (int)($_GET['cid']) . "'", false, true);
                     if ($get['reg'] == $userid || permission('news')) {
                         if ($get['reg'] != 0)
                             $form = show("page/editor_regged", array("nick" => autor($get['reg']), "von" => _autor));
@@ -300,7 +300,7 @@ if (defined('_News')) {
                                 "hphead" => _hp,
                                 "postemail" => h($get['email']),
                                 "posthp" => links(re($get['hp'])),
-                                "postnick" => h($get['nick']));
+                                "postnick" => h($get['nick'])));
                         }
 
                         $index = show("page/comments_add", array("titel" => _comments_edit,
