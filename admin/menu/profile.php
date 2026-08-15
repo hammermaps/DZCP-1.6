@@ -27,7 +27,7 @@ if ($do == "add") {
                      SET `name` = '" . up($_POST['name']) . "',
                                    `type` = '" . ((int)$_POST['type']) . "',
                          `kid`  = '" . ((int)$_POST['kat']) . "'");
-        $insID = mysqli_insert_id($mysql);
+        $insID = db_insert_id();
 
         $feldname = "custom_" . $insID;
         $add = db("UPDATE " . $db['profile'] . "

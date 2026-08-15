@@ -69,7 +69,7 @@ if ($do == 'new') {
                          `intern` = '" . ((int)$_POST['intern']) . "',
                          `von`    = '" . ((int)$userid) . "'");
 
-        $vid = mysqli_insert_id($mysql);
+        $vid = db_insert_id();
 
         $qry = db("INSERT INTO " . $db['vote_results'] . "
                     SET `vid`   = '" . ((int)$vid) . "',

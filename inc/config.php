@@ -137,6 +137,7 @@ $config_logging = [
 ];
 
 require_once(basePath . '/inc/logger.php');
+require_once(basePath . '/inc/database.php');
 DzcpLogger::init($config_logging);
 DzcpErrorHandler::configure($config_logging, view_error_reporting);
 
@@ -194,6 +195,13 @@ if (!isset($sql_host) || !isset($sql_user) || !isset($sql_pass) || !isset($sql_d
 
 if (file_exists(basePath . "/inc/mysql.php"))
     require_once(basePath . "/inc/mysql.php");
+
+$database_driver = strtolower((string) (getenv('DZCP_DATABASE_DRIVER') ?: ($sql_driver ?? 'mysql')));
+$sqlite_path = (string) (getenv('DZCP_SQLITE_PATH') ?: ($sqlite_path ?? basePath . '/var/test/dzcp.sqlite'));
+define('dzcp_test_mode', $database_driver === 'sqlite');
+if ($database_driver === 'sqlite' && $sql_prefix === '') {
+    $sql_prefix = 'dzcp_';
+}
 
 if (!isset($installation)) $installation = false;
 if (!isset($updater)) $updater = false;
@@ -346,22 +354,15 @@ $db = array("host" => $sql_host,
     "vote_results" => $prefix . "vote_results");
 unset($prefix, $sql_host, $sql_user, $sql_pass, $sql_db);
 
-if ($db['host'] != '' && $db['user'] != '' && $db['pass'] != '' && $db['db'] != '' && !$thumbgen) {
-    $db_host = (mysqli_persistconns ? 'p:' : '') . $db['host'];
-    $mysql = new mysqli($db_host, $db['user'], $db['pass'], $db['db']);
-    if ($mysql->connect_error) {
-        DzcpLogger::error()->critical('Datenbankverbindung fehlgeschlagen', [
-            'host' => $db['host'],
-            'database' => $db['db'],
-            'errno' => $mysql->connect_errno,
-            'error' => $mysql->connect_error,
-        ]);
-        throw new RuntimeException('Fehler beim Zugriff auf die Datenbank');
+if (!$thumbgen && ($database_driver === 'sqlite' || ($db['host'] !== '' && $db['user'] !== '' && $db['pass'] !== '' && $db['db'] !== ''))) {
+    try {
+        $mysql = $database_driver === 'sqlite'
+            ? DzcpDatabase::sqlite($sqlite_path)
+            : DzcpDatabase::mysql($db['host'], $db['user'], $db['pass'], $db['db'], mysqli_persistconns);
+    } catch (Throwable $e) {
+        DzcpLogger::error()->critical('Datenbankverbindung fehlgeschlagen', ['exception' => $e, 'driver' => $database_driver]);
+        throw new RuntimeException('Fehler beim Zugriff auf die Datenbank', 0, $e);
     }
-
-    // ── Character-Set auf UTF-8MB4 einstellen ─────────────────────────────
-    $mysql->set_charset("utf8mb4");
-    $mysql->query("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
 
     // ── Auto-Migration: fehlende Spalten nachträglich hinzufügen ─────────
     $migrations = [
@@ -420,7 +421,7 @@ function _fetch($fetch)
 function _real_escape_string($string = '')
 {
     global $mysql;
-    return !empty($string) ? $mysql->real_escape_string($string) : '';
+    return !empty($string) ? $mysql->escape($string) : '';
 }
 
 function db($query = '', $rows = false, $fetch = false)
@@ -431,27 +432,17 @@ function db($query = '', $rows = false, $fetch = false)
         DzcpLogger::sql()->debug('SQL Query', ['query' => $query]);
     }
 
-    if ($updater) {
+    try {
         $qry = $mysql->query($query);
-    } else {
-        if (!$qry = $mysql->query($query)) {
-            DzcpLogger::sql()->critical('SQL-Fehler', [
-                'query'    => $query,
-                'errno'    => $mysql->errno,
-                'error'    => $mysql->error,
-            ]);
-            $language_text = [];
-            include_once(basePath . '/inc/lang/languages/english.php');
-            $get = _fetch($mysql->query("SELECT `clanname` FROM `" . $db['settings'] . "`;"));
-            die('<img src="../inc/images/dberror.png" align="absmiddle"/>&nbsp;&nbsp;<b>Upps...</b><br /><br />Entschuldige bitte! Das h&auml;tte nicht passieren d&uuml;rfen.<p>' .
-                'Wir k&uuml;mmern uns so schnell wie m&ouml;glich darum.<br><br>' . mb_convert_encoding($get['clanname'] ?? '', 'ISO-8859-1', 'UTF-8') . '<br><br>' . $language_text['_back']);
-        }
+    } catch (Throwable $e) {
+        DzcpLogger::sql()->critical('SQL-Fehler', ['query' => $query, 'exception' => $e, 'driver' => $mysql->driver()]);
+        throw new RuntimeException('Datenbankabfrage fehlgeschlagen', 0, $e);
     }
 
     if ($rows && !$fetch)
         return _rows($qry);
     else if ($fetch && $rows)
-        return $qry->fetch_array(MYSQLI_NUM);
+        return $qry->fetch_array();
     else if ($fetch && !$rows)
         return _fetch($qry);
 
@@ -471,60 +462,17 @@ function db($query = '', $rows = false, $fetch = false)
  */
 function db_stmt($query, $params = array('si', 'hallo', '4'), $rows = false, $fetch = false)
 {
-    global $prefix, $mysql;
+    global $mysql;
 
     if (debug_all_sql_querys) {
         DzcpLogger::sql()->debug('SQL Prepared Query', ['query' => $query, 'params' => array_slice($params, 1)]);
     }
 
-    if (!$statement = $mysql->prepare($query)) {
-        DzcpLogger::sql()->critical('SQL Prepared-Statement Fehler (prepare)', [
-            'query' => $query,
-            'errno' => $mysql->connect_errno,
-            'error' => $mysql->connect_error,
-        ]);
-        die('<b>MySQL-Query failed:</b><br /><br /><ul>' .
-        '<li><b>ErrorNo</b> = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_errno) : $mysql->connect_errno) .
-        '<li><b>Error</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_error) : $mysql->connect_error) .
-        '<li><b>Query</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $query) . '</ul>' : $query));
-    }
-
-    call_user_func_array(array($statement, 'bind_param'), refValues($params));
-    if (!$statement->execute()) {
-        DzcpLogger::sql()->critical('SQL Prepared-Statement Fehler (execute)', [
-            'query' => $query,
-            'errno' => $mysql->connect_errno,
-            'error' => $mysql->connect_error,
-        ]);
-        die('<b>MySQL-Query failed:</b><br /><br /><ul>' .
-        '<li><b>ErrorNo</b> = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_errno) : $mysql->connect_errno) .
-        '<li><b>Error</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $mysql->connect_error) : $mysql->connect_error) .
-        '<li><b>Query</b>   = ' . (!empty($prefix) ? str_replace($prefix, '', $query) . '</ul>' : $query));
-    }
-
-    $meta = mysqli_stmt_result_metadata($statement);
-    if (!$meta || empty($meta)) {
-        mysqli_stmt_close($statement);
-        return;
-    }
-    $row = array();
-    $parameters = array();
-    $results = array();
-    while ($field = mysqli_fetch_field($meta)) {
-        $parameters[] = &$row[$field->name];
-    }
-
-    mysqli_stmt_store_result($statement);
-    $results['_stmt_rows_'] = mysqli_stmt_num_rows($statement);
-    call_user_func_array(array($statement, 'bind_result'), refValues($parameters));
-
-    while (mysqli_stmt_fetch($statement)) {
-        $x = array();
-        foreach ($row as $key => $val) {
-            $x[$key] = $val;
-        }
-
-        $results[] = $x;
+    try {
+        $results = $mysql->prepared($query, $params);
+    } catch (Throwable $e) {
+        DzcpLogger::sql()->critical('SQL Prepared-Statement Fehler', ['query' => $query, 'exception' => $e, 'driver' => $mysql->driver()]);
+        throw new RuntimeException('Parametrisierte Datenbankabfrage fehlgeschlagen', 0, $e);
     }
 
     if ($rows && !$fetch)

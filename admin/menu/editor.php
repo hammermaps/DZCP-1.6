@@ -98,7 +98,7 @@ if ($do == "add") {
                      SET `titel` = '" . up($_POST['titel']) . "',
                          `text`  = '" . up($_POST['inhalt']) . "',
                          `html`  = '" . ((int)$_POST['html']) . "'");
-        $insert_id = mysqli_insert_id($mysql);
+        $insert_id = db_insert_id();
 
         if ($_POST['pos'] == "1" || "2") $sign = ">= ";
         else $sign = "> ";

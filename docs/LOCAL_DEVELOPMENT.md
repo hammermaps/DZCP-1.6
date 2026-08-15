@@ -18,6 +18,16 @@ Starte den PHP-Testserver im Repository-Root mit:
 
 Standardmäßig läuft er unter `http://127.0.0.1:8011/`. Host, Port und Document Root können als Argumente überschrieben werden, zum Beispiel `./tools/start-test-server.sh 0.0.0.0 8080`. Ohne Datenbankkonfiguration ist die Weiterleitung zum Installer erwartetes Verhalten.
 
+## SQLite-Testmodus
+
+Der vollständige Demo-Modus läuft ohne MySQL mit SQLite und lokalen Beispieldaten:
+
+```bash
+./tools/start-test-server.sh --sqlite --reset
+```
+
+`--reset` erzeugt die Datenbank unter `var/test/dzcp.sqlite` neu. Ohne diesen Schalter bleiben Änderungen erhalten. Alternativ aktiviert `DZCP_DATABASE_DRIVER=sqlite` den Treiber; `DZCP_SQLITE_PATH` überschreibt den Dateipfad. Der Demo-Admin ist `admin` mit dem Passwort `dzcp-test`. Steam liefert einen festen Testbenutzer; andere externe HTTP-Aufrufe werden lokal unterdrückt und benötigen weder Netzwerk noch Schlüssel.
+
 ## Prüfen und Debuggen
 
 Vor einem Commit mindestens diese Prüfungen ausführen:

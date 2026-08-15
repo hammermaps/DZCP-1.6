@@ -202,7 +202,7 @@ ORDER BY game");
             `matchadmins` = '" . up($_POST['match_admins']) . "',
             `bericht` = '" . up($_POST['bericht'], true) . "'");
 
-        $cwid = mysqli_insert_id($mysql);
+        $cwid = db_insert_id();
 
         //Logo Upload
         $tmpname = $_FILES['logo']['tmp_name'];

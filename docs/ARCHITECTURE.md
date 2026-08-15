@@ -20,6 +20,8 @@ Das aktive Theme befindet sich unter `inc/_templates_/version1.6/`. HTML-Dateien
 
 `inc/config.php` baut das globale Tabellen-Mapping `$db` auf und stellt die MySQLi-Verbindung `$mysql` her. Das Schema und Startdaten liegen in `_installer/full_dzcp.sql`; der Installer verwaltet die Erstinstallation. Cache-Dateien liegen in `inc/_cache_/`, Monolog-Protokolle in `inc/_logs/`. Beide Verzeichnisse sowie Upload- und Banner-Ziele sind Laufzeitdaten und gehören nicht in Commits.
 
+Für Entwicklung und Tests kann `DZCP_DATABASE_DRIVER=sqlite` die zentrale `DzcpDatabase`-Schicht auf PDO/SQLite umstellen. Sie erhält den bestehenden `db()`- und `db_stmt()`-Vertrag, normalisiert die notwendigen Legacy-SQL-Formen und verwendet ein aus dem Installer-Dump erzeugtes vollständiges Demo-Schema unter `var/test/`.
+
 ## Fehlerbehandlung
 
 `DzcpErrorHandler` in `inc/debugger.php` wird vor der Anwendungskonfiguration registriert. Nach der Monolog-Initialisierung aktiviert er Tracy: PHP-Warnings, Notices und Deprecations werden in den Monolog-Kanal `error` geschrieben; ungefangene Exceptions und fatale PHP-Fehler werden ebenfalls protokolliert und von Tracy im Entwicklungsmodus dargestellt. Die Einstellungen `view_error_reporting` und `$config_logging` in `inc/config.php` steuern Entwicklungsmodus und Log-Ziele. Es gibt keine HTML-Debug-Konsole mehr.

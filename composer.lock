@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "65db5b86a387a325a85c67a27c5dddc5",
+    "content-hash": "bd2e7a735961ca54c737bb4fbce7d811",
     "packages": [
         {
             "name": "jaybizzle/crawler-detect",
@@ -2470,6 +2470,8 @@
         "ext-mysqli": "*",
         "ext-zlib": "*"
     },
-    "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "platform-dev": {
+        "ext-pdo_sqlite": "*"
+    },
+    "plugin-api-version": "2.6.0"
 }

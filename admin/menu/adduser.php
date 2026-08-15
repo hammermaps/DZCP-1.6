@@ -112,7 +112,7 @@ if ($do == "add") {
                                  `show` = 1,
                                  `status`   = 1;");
 
-        $insert_id = mysqli_insert_id($mysql);
+        $insert_id = db_insert_id();
         setIpcheck("createuser(" . $userid . "_" . $insert_id . ")");
 
         if (isset($_POST['land']) && isset($_POST['city'])) {

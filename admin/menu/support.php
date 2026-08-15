@@ -29,7 +29,7 @@ $support .= "#####################\r\n";
 $support .= "Server OS: " . @php_uname() . "\r\n";
 $support .= "Webserver: " . (array_key_exists('apache2handler', $PhpInfo) ? (array_key_exists('Apache Version', $PhpInfo['apache2handler']) ? $PhpInfo['apache2handler']['Apache Version'] : 'PHP l&auml;uft als CGI <Keine Info>') : 'PHP l&auml;uft als CGI <Keine Info>') . "\r\n";
 $support .= "PHP-Version: " . phpversion() . " (" . php_sapi_type() . ")" . "\r\n";
-$support .= "MySQL-Server Version: " . mysqli_get_server_info($mysql) . "\r\n";
+$support .= "Datenbank-Server Version: " . db_server_info() . "\r\n";
 $support .= "MySQLi-Persistente Datenbankverbindung: " . (mysqli_persistconns ? 'On' : 'Off') . "\r\n";
 $support .= "\r\n";
 

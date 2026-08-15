@@ -144,7 +144,7 @@ if ($do == 'new') {
                         break;
                 }
 
-                move_uploaded_file($tmpname, basePath . "/inc/images/slideshow/" . mysqli_insert_id($mysql) . "." . $ext);
+                move_uploaded_file($tmpname, basePath . "/inc/images/slideshow/" . db_insert_id() . "." . $ext);
             } else {
                 $show = info("Not a IMAGE", "?admin=slideshow");
             }

@@ -22,7 +22,7 @@ if (file_exists(basePath . "/inc/mysql.php"))
 // Zentrale Initialisierung (Buffer, Autoloader, GUMP, Sanitize)
 include(basePath . '/inc/buffer.php');
 
-if (empty($sql_user) && empty($sql_pass) && empty($sql_db)) {
+if (strtolower((string) getenv('DZCP_DATABASE_DRIVER')) !== 'sqlite' && empty($sql_user) && empty($sql_pass) && empty($sql_db)) {
     header('Location: _installer/index.php');
     ob_end_flush();
     exit();

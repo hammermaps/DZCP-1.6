@@ -75,7 +75,7 @@ if (defined('_Clanwars')) {
             $anz_squads = cnt($db['squads'], " WHERE status = '1'");
 
             $qry = db("SELECT game FROM " . $db['squads'] . "");
-            while ($row = mysqli_fetch_object($qry)) {
+            while ($row = db_fetch_object($qry)) {
                 $cwid = $row->id;
             }
             $results = _rows($qry);

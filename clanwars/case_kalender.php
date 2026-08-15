@@ -63,7 +63,7 @@ if (defined('_Clanwars')) {
 
             $qry = db("SELECT game FROM " . $db['squads'] . "
                  WHERE status = '1'");
-            while ($row = mysqli_fetch_object($qry)) {
+            while ($row = db_fetch_object($qry)) {
                 $cwid = $row->id;
             }
             $results = _rows($qry);

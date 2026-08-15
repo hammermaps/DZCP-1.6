@@ -51,6 +51,21 @@ class SteamAPI
      */
     public static function getUserInfos(string $custom_profile_url = '')
     {
+        if (defined('dzcp_test_mode') && dzcp_test_mode) {
+            return [
+                'user' => [
+                    'steamID' => '00000000000000000',
+                    'nickname' => 'SQLite Test Player',
+                    'profile_url' => 'https://example.test/steam/sqlite-test-player',
+                    'avatarIcon_url' => '',
+                    'onlineState' => 'offline',
+                    'runnedSteamAPI' => false,
+                    'lastlogoff' => time(),
+                    'gameextrainfo' => '',
+                ],
+            ];
+        }
+
         if (empty($custom_profile_url)) {
             DzcpLogger::app()->warning('Steam-Profil-URL fehlt');
             return false;

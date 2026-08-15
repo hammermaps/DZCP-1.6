@@ -21,7 +21,7 @@ switch ($do) {
             $show = show($dir . "/form_gallery_step2", array("head" => _gallery_admin_head,
                 "what" => htmlspecialchars($_POST['gallery'], ENT_QUOTES, 'UTF-8'),
                 "addfile" => $addfile,
-                "id" => mysqli_insert_id($mysql),
+                "id" => db_insert_id(),
                 "do" => "add",
                 "dowhat" => _button_value_add,
                 "anzahl" => $_POST['anzahl'],

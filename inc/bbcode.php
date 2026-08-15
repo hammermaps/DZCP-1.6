@@ -742,6 +742,11 @@ function getCountryName(string $land)
  */
 function get_external_contents(string $url, $post = false, bool $nogzip = false, $timeout = file_get_contents_timeout)
 {
+    if (defined('dzcp_test_mode') && dzcp_test_mode) {
+        DzcpLogger::app()->debug('Externer Request im SQLite-Testmodus unterdrückt', ['url' => $url]);
+        return false;
+    }
+
     if (!fsockopen_support() && (!extension_loaded('curl') || !use_curl_support))
         return false;
 

@@ -141,7 +141,7 @@ if ($do == "edit") {
         $qry = db("INSERT INTO " . $db['pos'] . "
                      SET `pid`        = '" . ((int)$_POST['pos']) . "',
                          `position`  = '" . up($_POST['kat']) . "'");
-        $posID = mysqli_insert_id($mysql);
+        $posID = db_insert_id();
         // permissions
         foreach ($_POST['perm'] as $v => $k) $p .= "`" . substr($v, 2) . "` = '" . (int)($k) . "',";
         if (!empty($p)) $p = ', ' . substr($p, 0, strlen($p) - 1);

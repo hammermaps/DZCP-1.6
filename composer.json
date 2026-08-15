@@ -46,6 +46,7 @@
     "test": "phpunit --configuration phpunit.xml"
   },
   "require-dev": {
+    "ext-pdo_sqlite": "*",
     "phpunit/phpunit": "^11.5"
   }
 }

@@ -146,7 +146,7 @@ function sql_backup()
     $sql_backup .= "-- Build: " . _release . " * " . _build . "\r\n";
     $sql_backup .= "-- Host: " . $db['host'] . "\r\n";
     $sql_backup .= "-- Erstellt am: " . date("d.m.Y") . " um " . date("H:i") . "\r\n";
-    $sql_backup .= "-- MySQL-Version: " . mysqli_get_server_info($mysql) . "\r\n";
+    $sql_backup .= "-- Datenbank-Version: " . db_server_info() . "\r\n";
     $sql_backup .= "-- PHP Version: " . phpversion() . "\r\n";
     $sql_backup .= "-- -------------------------------------------------------------------\r\n\r\n";
     $sql_backup .= "--\r\n-- Datenbank: `" . $db['db'] . "`\r\n--\n\n";
