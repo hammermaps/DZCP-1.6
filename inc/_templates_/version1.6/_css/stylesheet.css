@@ -302,6 +302,157 @@ div#index {
     border-radius: 3px;
 }
 
+/* Unified sidebar layout for all left and right menu boxes */
+.sideContent .box,
+.sideContent .box_tabs {
+    overflow: hidden;
+    margin-bottom: 9px;
+    border: 1px solid #d4d4d4;
+    border-bottom: 2px solid #cc0033;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+
+.sideContent .box {
+    padding: 0 7px 7px;
+}
+
+.sideContent .box .headline {
+    min-height: 39px;
+    height: auto;
+    margin: 0 -7px 7px;
+    padding: 0 10px;
+    border-bottom: 1px solid #dedede;
+    background: #f5f5f5;
+    color: #333;
+    line-height: 39px;
+}
+
+.sideContent .box_tabs {
+    padding: 0 7px 7px;
+}
+
+.sideContent .box_tabs .ui-tabs {
+    padding: 0;
+    box-shadow: none;
+}
+
+.sideContent .box_tabs .ui-tabs-nav,
+.sideContent .box_tabs .headline_tabs {
+    min-width: 0;
+    min-height: 39px;
+    height: auto;
+    margin: 0 -7px 7px;
+    padding: 0 7px;
+    border-bottom: 1px solid #dedede;
+    border-radius: 0;
+    background: #f5f5f5;
+    line-height: normal;
+}
+
+.sideContent .box_tabs .ui-tabs-nav,
+.sideContent .box_tabs .headline_tabs ul {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sideContent .box_tabs .ui-tabs-nav li,
+.sideContent .box_tabs .headline_tabs li {
+    display: flex;
+    float: none;
+    margin: 0;
+}
+
+.sideContent .box_tabs .ui-tabs-nav .ui-tabs-anchor,
+.sideContent .box_tabs .headline_tabs a {
+    display: flex;
+    align-items: center;
+    padding: 0 9px;
+    color: #555;
+}
+
+.sideContent .box_tabs .ui-tabs-nav li.ui-tabs-active .ui-tabs-anchor,
+.sideContent .box_tabs .headline_tabs li.ui-tabs-active a {
+    color: #cc0033;
+}
+
+.sideContent .box_tabs .switchs {
+    min-width: 0;
+}
+
+.sideContent table.navContent,
+.sideContent table.tableNav,
+.sideContent table.hperc {
+    margin-bottom: 0;
+    border-collapse: collapse;
+}
+
+.sideContent td.navLastNewsContent,
+.sideContent td.navFtopicsContent,
+.sideContent td.navLastArtikelContent,
+.sideContent td.navLastCwContent,
+.sideContent td.navNextCwContent,
+.sideContent td.navTopdlContent,
+.sideContent td.navLregContent,
+.sideContent td.navEventsContent {
+    border-bottom: 1px solid #ededed;
+}
+
+.sideContent a.navLastNews,
+.sideContent a.navFtopics,
+.sideContent a.navLastArtikel,
+.sideContent a.navLastCw,
+.sideContent a.navNextCw,
+.sideContent a.navTopdl,
+.sideContent a.navLastReg,
+.sideContent a.navTeam,
+.sideContent a.navTeamspeak {
+    display: block;
+    padding: 6px 4px;
+    line-height: 1.35;
+}
+
+.sideContent .counterContentHead {
+    padding: 7px 4px 4px;
+    border-bottom: 1px solid #ededed;
+}
+
+.sideContent .counterContentLeft,
+.sideContent .counterContentRight {
+    padding: 3px 4px;
+}
+
+.sideContent .counterContentRight {
+    color: #cc0033;
+    font-weight: bold;
+}
+
+.sideContent input.loginName_dis,
+.sideContent input.loginPwd_dis,
+.sideContent input.loginName_en,
+.sideContent input.loginPwd_en,
+.sideContent input.loginSubmit,
+.sideContent input.shoutEmail_dis,
+.sideContent input.shoutNick_dis,
+.sideContent input.shoutEmail_en,
+.sideContent input.shoutNick_en,
+.sideContent input.shoutSubmit,
+.sideContent input.voteSubmit,
+.sideContent textarea.shoutTextfield_dis,
+.sideContent textarea.shoutTextfield_en,
+.sideContent select.tempswitch {
+    box-sizing: border-box;
+    max-width: 100%;
+}
+
+.sideContent img {
+    max-width: 100%;
+    height: auto;
+}
+
 /* Main Navigation (left side) */
 .mainNavigation {
     background: #2f2f2f;
@@ -311,6 +462,26 @@ div#index {
     box-shadow: 0px 0 3px #ff0000; /* CSS3 Standard */
     -moz-box-shadow: 0 0 3px #ff0000; /* Firefox */
     -webkit-box-shadow: 0 0 3px #ff0000; /* Safari, Chrome, etc. */
+}
+
+.sideContent .mainNavigation {
+    overflow: hidden;
+    margin-bottom: 9px;
+    border: 1px solid #1d1d1d;
+    border-bottom: 2px solid #cc0033;
+    border-radius: 3px;
+    padding-bottom: 4px;
+}
+
+.sideContent .mainNavigation ul {
+    padding: 3px 0;
+}
+
+.sideContent .mainNavigation a.navMain {
+    min-height: 31px;
+    height: auto;
+    margin: 0 10px;
+    line-height: 31px;
 }
 
 .mainNavigation ul li:nth-last-child(1) a {
