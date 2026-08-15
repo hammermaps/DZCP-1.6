@@ -2593,7 +2593,7 @@ function img_cw(string $folder, string $img)
  */
 function gallery_size(string $img = "")
 {
-    return "<a href=\"../gallery/images/" . $img . "\" rel=\"lightbox[gallery_" . (int)($img) . "]\"><img src=\"../thumbgen.php?img=gallery/images/" . $img . "\" alt=\"\" /></a>";
+    return "<a href=\"../gallery/images/" . $img . "\" rel=\"lightbox[gallery_" . (int)($img) . "]\"><img src=\"../thumbgen.php?img=gallery/images/" . $img . "&amp;format=webp\" alt=\"\" /></a>";
 }
 
 /**
