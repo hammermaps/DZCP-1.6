@@ -17,19 +17,20 @@ use Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException;
 try {
 $imagePath = resolveImagePath((string) ($_GET['img'] ?? ''));
 $width = requestedWidth($_GET['width'] ?? null);
+$requestedFormat = requestedFormat($_GET['format'] ?? null);
 $rebuild = isset($_GET['rebuild']);
 
 if ($imagePath === null) {
-    thumbnailResponse(createMissingPreview($width));
+    thumbnailResponse(createMissingPreview($width, $requestedFormat));
 }
 
 $imageInfo = @getimagesize($imagePath);
 if ($imageInfo === false) {
-    thumbnailResponse(createMissingPreview($width));
+    thumbnailResponse(createMissingPreview($width, $requestedFormat));
 }
 
 $height = max(1, (int) round($imageInfo[1] * $width / $imageInfo[0]));
-$cacheKey = 'thumbgen:v2:' . hash('sha256', $imagePath . '|' . filemtime($imagePath) . "|{$width}x{$height}");
+$cacheKey = 'thumbgen:v3:' . hash('sha256', $imagePath . '|' . filemtime($imagePath) . "|{$width}x{$height}|{$requestedFormat}");
 $cache = CacheManager::getInstance($config_cache['storage'], $config_cache['config'], 'thumbgen');
 
 try {
@@ -48,16 +49,16 @@ try {
     $useImagick = extension_loaded('imagick') && getenv('DZCP_THUMBNAIL_ENGINE') !== 'gd';
     if ($useImagick) {
         try {
-            $payload = createImagickThumbnail($imagePath, $width, $height);
+            $payload = createImagickThumbnail($imagePath, $width, $height, $requestedFormat);
         } catch (Throwable $exception) {
             DzcpLogger::error()->warning('Imagick-Thumbnail fehlgeschlagen; GD-Fallback wird verwendet', [
                 'image' => basename($imagePath),
                 'exception' => $exception,
             ]);
-            $payload = createGdThumbnail($imagePath, $imageInfo, $width, $height);
+            $payload = createGdThumbnail($imagePath, $imageInfo, $width, $height, $requestedFormat);
         }
     } else {
-        $payload = createGdThumbnail($imagePath, $imageInfo, $width, $height);
+        $payload = createGdThumbnail($imagePath, $imageInfo, $width, $height, $requestedFormat);
     }
 } catch (Throwable $exception) {
     DzcpLogger::error()->warning('Thumbnail konnte nicht erzeugt werden', [
@@ -65,7 +66,7 @@ try {
         'engine' => extension_loaded('imagick') && getenv('DZCP_THUMBNAIL_ENGINE') !== 'gd' ? 'imagick' : 'gd',
         'exception' => $exception,
     ]);
-    $payload = createMissingPreview($width);
+    $payload = createMissingPreview($width, $requestedFormat);
 }
 
 if (thumbgen_cache && $cached !== null) {
@@ -88,7 +89,7 @@ thumbnailResponse($payload);
 }
 
 /** @return array{mime: string, data: string} */
-function createImagickThumbnail(string $path, int $width, int $height): array
+function createImagickThumbnail(string $path, int $width, int $height, ?string $requestedFormat = null): array
 {
     $image = new Imagick();
     $image->readImage($path);
@@ -98,12 +99,12 @@ function createImagickThumbnail(string $path, int $width, int $height): array
     }
     $image->thumbnailImage($width, $height, true, true);
 
-    $format = strtolower($image->getImageFormat());
+    $format = $requestedFormat ?? strtolower($image->getImageFormat());
     if (!in_array($format, ['gif', 'jpeg', 'png', 'webp'], true)) {
         $format = 'jpeg';
-        $image->setImageFormat($format);
     }
-    if ($format === 'jpeg') {
+    $image->setImageFormat($format);
+    if (in_array($format, ['jpeg', 'webp'], true)) {
         $image->setImageCompressionQuality(90);
     }
 
@@ -115,7 +116,7 @@ function createImagickThumbnail(string $path, int $width, int $height): array
 }
 
 /** @param array{0:int,1:int,2:int} $imageInfo @return array{mime: string, data: string} */
-function createGdThumbnail(string $path, array $imageInfo, int $width, int $height): array
+function createGdThumbnail(string $path, array $imageInfo, int $width, int $height, ?string $requestedFormat = null): array
 {
     $create = match ($imageInfo[2]) {
         IMAGETYPE_GIF => 'imagecreatefromgif',
@@ -138,10 +139,16 @@ function createGdThumbnail(string $path, array $imageInfo, int $width, int $heig
     imagecopyresampled($thumbnail, $source, 0, 0, 0, 0, $width, $height, $imageInfo[0], $imageInfo[1]);
 
     ob_start();
-    $mime = match ($imageInfo[2]) {
-        IMAGETYPE_GIF => (imagegif($thumbnail) ? 'image/gif' : ''),
-        IMAGETYPE_PNG => (imagepng($thumbnail) ? 'image/png' : ''),
-        IMAGETYPE_WEBP => (imagewebp($thumbnail, null, 90) ? 'image/webp' : ''),
+    $format = $requestedFormat ?? match ($imageInfo[2]) {
+        IMAGETYPE_GIF => 'gif',
+        IMAGETYPE_PNG => 'png',
+        IMAGETYPE_WEBP => 'webp',
+        default => 'jpeg',
+    };
+    $mime = match ($format) {
+        'gif' => (imagegif($thumbnail) ? 'image/gif' : ''),
+        'png' => (imagepng($thumbnail) ? 'image/png' : ''),
+        'webp' => function_exists('imagewebp') && imagewebp($thumbnail, null, 90) ? 'image/webp' : '',
         default => (imagejpeg($thumbnail, null, 90) ? 'image/jpeg' : ''),
     };
     $data = ob_get_clean();
@@ -155,16 +162,16 @@ function createGdThumbnail(string $path, array $imageInfo, int $width, int $heig
 }
 
 /** @return array{mime: string, data: string} */
-function createMissingPreview(int $width): array
+function createMissingPreview(int $width, ?string $requestedFormat = null): array
 {
     $fallback = basePath . '/inc/images/no_preview.png';
     if (is_file($fallback) && extension_loaded('imagick')) {
-        return createImagickThumbnail($fallback, $width, $width);
+        return createImagickThumbnail($fallback, $width, $width, $requestedFormat);
     }
     if (is_file($fallback) && extension_loaded('gd')) {
         $info = getimagesize($fallback);
         if ($info !== false) {
-            return createGdThumbnail($fallback, $info, $width, max(1, (int) round($info[1] * $width / $info[0])));
+            return createGdThumbnail($fallback, $info, $width, max(1, (int) round($info[1] * $width / $info[0])), $requestedFormat);
         }
     }
 
@@ -176,6 +183,11 @@ function requestedWidth(mixed $value): int
 {
     $width = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['default' => 100, 'min_range' => 1, 'max_range' => 2000]]);
     return (int) $width;
+}
+
+function requestedFormat(mixed $value): ?string
+{
+    return strtolower((string) $value) === 'webp' ? 'webp' : null;
 }
 
 function resolveImagePath(string $requestedPath): ?string

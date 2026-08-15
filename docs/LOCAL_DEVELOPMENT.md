@@ -28,7 +28,7 @@ Der vollständige Demo-Modus läuft ohne MySQL mit SQLite und lokalen Beispielda
 
 `--reset` erzeugt die Datenbank unter `var/test/dzcp.sqlite` neu. Ohne diesen Schalter bleiben Änderungen erhalten. Alternativ aktiviert `DZCP_DATABASE_DRIVER=sqlite` den Treiber; `DZCP_SQLITE_PATH` überschreibt den Dateipfad. Die Demo-Zugänge `admin`, `demo` und `moderator` verwenden jeweils das Passwort `dzcp-test`. Der Reset fügt verknüpfte Fixtures für News, Forum, Kommentare, Team, Clanwars, Downloads, Events, Abstimmungen, Nachrichten und Verwaltungslisten ein. Steam liefert einen festen Testbenutzer; andere externe HTTP-Aufrufe werden lokal unterdrückt und benötigen weder Netzwerk noch Schlüssel.
 
-`thumbgen.php` nutzt für Vorschauen bevorzugt die PHP-Erweiterung Imagick und fällt bei einem Fehler auf GD zurück. Für einen gezielten GD-Test setze vor dem Serverstart `DZCP_THUMBNAIL_ENGINE=gd`.
+`thumbgen.php` nutzt für Vorschauen bevorzugt die PHP-Erweiterung Imagick und fällt bei einem Fehler auf GD zurück. Für WebP-Ausgabe `&format=webp` an die Thumbnail-URL anhängen, zum Beispiel `/thumbgen.php?img=gallery/images/1_2.jpg&format=webp`. Für einen gezielten GD-Test setze vor dem Serverstart `DZCP_THUMBNAIL_ENGINE=gd`.
 
 ## Prüfen und Debuggen
 
