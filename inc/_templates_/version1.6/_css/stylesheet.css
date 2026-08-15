@@ -340,6 +340,10 @@ div#index {
 
 .sideContent .box_tabs .ui-tabs-nav,
 .sideContent .box_tabs .headline_tabs {
+    position: static;
+    top: auto;
+    left: auto;
+    width: auto;
     min-width: 0;
     min-height: 39px;
     height: auto;
