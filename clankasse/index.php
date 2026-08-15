@@ -14,17 +14,6 @@ $where = _site_clankasse;
 $title = $pagetitle . " - " . $where . "";
 $dir = "clankasse";
 
-function clankasseTimestamp(mixed $value): int
-{
-    if (is_numeric($value)) {
-        return (int) $value;
-    }
-
-    $timestamp = strtotime(trim((string) $value));
-
-    return $timestamp === false ? 0 : $timestamp;
-}
-
 ## SECTIONS ##
 switch ($action):
     default:
@@ -59,7 +48,7 @@ switch ($action):
                     "transaktion" => h($get['transaktion']),
                     "delete" => $delete,
                     "edit" => $edit,
-                    "datum" => date("d.m.Y", clankasseTimestamp($get['datum']))));
+                    "datum" => date("d.m.Y", dzcp_timestamp($get['datum']))));
             }
 
             $getp = sum($db['clankasse'], 'betrag', ' WHERE `pm` = 0');
@@ -76,7 +65,7 @@ switch ($action):
             $showstatus = '';
             while ($gets = _fetch($qrys)) {
                 if ($gets['user']) {
-                    $payed = clankasseTimestamp($gets['payed']);
+                    $payed = dzcp_timestamp($gets['payed']);
                     if ($payed >= time())
                         $status = show(_clankasse_status_payed, array("payed" => date("d.m.Y", $payed)));
                     elseif (date("d.m.Y", $payed) == date("d.m.Y", time()))
@@ -208,7 +197,7 @@ switch ($action):
                 }
             } elseif ($do == "edit") {
                 $get = db("SELECT * FROM `" . $db['clankasse'] . "` WHERE `id` = " . (int)($_GET['id']) . ";", false, true);
-                $timestamp = clankasseTimestamp($get['datum']);
+                $timestamp = dzcp_timestamp($get['datum']);
                 $dropdown_date = show(_dropdown_date, array("day" => dropdown("day", date("d", $timestamp)),
                     "month" => dropdown("month", date("m", $timestamp)),
                     "year" => dropdown("year", date("Y", $timestamp))));
@@ -273,7 +262,7 @@ switch ($action):
                 $qry = db("SELECT `payed` FROM `" . $db['c_payed'] . "` WHERE `user` = " . (int)($_GET['id']) . ";");
                 if (_rows($qry)) {
                     $get = _fetch($qry);
-                    $payed = clankasseTimestamp($get['payed']);
+                    $payed = dzcp_timestamp($get['payed']);
                     $tag = date("d", $payed);
                     $monat = date("m", $payed);
                     $jahr = date("Y", $payed);

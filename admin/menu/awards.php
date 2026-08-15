@@ -54,9 +54,10 @@ if ($do == "new") {
             "sel" => $sel));
     }
 
-    $dropdown_date = show(_dropdown_date, array("day" => dropdown("day", date("d", $get['date'])),
-        "month" => dropdown("month", date("m", $get['date'])),
-        "year" => dropdown("year", date("Y", $get['date']))));
+    $timestamp = dzcp_timestamp($get['date']);
+    $dropdown_date = show(_dropdown_date, array("day" => dropdown("day", date("d", $timestamp)),
+        "month" => dropdown("month", date("m", $timestamp)),
+        "year" => dropdown("year", date("Y", $timestamp))));
 
     $show = show($dir . "/form_awards", array("head" => _awards_admin_head_edit,
         "date" => _awards_head_date,
@@ -150,7 +151,7 @@ if ($do == "new") {
         $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
         $color++;
 
-        $show_ .= show($dir . "/awards_show", array("datum" => date("d.m.Y", $get['date']),
+        $show_ .= show($dir . "/awards_show", array("datum" => date("d.m.Y", dzcp_timestamp($get['date'])),
             "award" => h($get['event']),
             "id" => $get['squad'],
             "class" => $class,

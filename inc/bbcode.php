@@ -1527,6 +1527,27 @@ function zitat(string $nick, string $zitat)
 }
 
 /**
+ * Normalisiert Legacy-Datumswerte zu einem Unix-Zeitstempel.
+ * Akzeptiert numerische Zeitstempel sowie gespeicherte deutsche Datumswerte.
+ */
+function dzcp_timestamp(mixed $value): int
+{
+    if (is_numeric($value)) {
+        return (int) $value;
+    }
+
+    $date = trim((string) $value);
+    $parsed = DateTimeImmutable::createFromFormat('!d.m.Y', $date);
+    if ($parsed instanceof DateTimeImmutable && $parsed->format('d.m.Y') === $date) {
+        return $parsed->getTimestamp();
+    }
+
+    $timestamp = strtotime($date);
+
+    return $timestamp === false ? 0 : $timestamp;
+}
+
+/**
  * Konvertiert einen Datenbankwert für die sichere HTML-Ausgabe.
  * Entfernt Backslashes, konvertiert Sonderzeichen zu HTML-Entities
  * und dekodiert HTML-Entities (ISO-8859-1 kompatibel).
