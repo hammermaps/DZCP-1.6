@@ -10,7 +10,7 @@ function gallerie()
 
     $get = db("SELECT `id`,`kat` FROM " . $db['gallery'] . " " . (permission('galleryintern') ? "" : " WHERE `intern` = 0") . " ORDER BY RAND()", false, true);
     $files = get_files(basePath . '/gallery/images/', false, true, $picformat, "#^" . $get['id'] . "_(.*)#", array(), 'minimize');
-    $cnt = count($files);
+    $cnt = is_array($files) ? count($files) : 0;
 
     $gallery = '';
     if ($files && $cnt >= 1) {

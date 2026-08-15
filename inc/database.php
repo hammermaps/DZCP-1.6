@@ -195,6 +195,7 @@ final class DzcpDatabase
         $sql = preg_replace('/\bSQL_CALC_FOUND_ROWS\b/i', '', $sql) ?? $sql;
         $sql = preg_replace('/\bINSERT\s+IGNORE\b/i', 'INSERT OR IGNORE', $sql) ?? $sql;
         $sql = preg_replace('/\bLIMIT\s+([^,;]+),\s*([^;\s]+)/i', 'LIMIT $2 OFFSET $1', $sql) ?? $sql;
+        $sql = str_replace('&&', 'AND', $sql);
         $sql = preg_replace('/\s+AFTER\s+`?[a-zA-Z0-9_]+`?/i', '', $sql) ?? $sql;
         if (preg_match('/^\s*((?:INSERT|REPLACE)\s+INTO)\s+(.+?)\s+SET\s+(.+)$/is', $sql, $match)) {
             $assignments = self::splitSqlList(rtrim($match[3], ';'));

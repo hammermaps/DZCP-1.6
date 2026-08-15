@@ -53,4 +53,12 @@ final class SQLiteDatabaseTest extends TestCase
         self::assertSame('01.01.1970', $row['formatted']);
         self::assertSame('01.01.1970', $row['directly_formatted']);
     }
+
+    public function testSupportsLegacyAndOperator(): void
+    {
+        $database = DzcpDatabase::sqlite($this->path);
+        $row = $database->query('SELECT 1 AS result WHERE 1 = 1 && 2 = 2')->fetch_assoc();
+
+        self::assertSame(1, $row['result']);
+    }
 }

@@ -5,8 +5,8 @@
  */
 
 if (defined('_Clanwars')) {
-    $sum_punkte = sum($db['cw'], '', 'punkte');
-    $sum_gpunkte = sum($db['cw'], '', 'gpunkte');
+    $sum_punkte = sum($db['cw'], 'punkte');
+    $sum_gpunkte = sum($db['cw'], 'gpunkte');
     $anz_ges_points = show(_cw_stats_ges_points, array("ges_won" => $sum_punkte, "ges_lost" => $sum_gpunkte));
 
     if (cnt($db['cw'], " WHERE datum < " . time() . "") != "0") {
@@ -102,8 +102,8 @@ if (defined('_Clanwars')) {
                 "details" => $details));
         }
 
-        $sum_punkte = sum($db['cw'], ' WHERE squad_id = ' . $get['id'], 'punkte');
-        $sum_gpunkte = sum($db['cw'], ' WHERE squad_id = ' . $get['id'], 'gpunkte');
+        $sum_punkte = sum($db['cw'], 'punkte', ' WHERE squad_id = ' . $get['id']);
+        $sum_gpunkte = sum($db['cw'], 'gpunkte', ' WHERE squad_id = ' . $get['id']);
         $anz_ges_points = show(_cw_stats_ges_points, array("ges_won" => $sum_punkte,
             "ges_lost" => $sum_gpunkte));
 
