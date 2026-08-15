@@ -143,7 +143,7 @@ function seedDemoData(PDO $pdo): void
             ['id' => 2, 'kid' => 1, 'sid' => 1, 'date' => $now - 600, 'nick' => 'Demo Member', 'reg' => 2, 'email' => 'demo@example.test', 'text' => 'Verstanden, danke!', 'edited' => null, 'ip' => '127.0.0.2', 'hp' => ''],
         ],
         'dzcp_f_abo' => [['id' => 1, 'fid' => 1, 'datum' => $now - 3600, 'user' => 2]],
-        'dzcp_gb' => [['id' => 1, 'datum' => $now - 4000, 'nick' => 'Gast', 'email' => 'guest@example.test', 'hp' => '', 'reg' => 0, 'nachricht' => 'Schöne Demo-Seite!', 'ip' => '127.0.0.4', 'editby' => null, 'public' => 1]],
+        'dzcp_gb' => [['id' => 1, 'datum' => $now - 4000, 'nick' => 'Gast', 'email' => 'guest@example.test', 'hp' => '', 'reg' => 0, 'nachricht' => 'Sch&ouml;ne Demo-Seite!', 'ip' => '127.0.0.4', 'editby' => null, 'public' => 1]],
         'dzcp_shoutbox' => [['id' => 2, 'datum' => $now - 300, 'nick' => 'Demo Member', 'email' => 'demo@example.test', 'text' => 'Hallo aus dem SQLite-Testmodus!', 'ip' => '127.0.0.2']],
         'dzcp_events' => [['id' => 2, 'datum' => $now + 86400 * 3, 'title' => 'Demo-Training', 'event' => 'Gemeinsames Training mit dem Demo Squad.']],
         'dzcp_awards' => [['id' => 1, 'squad' => 2, 'date' => date('d.m.Y', $now - 86400 * 14), 'postdate' => (string) $now, 'event' => 'Demo Cup', 'place' => '1', 'prize' => 'Lokaler Testpokal', 'url' => 'https://example.test/demo-cup']],
@@ -164,7 +164,7 @@ function seedDemoData(PDO $pdo): void
         'dzcp_clankasse' => [['id' => 1, 'datum' => date('d.m.Y', $now), 'member' => 'Demo Member', 'transaktion' => 'Serverbeitrag', 'pm' => 1, 'betrag' => 10.0]],
         'dzcp_clankasse_payed' => [['id' => 1, 'user' => 2, 'payed' => date('m.Y', $now)]],
         'dzcp_userbuddys' => [['id' => 1, 'user' => 2, 'buddy' => 3]],
-        'dzcp_usergb' => [['id' => 1, 'user' => 2, 'datum' => $now - 5000, 'nick' => 'Demo Moderator', 'email' => 'moderator@example.test', 'hp' => '', 'reg' => 3, 'nachricht' => 'Grüße im Demo-Gästebuch.', 'ip' => '127.0.0.3', 'editby' => null]],
+        'dzcp_usergb' => [['id' => 1, 'user' => 2, 'datum' => $now - 5000, 'nick' => 'Demo Moderator', 'email' => 'moderator@example.test', 'hp' => '', 'reg' => 3, 'nachricht' => 'Gr&uuml;&szlig;e im Demo-G&auml;stebuch.', 'ip' => '127.0.0.3', 'editby' => null]],
         'dzcp_sites' => [['id' => 1, 'titel' => 'Demo-Seite', 'text' => '<p>Freier Seiteninhalt für Tests.</p>', 'html' => 1]],
         'dzcp_slideshow' => [['id' => 1, 'pos' => 1, 'bez' => 'Demo-Slide', 'showbez' => 1, 'desc' => 'Platzhalter für die Slideshow.', 'url' => '?page=news', 'target' => 0]],
     ];
