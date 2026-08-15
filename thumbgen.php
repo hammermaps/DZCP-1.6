@@ -14,6 +14,7 @@ require_once basePath . '/inc/buffer.php';
 use Phpfastcache\CacheManager;
 use Phpfastcache\Exceptions\PhpfastcacheInvalidArgumentException;
 
+try {
 $imagePath = resolveImagePath((string) ($_GET['img'] ?? ''));
 $width = requestedWidth($_GET['width'] ?? null);
 $rebuild = isset($_GET['rebuild']);
@@ -73,6 +74,18 @@ if (thumbgen_cache && $cached !== null) {
 }
 
 thumbnailResponse($payload);
+} catch (Throwable $exception) {
+    DzcpLogger::error()->error('Thumbnail-Endpunkt fehlgeschlagen', [
+        'requested_image' => basename((string) ($_GET['img'] ?? '')),
+        'exception' => $exception,
+    ]);
+    http_response_code(500);
+    header('Content-Type: text/plain; charset=utf-8');
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    exit('Thumbnail could not be generated.');
+}
 
 /** @return array{mime: string, data: string} */
 function createImagickThumbnail(string $path, int $width, int $height): array
