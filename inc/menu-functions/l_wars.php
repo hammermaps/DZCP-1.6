@@ -27,6 +27,7 @@ function l_wars()
                 "clantag" => h(cut($get['clantag'], config('l_lwars'), true, false)),
                 "icon" => h($get['icon']),
                 "info" => $info,
+                "datum" => date("d.m.Y", $get['datum']),
                 "result" => cw_result_pic($get['punkte'], $get['gpunkte'])));
         }
     }
