@@ -78,6 +78,10 @@ function cut_pascal(&$buffer, $start_byte = 1, $length_adjust = 0, $end_byte = 0
 
 function gs_normalise($server)
 {
+    if (!is_array($server)) {
+        $server = array();
+    }
+
     $keys = array('gamemod' => '', 'hostname' => '', 'maxplayers' => '0',
         'players' => '0', 'mapname' => '', 'game' => '');
     foreach ($keys as $key => $default) {

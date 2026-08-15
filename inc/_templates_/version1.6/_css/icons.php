@@ -1,10 +1,11 @@
 <?php
 ob_start();
-header("Content-type: text/css");
 define('basePath', realpath('../../../..'));
 $thumbgen = true;
 
 require_once(basePath . '/inc/buffer.php');
+
+header('Content-Type: text/css; charset=utf-8');
 
 use Phpfastcache\CacheManager;
 

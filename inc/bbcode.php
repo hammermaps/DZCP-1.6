@@ -627,7 +627,7 @@ function lang(string $lng)
     header("X-Frame-Options: SAMEORIGIN");
     header("X-Content-Type-Options: nosniff");
     header("Referrer-Policy: strict-origin-when-cross-origin");
-    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self';");
+    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self';");
     // TODO: Replace 'unsafe-inline'/'unsafe-eval' with nonces or hashes once inline scripts/styles are refactored
 
     //Set language for GUMP
@@ -3882,6 +3882,10 @@ function page(string $index = '', string $title = '', string $where = '', string
         $dir = $designpath;
         $title = re(strip_tags($title));
         $gmaps_key = re(settings("gmaps_key"));
+        $gmaps_script = '';
+        if (strpos($index, 'function initMap') !== false && $gmaps_key !== '') {
+            $gmaps_script = '<script src="https://maps.googleapis.com/maps/api/js?key=' . rawurlencode($gmaps_key) . '&amp;callback=initMap&amp;libraries=&amp;v=weekly" defer></script>';
+        }
 
         if (check_internal_url())
             $index = error(_error_have_to_be_logged, 1);
@@ -3901,7 +3905,7 @@ function page(string $index = '', string $title = '', string $where = '', string
 
         //filter placeholders
         $blArr = array("[clanname]", "[title]", "[copyright]", "[java_vars]", "[min]",
-            "[headtitle]", "[index]", "[time]", "[rss]", "[dir]", "[charset]", "[where]", "[lang]", "[gmaps_key]");
+            "[headtitle]", "[index]", "[time]", "[rss]", "[dir]", "[charset]", "[where]", "[lang]", "[gmaps_key]", "[gmaps_script]");
         $pholdervars = '';
         for ($i = 0; $i <= count($blArr) - 1; $i++) {
             if (preg_match("#" . $blArr[$i] . "#", $pholder))

@@ -15,7 +15,7 @@ $server_link = 'bf2://{IP}:{S_PORT}';
 function server_query_bf2($ip, $port, $q_port, $request, $challenge_code = '')
 {
     global $server_timeout;
-    $q_port = empty($q_port) ? ($q_port + 3) : $q_port;
+    $q_port = empty($q_port) ? ((int)$port + 3) : (int)$q_port;
 
     @set_time_limit(2);
     $fp = @fsockopen("udp://$ip", $q_port, $errno, $errstr, $server_timeout);

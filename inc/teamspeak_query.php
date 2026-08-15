@@ -116,9 +116,9 @@ class TSStatus
         @set_time_limit(10);
         $fp = @fsockopen($this->_host, $this->_qport, $errno, $errstr, 2);
         $this->_socket = $fp;
-        @stream_set_timeout($fp, 2, 0);
-        @stream_set_blocking($fp, true);
         if ($fp) {
+            @stream_set_timeout($fp, 2, 0);
+            @stream_set_blocking($fp, true);
 
             $response = $this->sendCommand($fp, "use port=" . $this->_port);
 
