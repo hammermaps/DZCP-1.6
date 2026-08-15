@@ -158,7 +158,7 @@ function seedDemoData(PDO $pdo): void
         ],
         'dzcp_serverliste' => [['id' => 1, 'datum' => $now - 3600, 'clanname' => 'Demo Clan', 'clanurl' => 'https://example.test', 'ip' => '127.0.0.1', 'port' => 27015, 'pwd' => '', 'checked' => 1, 'slots' => 16]],
         'dzcp_votes' => [['id' => 1, 'datum' => $now - 7200, 'titel' => 'Welcher Testbereich ist als N&auml;chstes dran?', 'intern' => 0, 'menu' => 1, 'closed' => 0, 'von' => 1, 'forum' => 0]],
-        'dzcp_vote_results' => [['id' => 1, 'vid' => 1, 'what' => 'Forum', 'sel' => 1, 'stimmen' => 4], ['id' => 2, 'vid' => 1, 'what' => 'Galerie', 'sel' => 2, 'stimmen' => 2]],
+        'dzcp_vote_results' => [['id' => 1, 'vid' => 1, 'what' => 'a1', 'sel' => 'Forum', 'stimmen' => 4], ['id' => 2, 'vid' => 1, 'what' => 'a2', 'sel' => 'Galerie', 'stimmen' => 2]],
         'dzcp_messages' => [['id' => 1, 'datum' => $now - 900, 'von' => 3, 'an' => 2, 'see_u' => 0, 'page' => 0, 'titel' => 'Willkommen', 'nachricht' => 'Dies ist eine Demo-Privatnachricht.', 'see' => 0, 'readed' => 0, 'sendmail' => 0, 'sendnews' => 0, 'senduser' => 0, 'sendnewsuser' => 0]],
         'dzcp_away' => [['id' => 1, 'userid' => 2, 'titel' => 'Urlaub', 'reason' => 'Beispiel-Abwesenheit für die Teamansicht.', 'start' => $now + 86400 * 10, 'end' => $now + 86400 * 17, 'date' => date('d.m.Y', $now), 'lastedit' => null]],
         'dzcp_clankasse' => [['id' => 1, 'datum' => date('d.m.Y', $now), 'member' => 'Demo Member', 'transaktion' => 'Serverbeitrag', 'pm' => 1, 'betrag' => 10.0]],

@@ -20,7 +20,7 @@ function vote($ajax = false)
         while ($getv = _fetch($qryv)) {
             $stimmen = sum($db['vote_results'], "stimmen", " WHERE `vid` = '" . $get['id'] . "'");
             if ($stimmen != 0) {
-                if (ipcheck("vid_" . $get['id']) || cookie::get('vid_' . $get['id']) != false || $get['closed'] == 1) {
+                if ((HasDSGVO() && ipcheck("vid_" . $get['id'])) || cookie::get('vid_' . $get['id']) != false || $get['closed'] == 1) {
                     $percent = round($getv['stimmen'] / $stimmen * 100, 1);
                     $rawpercent = round($getv['stimmen'] / $stimmen * 100, 0);
 
@@ -31,16 +31,12 @@ function vote($ajax = false)
                         "stimmen" => $getv['stimmen'],
                         "balken" => $balken));
                 } else {
-                    if (HasDSGVO()) {
-                        $votebutton = '<input id="contentSubmitVote" type="submit" value="' . _button_value_vote . '" class="voteSubmit" />';
-                        $results .= show("menu/vote_vote", array("id" => $getv['id'], "answer" => re($getv['sel'])));
-                    }
-                }
-            } else {
-                if (HasDSGVO()) {
                     $votebutton = '<input id="contentSubmitVote" type="submit" value="' . _button_value_vote . '" class="voteSubmit" />';
                     $results .= show("menu/vote_vote", array("id" => $getv['id'], "answer" => re($getv['sel'])));
                 }
+            } else {
+                $votebutton = '<input id="contentSubmitVote" type="submit" value="' . _button_value_vote . '" class="voteSubmit" />';
+                $results .= show("menu/vote_vote", array("id" => $getv['id'], "answer" => re($getv['sel'])));
             }
         }
 

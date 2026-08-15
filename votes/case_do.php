@@ -10,7 +10,10 @@ if (defined('_Votes')) {
             $index = error(_vote_no_answer);
         else {
             $get = db("SELECT * FROM " . $db['votes'] . " WHERE id = '" . (int)($_GET['id']) . "'", false, true);
-            if ($get['intern']) {
+            $vote = db("SELECT id FROM " . $db['vote_results'] . " WHERE id = " . (int)($_POST['vote']) . " AND vid = " . (int)($_GET['id']), false, true);
+            if (!$get || !$vote) {
+                $index = error(_vote_no_answer);
+            } else if ($get['intern']) {
                 $ipcheck = db("SELECT ip FROM " . $db['ipcheck'] . " WHERE what = 'vid_" . (int)($_GET['id']) . "'", false, true);
                 if ($ipcheck['ip'] == $userid)
                     $index = error(_error_voted_again, 1);
@@ -27,7 +30,7 @@ if (defined('_Votes')) {
                         $index = info(_vote_successful, "?show=" . $_GET['id'] . "");
                 }
             } else {
-                if (ipcheck("vid_" . $_GET['id']))
+                if (cookie::get('vid_' . $_GET['id']) != false || (HasDSGVO() && ipcheck("vid_" . $_GET['id'])))
                     $index = error(_error_voted_again, 1);
                 else if ($get['closed'])
                     $index = error(_error_vote_closed, 1);
@@ -37,8 +40,10 @@ if (defined('_Votes')) {
 
                     db("UPDATE `" . $db['vote_results'] . "` SET `stimmen` = (stimmen+1) WHERE `id` = " . (int)($_POST['vote']) . ";");
 
-                    setIpcheck("vid_" . (int)($_GET['id']), false);
-                    setIpcheck("vid(" . (int)($_GET['id']) . ")");
+                    if (HasDSGVO()) {
+                        setIpcheck("vid_" . (int)($_GET['id']), false);
+                        setIpcheck("vid(" . (int)($_GET['id']) . ")");
+                    }
 
                     if (!isset($_GET['ajax']))
                         $index = info(_vote_successful, "?show=" . $_GET['id'] . "");
