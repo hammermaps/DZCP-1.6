@@ -13,6 +13,24 @@ http://demo.dzcp.de/news/
 
 ---
 
+## Changelog – Entwicklung (15.08.2026)
+
+### Neuerungen
+- SQLite-Testmodus mit vollständigen, verknüpften Demo-Daten und Startskript für den integrierten PHP-Server ergänzt.
+- Zentrale Fehlerbehandlung mit Monolog und Tracy eingeführt; PHP-Fehler werden strukturiert protokolliert.
+- Die Spielserver- und TeamSpeak-Viewer auf GameQ umgestellt; die Administration ermittelt verfügbare Spielprotokolle dynamisch.
+- Thumbnail-Erzeugung mit Imagick, GD-Fallback und optionaler WebP-Ausgabe erweitert; Galerie-Vorschaubilder verwenden WebP.
+- PHPUnit-Grundlage für datenbankunabhängige Unit-Tests ergänzt.
+
+### Verbesserungen und Fehlerbehebungen
+- Navigation und Sidebar vereinheitlicht, einschließlich strukturierter Serverkarten und korrigierter Tab-Kopfzeilen.
+- Öffentliche Abstimmungen, Artikel-, Clanwar- und TinyMCE-Menüs sowie Umlaute in Demo-Inhalten korrigiert.
+- SQLite-Kompatibilität für Legacy-SQL und Datumswerte verbessert; ältere Datumsstrings werden zentral normalisiert.
+- Demo-Daten für Clankasse und Awards auf Unix-Zeitstempel korrigiert.
+- Addon-Check und Taktik-Bildauswahl gegen fehlende externe Daten bzw. leere Verzeichnisse abgesichert.
+
+---
+
 ## Changelog 1.6.1.3 (07.03.2026)
 
 ### Neuerungen
