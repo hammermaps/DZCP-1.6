@@ -18,12 +18,13 @@ function l_artikel()
         while ($get = _fetch($qry)) {
             $getkat = db("SELECT `kategorie` FROM " . $db['newskat'] . " WHERE `id` = '" . $get['kat'] . "'", false, true);
             $text = strip_tags($get['text']);
+            $title = html_entity_decode(re($get['titel'], true), ENT_QUOTES, 'UTF-8');
 
             if (config('allowhover') == 1)
-                $info = 'onmouseover="DZCP.showInfo(\'' . up(re($get['titel'])) . '\', \'' . _datum . ';' . _autor . ';' . _news_admin_kat . ';' . _comments_head . '\', \'' . date("d.m.Y H:i", $get['datum']) . _uhr . ';' . fabo_autor($get['autor']) . ';' . jsconvert(re($getkat['kategorie'])) . ';' . cnt($db['acomments'], "WHERE artikel = '" . $get['id'] . "'") . '\')" onmouseout="DZCP.hideInfo()"';
+                $info = 'onmouseover="DZCP.showInfo(\'' . jsconvert($title) . '\', \'' . _datum . ';' . _autor . ';' . _news_admin_kat . ';' . _comments_head . '\', \'' . date("d.m.Y H:i", $get['datum']) . _uhr . ';' . fabo_autor($get['autor']) . ';' . jsconvert(re($getkat['kategorie'])) . ';' . cnt($db['acomments'], "WHERE artikel = '" . $get['id'] . "'") . '\')" onmouseout="DZCP.hideInfo()"';
 
             $l_articles .= show("menu/last_artikel", array("id" => $get['id'],
-                "titel" => h(cut($get['titel'], config('l_lartikel'), true, false)),
+                "titel" => htmlspecialchars(cut($title, config('l_lartikel'), true, false), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
                 "text" => cut(bbcode($text), 260),
                 "datum" => date("d.m.Y", $get['datum']),
                 "info" => $info));
