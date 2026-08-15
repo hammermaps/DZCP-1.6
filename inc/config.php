@@ -352,7 +352,7 @@ $db = array("host" => $sql_host,
     "vote_results" => $prefix . "vote_results");
 unset($prefix, $sql_host, $sql_user, $sql_pass, $sql_db);
 
-if (!$thumbgen && ($database_driver === 'sqlite' || ($db['host'] !== '' && $db['user'] !== '' && $db['pass'] !== '' && $db['db'] !== ''))) {
+if ($database_driver === 'sqlite' || ($db['host'] !== '' && $db['user'] !== '' && $db['pass'] !== '' && $db['db'] !== '')) {
     try {
         $mysql = $database_driver === 'sqlite'
             ? DzcpDatabase::sqlite($sqlite_path)
