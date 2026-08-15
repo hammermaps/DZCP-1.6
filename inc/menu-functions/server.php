@@ -19,7 +19,7 @@ function server($serverID = 0): string
         return $output === '' ? '<div style="text-align:center;margin:15px 5px 0 15px">' . _no_server_navi . '</div>' : $output;
     }
 
-    $row = db("SELECT `id`, `status`, `ip`, `port`, `pwd`, `game`, `qport` FROM `{$db['server']}` WHERE `navi` = 1 AND `id` = " . (int)$serverID, false, true);
+    $row = db("SELECT `id`, `name`, `status`, `ip`, `port`, `pwd`, `game`, `qport` FROM `{$db['server']}` WHERE `navi` = 1 AND `id` = " . (int)$serverID, false, true);
     if (empty($row) || $row['status'] === 'nope' || !DzcpGameQ::isGameProtocol((string)$row['status'])) {
         return '<div style="text-align:center;margin:15px 5px 0 15px">' . _no_server_navi . '</div>';
     }
