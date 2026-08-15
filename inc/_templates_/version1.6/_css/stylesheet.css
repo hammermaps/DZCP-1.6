@@ -651,6 +651,87 @@ img.navServerPic, img.ServerPic {
     border: 1px solid;
 }
 
+.navServerCard {
+    margin: 4px 0 10px;
+    overflow: hidden;
+    border: 1px solid #d4d4d4;
+    border-radius: 3px;
+    background: #fff;
+}
+
+.navServerCardTitle {
+    overflow: hidden;
+    padding: 7px 8px;
+    color: #333;
+    font-weight: bold;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.navServerCardMap {
+    display: block;
+    line-height: 0;
+}
+
+.navServerCard .navServerPic {
+    display: block;
+    width: 100%;
+    max-height: 86px;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    object-fit: cover;
+}
+
+.navServerCardEndpoint {
+    padding: 6px 8px;
+    border-bottom: 1px solid #e5e5e5;
+    background: #f5f5f5;
+    text-align: center;
+}
+
+.navServerCardDetails {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.navServerCardDetails > div {
+    min-width: 0;
+    padding: 6px 8px;
+    border-bottom: 1px solid #ededed;
+}
+
+.navServerCardDetails > div:nth-child(odd) {
+    border-right: 1px solid #ededed;
+}
+
+.navServerCardDetails > div:last-child {
+    grid-column: 1 / -1;
+    border-bottom: 0;
+    text-align: center;
+}
+
+.navServerCardDetails span {
+    display: block;
+    margin-bottom: 2px;
+    color: #777;
+    font-size: 10px;
+    text-transform: uppercase;
+}
+
+.navServerCardDetails strong,
+.navServerCardDetails a {
+    display: block;
+    overflow: hidden;
+    color: #333;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.navServerCardDetails strong img {
+    vertical-align: middle;
+}
+
 /* Attributes of all navigation boxes e.g. menu/nav_[box].html */
 table.tableNav {
     width: 100%;

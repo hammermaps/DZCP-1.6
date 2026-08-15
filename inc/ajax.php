@@ -79,7 +79,7 @@ switch (isset($_GET['i']) ? $_GET['i'] : ''):
         echo team($_GET['tID']);
         break;
     case 'server':
-        echo '<table class="hperc" cellspacing="0">' . server($_GET['serverID']) . '</table>';
+        echo server($_GET['serverID']);
         break;
     case 'shoutbox':
         echo '<table class="hperc" cellspacing="1">' . shout(true) . '</table>';

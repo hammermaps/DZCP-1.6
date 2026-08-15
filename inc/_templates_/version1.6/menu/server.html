@@ -1,43 +1,10 @@
-<table class="navContent" cellspacing="0">
-    <tr>
-        <td class="navServerStatsLeft"></td>
-        <td>
-            <table class="navContent">
-                <tr>
-                    <td class="navServerStatsContent"><span class="fontBold">[host]</span></td>
-                </tr>
-                <tr>
-                    <td class="navServerStatsContent" style="text-align:center;"><a href="../server/" [info]><img
-                            src="[mappic]" class="navServerPic"/></a></td>
-                </tr>
-                <tr>
-                    <td class="navServerStatsSpace"></td>
-                </tr>
-                <tr>
-                    <td class="navServerStatsContent"><a class="navServerStats" href="[launch]">[ip]:[port]</a><br/>[pwd]
-                    </td>
-                </tr>
-                <tr>
-                    <td class="navServerStatsSpace"></td>
-                </tr>
-                <tr>
-                    <td class="navServerStatsContent"><span class="fontBold">Game:</span> [icon] [data_gamemod]</td>
-                </tr>
-                <tr>
-                    <td class="navServerStatsContent"><span class="fontBold">Map:</span> [map]</td>
-                </tr>
-                <tr>
-                    <td class="navServerStatsContent"><a class="navServerStats" href="../server/"><span
-                            class="fontBold">Players:</span> [aktplayers]/[maxplayers]</a></td>
-                </tr>
-                <tr>
-                    <td class="navServerStatsSpace"></td>
-                </tr>
-                <tr>
-                    <td class="navServerStatsContent">&nbsp;</td>
-                </tr>
-            </table>
-        </td>
-        <td class="navServerStatsRight"></td>
-    </tr>
-</table>
+<div class="navServerCard">
+    <div class="navServerCardTitle">[host]</div>
+    <a class="navServerCardMap" href="../server/" [info]><img src="[mappic]" class="navServerPic" alt="" /></a>
+    <div class="navServerCardEndpoint"><a class="navServerStats" href="[launch]">[ip]:[port]</a>[pwd]</div>
+    <div class="navServerCardDetails">
+        <div><span>Spiel</span><strong>[icon] [data_gamemod]</strong></div>
+        <div><span>Karte</span><strong>[map]</strong></div>
+        <div class="navServerCardPlayers"><span>Spieler</span><a class="navServerStats" href="../server/">[aktplayers]/[maxplayers]</a></div>
+    </div>
+</div>
