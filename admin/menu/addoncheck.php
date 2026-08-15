@@ -49,6 +49,8 @@ if (count($addons_xml)) {
         if (!is_array($addon) || !array_key_exists('AID', $addon))
             continue;
 
+        $server = is_array($addon['Server'] ?? null) ? $addon['Server'] : array();
+        $link = is_array($addon['Link'] ?? null) ? $addon['Link'] : array();
         $class = ($color % 2) ? "contentMainSecond" : "contentMainFirst";
         if (!$addon['Version']) {
             $show_not_installed .= show($dir . '/addon_check_show', [
@@ -56,16 +58,16 @@ if (count($addons_xml)) {
                 'name' => $addon['Name'],
                 'autor' => $addon['Autor'],
                 'version' => '<span class="fontBold" style="color:#999999">' . _addoncheck_notinstalled . '</span>',
-                'url' => $addon['Link']['URL'],
-                'title' => $addon['Link']['Title']]);
+                'url' => $link['URL'] ?? '',
+                'title' => $link['Title'] ?? '']);
         } else {
-            if (array_key_exists('Server', $addon) && array_key_exists('Version', $addon['Server']) && !array_key_exists('error', $addon['Server'])) {
-                if (!$addons['error'] && array_key_exists('Server', $addon) && $addon['Server']['Version']) {
+            if (array_key_exists('Version', $server) && !array_key_exists('error', $server)) {
+                if (!$addons['error'] && $server['Version']) {
                     $version = '<span class="fontBold">' . _addoncheck_yourversion . ':</span> <span style="color:#17D427">' . $addon['Version'] . '</span><br />' .
                         '<span class="fontBold" style="color:#17D427">' . _addoncheck_VersionOK . '</span>';
-                    if (api::versionCompare($addon['Version'], '<', $addon['Server']['Version'])) {
+                    if (api::versionCompare($addon['Version'], '<', $server['Version'])) {
                         $version = '<span class="fontBold">' . _addoncheck_yourversion . ':</span> <span class="fontBold" style="color:#FF0000">' . $addon['Version'] . '</span><br />' .
-                            '<span class="fontBold" style="color:#FF0000">' . _addoncheck_currVersion . ':</span> <span class="fontBold" style="color:#FF0000">' . $addon['Server']['Version'] . '</span>';
+                            '<span class="fontBold" style="color:#FF0000">' . _addoncheck_currVersion . ':</span> <span class="fontBold" style="color:#FF0000">' . $server['Version'] . '</span>';
                     }
                 } else if ($addons['error']) {
                     $version = '<span class="fontBold" style="color:#7783ff">' . _addoncheck_checkDisabled . '</span><br /><span class="fontBold">' . _addoncheck_yourversion . ': </span>' . $addon['Version'];
@@ -79,14 +81,14 @@ if (count($addons_xml)) {
                     'name' => $addon['Name'],
                     'autor' => $addon['Autor'],
                     'version' => $version,
-                    'url' => (api::versionCompare($addon['Version'], '<', $addon['Server']['Version']) ?
-                        $addon['Server']['URL'] : $addon['Link']['URL']),
-                    'title' => (api::versionCompare($addon['Version'], '<', $addon['Server']['Version']) ?
-                        $addon['Server']['Title'] : $addon['Link']['Title'])]);
+                    'url' => (api::versionCompare($addon['Version'], '<', $server['Version']) ?
+                        ($server['URL'] ?? $link['URL'] ?? '') : ($link['URL'] ?? '')),
+                    'title' => (api::versionCompare($addon['Version'], '<', $server['Version']) ?
+                        ($server['Title'] ?? $link['Title'] ?? '') : ($link['Title'] ?? ''))]);
             } else {
                 $msg = _addoncheck_checkDisabled;
-                if (array_key_exists('error', $addon['Server'])) {
-                    $msg = $addon['Server']['msg'] != 'no_id' ? $msg :
+                if (array_key_exists('error', $server)) {
+                    $msg = ($server['msg'] ?? '') != 'no_id' ? $msg :
                         show(_addoncheck_id_error, ['id' => $addon['AID']]);
                 }
 
@@ -96,8 +98,8 @@ if (count($addons_xml)) {
                     'autor' => $addon['Autor'],
                     'version' => '<span class="fontBold" style="color:#999999">'
                         . $msg . '</span>',
-                    'url' => $addon['Link']['URL'],
-                    'title' => $addon['Link']['Title']]);
+                    'url' => $link['URL'] ?? '',
+                    'title' => $link['Title'] ?? '']);
             }
         }
 
