@@ -5,14 +5,16 @@
  */
 
 ob_start();
-define('basePath', realpath('../../../..'));
+define('basePath', dirname(__DIR__, 4));
 
 ## INCLUDES ##
 $ajaxJob = true;
 ## INCLUDES ##
 include(basePath . '/vendor/autoload.php');
 
-use GUMP\GUMP;
+if (file_exists(basePath . '/inc/mysql.php')) {
+    require_once(basePath . '/inc/mysql.php');
+}
 
 $gump = GUMP::get_instance();
 $_GET = $gump->sanitize($_GET);
