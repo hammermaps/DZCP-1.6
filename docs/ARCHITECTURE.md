@@ -22,6 +22,8 @@ Das aktive Theme befindet sich unter `inc/_templates_/version1.6/`. HTML-Dateien
 
 Für Entwicklung und Tests kann `DZCP_DATABASE_DRIVER=sqlite` die zentrale `DzcpDatabase`-Schicht auf PDO/SQLite umstellen. Sie erhält den bestehenden `db()`- und `db_stmt()`-Vertrag, normalisiert die notwendigen Legacy-SQL-Formen und verwendet ein aus dem Installer-Dump erzeugtes vollständiges Demo-Schema unter `var/test/`.
 
+Spielserver- und TeamSpeak-Status werden über `DzcpGameQ` in `inc/gameq.php` abgefragt. Der Adapter normalisiert GameQ-Ergebnisse für die öffentlichen Viewer und die Navigation; die Administration ermittelt auswählbare Spielprotokolle zur Laufzeit aus den stabilen GameQ-Protokollen.
+
 ## Fehlerbehandlung
 
 `DzcpErrorHandler` in `inc/debugger.php` wird vor der Anwendungskonfiguration registriert. Nach der Monolog-Initialisierung aktiviert er Tracy: PHP-Warnings, Notices und Deprecations werden in den Monolog-Kanal `error` geschrieben; ungefangene Exceptions und fatale PHP-Fehler werden ebenfalls protokolliert und von Tracy im Entwicklungsmodus dargestellt. Die Einstellungen `view_error_reporting` und `$config_logging` in `inc/config.php` steuern Entwicklungsmodus und Log-Ziele. Es gibt keine HTML-Debug-Konsole mehr.

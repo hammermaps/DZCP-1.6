@@ -2,7 +2,7 @@
 
 ## Voraussetzungen und Einrichtung
 
-Verwende PHP 8.4 oder neuer mit den in `composer.json` genannten Erweiterungen, insbesondere `mysqli`, `mbstring`, `intl`, `json`, `bcmath` und `zlib`, sowie eine lokale MySQL- oder MariaDB-Datenbank. Installiere Abhängigkeiten mit:
+Verwende PHP 8.4 oder neuer mit den in `composer.json` genannten Erweiterungen, insbesondere `mysqli`, `mbstring`, `intl`, `json`, `bcmath`, `zlib`, `xml` und `bz2`, sowie eine lokale MySQL- oder MariaDB-Datenbank. `bz2` wird von GameQ für komprimierte Serverantworten benötigt. Installiere Abhängigkeiten mit:
 
 ```bash
 composer install --prefer-dist --no-progress

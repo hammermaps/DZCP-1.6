@@ -9,16 +9,17 @@ $where = $where . ': ' . _server_admin_head;
 
 switch ($do) {
     case 'ts':
+        if (!csrf_check()) {
+            $show = error('Ungültige Sicherheitsprüfung.', 1);
+            break;
+        }
         $tsport = 9987;
         $tsqport = 10011;
         $tsport = empty($_POST['ts_port']) ? $tsport : $_POST['ts_port'];
         $tsqport = empty($_POST['ts_sport']) ? $tsqport : $_POST['ts_sport'];
         db("UPDATE `" . $db['settings'] . "` SET `ts_port` = " . ((int)$tsport) .
             ", `ts_sport` = " . ((int)$tsqport) .
-            ", `ts_width` = " . ((int)$_POST['ts_width']) .
             ",`ts_ip` = '" . up($_POST['ts_ip']) .
-            "',`ts_customicon`  = " . ((int)$_POST['ts_customicon']) .
-            ",`ts_showchannel` = " . ((int)$_POST['ts_showchannel']) .
             " WHERE `id` = 1;");
 
         $show = info(_config_server_ts_updated, "?admin=server");
@@ -66,7 +67,7 @@ switch ($do) {
             "port" => _server_admin_qport,
             "qport" => $get['qport'],
             "pwd" => _pwd,
-            "games" => sgames($get['status']),
+            "games" => DzcpGameQ::protocolOptions($get['status']),
             "status" => _admin_status,
             "no_status" => _no_live_status,
             "value" => _button_value_edit,
@@ -76,19 +77,21 @@ switch ($do) {
             "sgame" => $game));
         break;
     case 'editserver':
-        if (empty($_POST['ip']) || empty($_POST['port']))
+        if (!csrf_check()) {
+            $show = error('Ungültige Sicherheitsprüfung.', 1);
+        } elseif (empty($_POST['ip']) || empty($_POST['port']))
             $show = error(_empty_ip, 1);
         elseif (empty($_POST['name']))
             $show = error(_empty_servername, 1);
+        elseif ($_POST['status'] !== 'nope' && !DzcpGameQ::isGameProtocol((string)$_POST['status']))
+            $show = error('Das gewählte GameQ-Protokoll ist nicht verfügbar.', 1);
         else {
-            $game = ($_POST['game'] == "lazy") ? "" : "`game` = '" . up($_POST['game']) . "',";
-            $status = ($_POST['status'] == "lazy") ? "" : "`status` = '" . up($_POST['status']) . "',";
             db("UPDATE " . $db['server'] . " SET `ip` = '" . up($_POST['ip']) . "',
                                              `port` = '" . ((int)$_POST['port']) . "',
                                              `qport` = '" . up($_POST['qport']) . "',
                                              `name`  = '" . up($_POST['name']) . "',
-                                             " . $game . "
-                                             " . $status . "
+                                             `game` = '" . up($_POST['game']) . "',
+                                             `status` = '" . up($_POST['status']) . "',
                                              `pwd` = '" . up($_POST['pwd']) . "'
                                          WHERE id = '" . (int)($_GET['id']) . "'");
 
@@ -116,7 +119,7 @@ switch ($do) {
             "ip" => _server_ip,
             "pwd" => _pwd,
             "value" => _button_value_add,
-            "games" => sgames(),
+            "games" => DzcpGameQ::protocolOptions(),
             "no_status" => _no_live_status,
             "game" => _game,
             "port" => _server_admin_qport,
@@ -125,12 +128,16 @@ switch ($do) {
             "sgame" => $game));
         break;
     case 'add':
-        if (empty($_POST['ip']) || empty($_POST['port']))
+        if (!csrf_check()) {
+            $show = error('Ungültige Sicherheitsprüfung.', 1);
+        } elseif (empty($_POST['ip']) || empty($_POST['port']))
             $show = error(_empty_ip, 1);
         elseif ($_POST['game'] == "lazy")
             $show = error(_empty_game, 1);
         elseif (empty($_POST['name']))
             $show = error(_empty_servername, 1);
+        elseif ($_POST['status'] !== 'nope' && !DzcpGameQ::isGameProtocol((string)$_POST['status']))
+            $show = error('Das gewählte GameQ-Protokoll ist nicht verfügbar.', 1);
         else {
             db("INSERT INTO " . $db['server'] . " SET `ip` = '" . up($_POST['ip']) . "',
                                               `port` = '" . ((int)$_POST['port']) . "',
@@ -144,6 +151,14 @@ switch ($do) {
         }
         break;
     default:
+        $supportedProtocols = array_keys(DzcpGameQ::gameProtocols());
+        $legacyServers = db("SELECT `id`, `status` FROM `{$db['server']}` WHERE `status` != 'nope'");
+        while ($legacy = _fetch($legacyServers)) {
+            if (!in_array($legacy['status'], $supportedProtocols, true)) {
+                db("DELETE FROM `{$db['server']}` WHERE `id` = " . (int)$legacy['id']);
+                DzcpLogger::app()->warning('Nicht unterstützten Legacy-Server entfernt', ['id' => (int)$legacy['id'], 'status' => $legacy['status']]);
+            }
+        }
         $qry = db("SELECT * FROM " . $db['server'] . " ORDER BY id");
         $show_ = '';
         while ($get = _fetch($qry)) {
@@ -184,19 +199,10 @@ switch ($do) {
             "ts_port" => settings('ts_port'),
             "ts_ip" => re(settings('ts_ip')),
             "ts_sport" => settings('ts_sport'),
-            "ts_width" => settings('ts_width'),
-            "ts_checkcustomicon" => (settings('ts_customicon') ? ' selected="selected"' : ''),
-            "ts_checkshowchannel" => (settings('ts_showchannel') ? ' selected="selected"' : ''),
-            "ts_showchannel" => _ts_settings_showchannels,
-            "ts_customicon" => _ts_settings_customicon,
-            "ts_showchannel_desc" => _ts_settings_showchannels_desc,
-            "on" => _on,
-            "off" => _off,
             "name" => _server_name,
             "menu" => _yesno,
             "pwd" => _pwd,
             "sport" => _ts_sport,
-            "width" => _ts_width,
             "ts_head" => _teamspeak,
             "teamspeak" => _server_ip,
             "add" => _admin_server_new,

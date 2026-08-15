@@ -18,8 +18,7 @@ unset($filter404);
 // Composer classmap geladen (vendor/autoload.php in buffer.php)
 require_once(basePath . '/inc/_version.php');
 require_once(basePath . '/inc/logger.php');
-require_once(basePath . '/inc/server_query/_functions.php');
-require_once(basePath . '/inc/teamspeak_query.php');
+require_once(basePath . '/inc/gameq.php');
 
 //Libs
 use Phpfastcache\CacheManager;
@@ -3003,94 +3002,6 @@ function dropdown(string $what, int $wert, int $age = 0)
     }
 
     return $return;
-}
-
-/**
- * Games fuer den Livestatus
- * @param string $game
- * @return mixed|string
- */
-function sgames($game = '')
-{
-    $protocols = get_files(basePath . '/inc/server_query/');
-    $games = '';
-    foreach ($protocols as $protocol) {
-        unset($gamemods, $server_name_config);
-        $protocol = str_replace('.php', '', $protocol);
-        if (substr($protocol, 0, 1) != '_') {
-            $explode = '##############################################################################################################################';
-            $protocol_config = explode($explode, file_get_contents(basePath . '/inc/server_query/' . $protocol . '.php'));
-            // Parse configuration variables safely without eval()
-            // The configuration contains variable assignments like: $server_name_config = [...];
-            $config_code = str_replace('<?php', '', $protocol_config[0]);
-            // Create isolated scope for variable extraction
-            $extract_vars = function() use ($config_code) {
-                // Parse only if the code looks safe (basic variable assignments)
-                if (preg_match('/^\s*\$\w+\s*=/', $config_code)) {
-                    $temp_file = tempnam(sys_get_temp_dir(), 'dzcp_protocol_');
-                    file_put_contents($temp_file, '<?php ' . $config_code . ' return get_defined_vars();');
-                    $vars = include($temp_file);
-                    unlink($temp_file);
-                    return $vars;
-                }
-                return [];
-            };
-            $vars = $extract_vars();
-            $server_name_config = $vars['server_name_config'] ?? null;
-            $gamemods = $vars['gamemods'] ?? null;
-
-            if (!empty($server_name_config) && count($server_name_config) > 2) {
-                $gamemods = '';
-                foreach ($server_name_config as $slabel => $sconfig) {
-                    $gamemods .= $sconfig[1] . ', ';
-                }
-            }
-            $gamemods = empty($gamemods) ? '' : ' (' . substr($gamemods, 0, strlen($gamemods) - 2) . ')';
-
-            $games .= '<option value="' . $protocol . '">';
-            switch ($protocol):
-                case 'bf1942':
-                case 'bf2142':
-                case 'bf2':
-                case 'bfvietnam':
-                case 'bfbc2':
-                    $protocol = strtr($protocol, array('bfbc2' => 'Battlefield Bad Company 2', 'bfv' => 'Battlefield V', 'bf' => 'Battlefield '));
-                    break;
-                case 'swat4':
-                    $protocol = strtoupper($protocol);
-                    break;
-                case 'aarmy':
-                    $protocol = 'Americas Army';
-                    break;
-                case 'arma':
-                    $protocol = 'Armed Assault';
-                    break;
-                case 'wet':
-                    $protocol = 'Wolfenstein: Enemy Territory';
-                    break;
-                case 'mta':
-                    $protocol = 'Multi-Theft-Auto';
-                    break;
-                case 'cnc':
-                    $protocol = 'Command &amp; Conquer';
-                    break;
-                case 'sof2':
-                    $protocol = 'Soldiers of Fortune 2';
-                    break;
-                case 'ut':
-                    $protocol = 'Unreal Tournament';
-                    break;
-                default:
-                    $protocol = ucfirst(str_replace('_', ' ', $protocol));
-                    $protocol = (strlen($protocol) < 4) ? strtoupper($protocol) : $protocol;
-                    break;
-            endswitch;
-            $games .= $protocol . $gamemods;
-            $games .= '</option>';
-        }
-    }
-    $games = str_replace("value=\"" . $game . "\"", "value=\"" . $game . "\" selected=\"selected\"", $games);
-    return $games;
 }
 
 /**
