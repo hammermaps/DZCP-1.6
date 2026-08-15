@@ -152,6 +152,10 @@ function seedDemoData(PDO $pdo): void
         'dzcp_taktiken' => [['id' => 1, 'datum' => $now - 86400, 'map' => 'de_demo', 'spart' => 'T-Start', 'standardt' => 'Mitte sichern', 'sparct' => 'CT-Start', 'standardct' => 'A halten', 'autor' => 3]],
         'dzcp_downloads' => [['id' => 2, 'download' => 'Demo-Handbuch', 'url' => 'https://example.test/download/demo-handbuch.pdf', 'beschreibung' => 'Externer Platzhalter-Download für Listen und Rechte.', 'hits' => 7, 'kat' => 1, 'date' => $now - 86400 * 2, 'last_dl' => $now - 3600, 'intern' => 0]],
         'dzcp_rankings' => [['id' => 1, 'league' => 'Demo League', 'lastranking' => 5, 'rank' => 3, 'squad' => '2', 'url' => 'https://example.test/ranking', 'postdate' => $now]],
+        'dzcp_server' => [
+            ['id' => 1, 'status' => 'css', 'shown' => 1, 'navi' => 1, 'name' => 'GameTracker CSS: c400.ru de_dust', 'ip' => '89.179.240.119', 'port' => 27076, 'pwd' => '', 'game' => 'css.gif', 'qport' => ''],
+            ['id' => 2, 'status' => 'bf2', 'shown' => 1, 'navi' => 1, 'name' => 'GameTracker BF2: Reclamation EU', 'ip' => '95.179.130.30', 'port' => 17567, 'pwd' => '', 'game' => 'bf2.gif', 'qport' => ''],
+        ],
         'dzcp_serverliste' => [['id' => 1, 'datum' => $now - 3600, 'clanname' => 'Demo Clan', 'clanurl' => 'https://example.test', 'ip' => '127.0.0.1', 'port' => 27015, 'pwd' => '', 'checked' => 1, 'slots' => 16]],
         'dzcp_votes' => [['id' => 1, 'datum' => $now - 7200, 'titel' => 'Welcher Testbereich ist als N&auml;chstes dran?', 'intern' => 0, 'menu' => 1, 'closed' => 0, 'von' => 1, 'forum' => 0]],
         'dzcp_vote_results' => [['id' => 1, 'vid' => 1, 'what' => 'Forum', 'sel' => 1, 'stimmen' => 4], ['id' => 2, 'vid' => 1, 'what' => 'Galerie', 'sel' => 2, 'stimmen' => 2]],

@@ -56,7 +56,7 @@ while ($row = _fetch($query)) {
     $index .= show($dir . '/server_show', [
         'status_img' => '../inc/images/' . ($view['online'] ? 'online.gif' : 'offline.gif'),
         'pwd_img' => $view['password'] ? '<img src="../inc/images/closed.gif" alt="" class="icon" />' : '',
-        'name' => h((string)$view['hostname']),
+        'name' => h((string)($view['online'] ? $view['hostname'] : $row['name'])),
         'game' => _game,
         'icon' => !empty($row['game']) ? '<img src="../inc/images/gameicons/' . h((string)$row['game']) . '" alt="" />' : '',
         'data_gamemod' => h((string)$view['protocol']),

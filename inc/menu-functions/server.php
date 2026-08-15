@@ -40,7 +40,7 @@ function server($serverID = 0): string
 
     $icon = !empty($row['game']) ? '<img src="../inc/images/gameicons/' . h($row['game']) . '" alt="" />' : '';
     return show('menu/server', [
-        'host' => h((string)$view['hostname']),
+        'host' => h((string)($view['online'] ? $view['hostname'] : $row['name'])),
         'ip' => h((string)$row['ip']),
         'map' => h((string)$view['mapname']) ?: '-',
         'mappic' => '../inc/images/maps/no_map.gif',
