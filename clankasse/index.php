@@ -14,6 +14,17 @@ $where = _site_clankasse;
 $title = $pagetitle . " - " . $where . "";
 $dir = "clankasse";
 
+function clankasseTimestamp(mixed $value): int
+{
+    if (is_numeric($value)) {
+        return (int) $value;
+    }
+
+    $timestamp = strtotime(trim((string) $value));
+
+    return $timestamp === false ? 0 : $timestamp;
+}
+
 ## SECTIONS ##
 switch ($action):
     default:
@@ -48,7 +59,7 @@ switch ($action):
                     "transaktion" => h($get['transaktion']),
                     "delete" => $delete,
                     "edit" => $edit,
-                    "datum" => date("d.m.Y", $get['datum'])));
+                    "datum" => date("d.m.Y", clankasseTimestamp($get['datum']))));
             }
 
             $getp = sum($db['clankasse'], 'betrag', ' WHERE `pm` = 0');
@@ -65,12 +76,13 @@ switch ($action):
             $showstatus = '';
             while ($gets = _fetch($qrys)) {
                 if ($gets['user']) {
-                    if ($gets['payed'] >= time())
-                        $status = show(_clankasse_status_payed, array("payed" => date("d.m.Y", $gets['payed'])));
-                    elseif (date("d.m.Y", $gets['payed']) == date("d.m.Y", time()))
+                    $payed = clankasseTimestamp($gets['payed']);
+                    if ($payed >= time())
+                        $status = show(_clankasse_status_payed, array("payed" => date("d.m.Y", $payed)));
+                    elseif (date("d.m.Y", $payed) == date("d.m.Y", time()))
                         $status = show(_clankasse_status_today, array());
                     else
-                        $status = show(_clankasse_status_notpayed, array("payed" => date("d.m.Y", $gets['payed'])));
+                        $status = show(_clankasse_status_notpayed, array("payed" => date("d.m.Y", $payed)));
                 } else
                     $status = show(_clankasse_status_noentry, array());
 
@@ -196,9 +208,10 @@ switch ($action):
                 }
             } elseif ($do == "edit") {
                 $get = db("SELECT * FROM `" . $db['clankasse'] . "` WHERE `id` = " . (int)($_GET['id']) . ";", false, true);
-                $dropdown_date = show(_dropdown_date, array("day" => dropdown("day", date("d", $get['datum'])),
-                    "month" => dropdown("month", date("m", $get['datum'])),
-                    "year" => dropdown("year", date("Y", $get['datum']))));
+                $timestamp = clankasseTimestamp($get['datum']);
+                $dropdown_date = show(_dropdown_date, array("day" => dropdown("day", date("d", $timestamp)),
+                    "month" => dropdown("month", date("m", $timestamp)),
+                    "year" => dropdown("year", date("Y", $timestamp))));
 
                 $psel = ($get['pm'] == 0 ? 'selected="selected"' : '');
                 $msel = ($get['pm'] == 1 ? 'selected="selected"' : '');
@@ -260,9 +273,10 @@ switch ($action):
                 $qry = db("SELECT `payed` FROM `" . $db['c_payed'] . "` WHERE `user` = " . (int)($_GET['id']) . ";");
                 if (_rows($qry)) {
                     $get = _fetch($qry);
-                    $tag = date("d", $get['payed']);
-                    $monat = date("m", $get['payed']);
-                    $jahr = date("Y", $get['payed']);
+                    $payed = clankasseTimestamp($get['payed']);
+                    $tag = date("d", $payed);
+                    $monat = date("m", $payed);
+                    $jahr = date("Y", $payed);
                 }
 
                 $index = show($dir . "/paycheck", array("id" => $_GET['id'],
