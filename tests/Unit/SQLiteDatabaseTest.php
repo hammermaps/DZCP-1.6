@@ -35,6 +35,16 @@ final class SQLiteDatabaseTest extends TestCase
         self::assertSame('second', $database->query('SELECT title FROM entries ORDER BY id LIMIT 1, 1')->fetch_assoc()['title']);
     }
 
+    public function testSupportsLegacyReplaceIntoSetSyntax(): void
+    {
+        $database = DzcpDatabase::sqlite($this->path);
+        $database->query('CREATE TABLE visitors (ip TEXT PRIMARY KEY, online INTEGER NOT NULL)');
+        $database->query("REPLACE INTO visitors SET ip = '127.0.0.1', online = 1");
+        $database->query("REPLACE INTO visitors SET ip = '127.0.0.1', online = 2");
+
+        self::assertSame(['ip' => '127.0.0.1', 'online' => 2], $database->query('SELECT ip, online FROM visitors')->fetch_assoc());
+    }
+
     public function testSupportsLegacyDateFunctions(): void
     {
         $database = DzcpDatabase::sqlite($this->path);

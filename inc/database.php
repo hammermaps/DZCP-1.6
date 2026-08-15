@@ -192,8 +192,8 @@ final class DzcpDatabase
         $sql = preg_replace('/\bINSERT\s+IGNORE\b/i', 'INSERT OR IGNORE', $sql) ?? $sql;
         $sql = preg_replace('/\bLIMIT\s+([^,;]+),\s*([^;\s]+)/i', 'LIMIT $2 OFFSET $1', $sql) ?? $sql;
         $sql = preg_replace('/\s+AFTER\s+`?[a-zA-Z0-9_]+`?/i', '', $sql) ?? $sql;
-        if (preg_match('/^\s*INSERT\s+INTO\s+(.+?)\s+SET\s+(.+)$/is', $sql, $match)) {
-            $assignments = self::splitSqlList(rtrim($match[2], ';'));
+        if (preg_match('/^\s*((?:INSERT|REPLACE)\s+INTO)\s+(.+?)\s+SET\s+(.+)$/is', $sql, $match)) {
+            $assignments = self::splitSqlList(rtrim($match[3], ';'));
             $columns = [];
             $values = [];
             foreach ($assignments as $assignment) {
@@ -201,7 +201,7 @@ final class DzcpDatabase
                 $columns[] = trim($column);
                 $values[] = trim($value);
             }
-            $sql = 'INSERT INTO ' . trim($match[1]) . ' (' . implode(', ', $columns) . ') VALUES (' . implode(', ', $values) . ')';
+            $sql = trim($match[1]) . ' ' . trim($match[2]) . ' (' . implode(', ', $columns) . ') VALUES (' . implode(', ', $values) . ')';
         }
         return $sql;
     }
