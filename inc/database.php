@@ -72,6 +72,10 @@ final class DzcpDatabase
         $connection->exec('PRAGMA foreign_keys = ON');
         $createFunction = method_exists($connection, 'createFunction') ? 'createFunction' : 'sqliteCreateFunction';
         $connection->$createFunction('FROM_UNIXTIME', static fn($value): string => date('Y-m-d H:i:s', (int) $value), 1);
+        $connection->$createFunction('FROM_UNIXTIME', static function ($value, string $format): string {
+            $phpFormat = strtr($format, ['%i' => 'i', '%s' => 's', '%d' => 'd', '%m' => 'm', '%Y' => 'Y', '%y' => 'y', '%H' => 'H', '%h' => 'h']);
+            return date($phpFormat, (int) $value);
+        }, 2);
         $connection->$createFunction('DATE_FORMAT', static function ($value, string $format): string {
             $timestamp = is_numeric($value) ? (int) $value : strtotime((string) $value);
             $phpFormat = strtr($format, ['%i' => 'i', '%s' => 's', '%d' => 'd', '%m' => 'm', '%Y' => 'Y', '%y' => 'y', '%H' => 'H', '%h' => 'h']);

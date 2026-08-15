@@ -48,8 +48,9 @@ final class SQLiteDatabaseTest extends TestCase
     public function testSupportsLegacyDateFunctions(): void
     {
         $database = DzcpDatabase::sqlite($this->path);
-        $row = $database->query("SELECT DATE_FORMAT(FROM_UNIXTIME(0), '%d.%m.%Y') AS formatted")->fetch_assoc();
+        $row = $database->query("SELECT DATE_FORMAT(FROM_UNIXTIME(0), '%d.%m.%Y') AS formatted, FROM_UNIXTIME(0, '%d.%m.%Y') AS directly_formatted")->fetch_assoc();
 
         self::assertSame('01.01.1970', $row['formatted']);
+        self::assertSame('01.01.1970', $row['directly_formatted']);
     }
 }
