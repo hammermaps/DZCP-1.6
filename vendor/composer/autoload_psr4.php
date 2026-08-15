@@ -10,7 +10,6 @@ return array(
     'Psr\\SimpleCache\\' => array($vendorDir . '/psr/simple-cache/src'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/src'),
     'Psr\\Cache\\' => array($vendorDir . '/psr/cache/src'),
-    'Phpfastcache\\Tests\\' => array($vendorDir . '/phpfastcache/phpfastcache/tests/lib'),
     'Phpfastcache\\' => array($vendorDir . '/phpfastcache/phpfastcache/lib/Phpfastcache'),
     'PhpParser\\' => array($vendorDir . '/nikic/php-parser/lib/PhpParser'),
     'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),

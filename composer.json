@@ -21,7 +21,7 @@
     "ext-iconv": "*",
     "ext-mysqli": "*",
     "monolog/monolog": "^3.10.0",
-    "phpfastcache/phpfastcache": "8.0.8.0",
+    "phpfastcache/phpfastcache": "9.2.4",
     "phpmailer/phpmailer": "^7.0.2",
     "jaybizzle/crawler-detect": "^1.3.7",
     "wixel/gump": "2.3.2",

@@ -14,33 +14,32 @@ class ComposerStaticInit3ae559e2dbc63b5d16fbfdfeb86b5b35
     );
 
     public static $prefixLengthsPsr4 = array (
-        'T' =>
+        'T' => 
         array (
             'Tracy\\' => 6,
         ),
-        'P' =>
+        'P' => 
         array (
             'Psr\\SimpleCache\\' => 16,
             'Psr\\Log\\' => 8,
             'Psr\\Cache\\' => 10,
-            'Phpfastcache\\Tests\\' => 19,
             'Phpfastcache\\' => 13,
             'PhpParser\\' => 10,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
-        'M' =>
+        'M' => 
         array (
             'Monolog\\' => 8,
         ),
-        'J' =>
+        'J' => 
         array (
             'Jaybizzle\\CrawlerDetect\\' => 24,
         ),
-        'G' =>
+        'G' => 
         array (
             'GUMP\\' => 5,
         ),
-        'D' =>
+        'D' => 
         array (
             'DeepCopy\\' => 9,
             'DZCP\\Tests\\' => 11,
@@ -48,55 +47,51 @@ class ComposerStaticInit3ae559e2dbc63b5d16fbfdfeb86b5b35
     );
 
     public static $prefixDirsPsr4 = array (
-        'Tracy\\' =>
+        'Tracy\\' => 
         array (
             0 => __DIR__ . '/..' . '/tracy/tracy/src',
         ),
-        'Psr\\SimpleCache\\' =>
+        'Psr\\SimpleCache\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/simple-cache/src',
         ),
-        'Psr\\Log\\' =>
+        'Psr\\Log\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/log/src',
         ),
-        'Psr\\Cache\\' =>
+        'Psr\\Cache\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/cache/src',
         ),
-        'Phpfastcache\\Tests\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/phpfastcache/phpfastcache/tests/lib',
-        ),
-        'Phpfastcache\\' =>
+        'Phpfastcache\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache',
         ),
-        'PhpParser\\' =>
+        'PhpParser\\' => 
         array (
             0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
         ),
-        'PHPMailer\\PHPMailer\\' =>
+        'PHPMailer\\PHPMailer\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
-        'Monolog\\' =>
+        'Monolog\\' => 
         array (
             0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
         ),
-        'Jaybizzle\\CrawlerDetect\\' =>
+        'Jaybizzle\\CrawlerDetect\\' => 
         array (
             0 => __DIR__ . '/..' . '/jaybizzle/crawler-detect/src',
         ),
-        'GUMP\\' =>
+        'GUMP\\' => 
         array (
             0 => __DIR__ . '/..' . '/wixel/gump/src',
         ),
-        'DeepCopy\\' =>
+        'DeepCopy\\' => 
         array (
             0 => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy',
         ),
-        'DZCP\\Tests\\' =>
+        'DZCP\\Tests\\' => 
         array (
             0 => __DIR__ . '/../..' . '/tests',
         ),
@@ -104,8 +99,8 @@ class ComposerStaticInit3ae559e2dbc63b5d16fbfdfeb86b5b35
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'DZCP\\Tests\\Unit\\SQLiteDatabaseTest' => __DIR__ . '/../..' . '/tests/Unit/SQLiteDatabaseTest.php',
         'DZCP\\Tests\\Unit\\TestEnvironmentTest' => __DIR__ . '/../..' . '/tests/Unit/TestEnvironmentTest.php',
-        'DebugConsole' => __DIR__ . '/../..' . '/inc/debugger.php',
         'DeepCopy\\DeepCopy' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/DeepCopy.php',
         'DeepCopy\\Exception\\CloneException' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/Exception/CloneException.php',
         'DeepCopy\\Exception\\PropertyException' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/Exception/PropertyException.php',
@@ -132,6 +127,7 @@ class ComposerStaticInit3ae559e2dbc63b5d16fbfdfeb86b5b35
         'DeepCopy\\TypeFilter\\Spl\\SplDoublyLinkedListFilter' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/TypeFilter/Spl/SplDoublyLinkedListFilter.php',
         'DeepCopy\\TypeFilter\\TypeFilter' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/TypeFilter/TypeFilter.php',
         'DeepCopy\\TypeMatcher\\TypeMatcher' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/TypeMatcher/TypeMatcher.php',
+        'DzcpErrorHandler' => __DIR__ . '/../..' . '/inc/debugger.php',
         'GUMP\\ArrayHelpers' => __DIR__ . '/..' . '/wixel/gump/src/ArrayHelpers.php',
         'GUMP\\EnvHelpers' => __DIR__ . '/..' . '/wixel/gump/src/EnvHelpers.php',
         'Jaybizzle\\CrawlerDetect\\CrawlerDetect' => __DIR__ . '/..' . '/jaybizzle/crawler-detect/src/CrawlerDetect.php',
@@ -1543,6 +1539,7 @@ class ComposerStaticInit3ae559e2dbc63b5d16fbfdfeb86b5b35
         'PhpParser\\PrettyPrinter\\Standard' => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser/PrettyPrinter/Standard.php',
         'PhpParser\\Token' => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser/Token.php',
         'Phpfastcache\\Api' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Api.php',
+        'Phpfastcache\\CacheContract' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/CacheContract.php',
         'Phpfastcache\\CacheManager' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/CacheManager.php',
         'Phpfastcache\\Cluster\\AggregatablePoolInterface' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Cluster/AggregatablePoolInterface.php',
         'Phpfastcache\\Cluster\\AggregatorInterface' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Cluster/AggregatorInterface.php',
@@ -1550,27 +1547,31 @@ class ComposerStaticInit3ae559e2dbc63b5d16fbfdfeb86b5b35
         'Phpfastcache\\Cluster\\ClusterPoolAbstract' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Cluster/ClusterPoolAbstract.php',
         'Phpfastcache\\Cluster\\ClusterPoolInterface' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Cluster/ClusterPoolInterface.php',
         'Phpfastcache\\Cluster\\ClusterPoolTrait' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Cluster/ClusterPoolTrait.php',
-        'Phpfastcache\\Cluster\\Drivers\\FullReplication\\FullReplicationCluster' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Cluster/Drivers/FullReplication/FullReplicationCluster.php',
+        'Phpfastcache\\Cluster\\Drivers\\FullReplication\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Cluster/Drivers/FullReplication/Driver.php',
         'Phpfastcache\\Cluster\\Drivers\\FullReplication\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Cluster/Drivers/FullReplication/Item.php',
+        'Phpfastcache\\Cluster\\Drivers\\MasterSlaveReplication\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Cluster/Drivers/MasterSlaveReplication/Driver.php',
         'Phpfastcache\\Cluster\\Drivers\\MasterSlaveReplication\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Cluster/Drivers/MasterSlaveReplication/Item.php',
-        'Phpfastcache\\Cluster\\Drivers\\MasterSlaveReplication\\MasterSlaveReplicationCluster' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Cluster/Drivers/MasterSlaveReplication/MasterSlaveReplicationCluster.php',
+        'Phpfastcache\\Cluster\\Drivers\\RandomReplication\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Cluster/Drivers/RandomReplication/Driver.php',
         'Phpfastcache\\Cluster\\Drivers\\RandomReplication\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Cluster/Drivers/RandomReplication/Item.php',
-        'Phpfastcache\\Cluster\\Drivers\\RandomReplication\\RandomReplicationCluster' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Cluster/Drivers/RandomReplication/RandomReplicationCluster.php',
+        'Phpfastcache\\Cluster\\Drivers\\SemiReplication\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Cluster/Drivers/SemiReplication/Driver.php',
         'Phpfastcache\\Cluster\\Drivers\\SemiReplication\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Cluster/Drivers/SemiReplication/Item.php',
-        'Phpfastcache\\Cluster\\Drivers\\SemiReplication\\SemiReplicationCluster' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Cluster/Drivers/SemiReplication/SemiReplicationCluster.php',
         'Phpfastcache\\Cluster\\ItemAbstract' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Cluster/ItemAbstract.php',
+        'Phpfastcache\\Config\\AbstractConfigurationOption' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Config/AbstractConfigurationOption.php',
         'Phpfastcache\\Config\\Config' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Config/Config.php',
         'Phpfastcache\\Config\\ConfigurationOption' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Config/ConfigurationOption.php',
         'Phpfastcache\\Config\\ConfigurationOptionInterface' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Config/ConfigurationOptionInterface.php',
-        'Phpfastcache\\Config\\IOConfigurationOptionTrait' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Config/IOConfigurationOptionTrait.php',
+        'Phpfastcache\\Config\\IOConfigurationOption' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Config/IOConfigurationOption.php',
+        'Phpfastcache\\Config\\IOConfigurationOptionInterface' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Config/IOConfigurationOptionInterface.php',
+        'Phpfastcache\\Config\\LockableConfigurationInterface' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Config/LockableConfigurationInterface.php',
+        'Phpfastcache\\Core\\Item\\CacheItemTrait' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Core/Item/CacheItemTrait.php',
         'Phpfastcache\\Core\\Item\\ExtendedCacheItemInterface' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Core/Item/ExtendedCacheItemInterface.php',
-        'Phpfastcache\\Core\\Item\\ItemBaseTrait' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Core/Item/ItemBaseTrait.php',
-        'Phpfastcache\\Core\\Item\\ItemExtendedTrait' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Core/Item/ItemExtendedTrait.php',
+        'Phpfastcache\\Core\\Item\\ExtendedCacheItemTrait' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Core/Item/ExtendedCacheItemTrait.php',
         'Phpfastcache\\Core\\Item\\TaggableCacheItemInterface' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Core/Item/TaggableCacheItemInterface.php',
         'Phpfastcache\\Core\\Item\\TaggableCacheItemTrait' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Core/Item/TaggableCacheItemTrait.php',
-        'Phpfastcache\\Core\\Pool\\AbstractDriverPoolTrait' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Core/Pool/AbstractDriverPoolTrait.php',
+        'Phpfastcache\\Core\\Pool\\AggregatablePoolTrait' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Core/Pool/AggregatablePoolTrait.php',
         'Phpfastcache\\Core\\Pool\\CacheItemPoolTrait' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Core/Pool/CacheItemPoolTrait.php',
         'Phpfastcache\\Core\\Pool\\DriverBaseTrait' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Core/Pool/DriverBaseTrait.php',
+        'Phpfastcache\\Core\\Pool\\DriverPoolAbstractTrait' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Core/Pool/DriverPoolAbstractTrait.php',
         'Phpfastcache\\Core\\Pool\\ExtendedCacheItemPoolInterface' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Core/Pool/ExtendedCacheItemPoolInterface.php',
         'Phpfastcache\\Core\\Pool\\ExtendedCacheItemPoolTrait' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Core/Pool/ExtendedCacheItemPoolTrait.php',
         'Phpfastcache\\Core\\Pool\\IO\\IOHelperTrait' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Core/Pool/IO/IOHelperTrait.php',
@@ -1582,27 +1583,15 @@ class ComposerStaticInit3ae559e2dbc63b5d16fbfdfeb86b5b35
         'Phpfastcache\\Drivers\\Cassandra\\Config' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Cassandra/Config.php',
         'Phpfastcache\\Drivers\\Cassandra\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Cassandra/Driver.php',
         'Phpfastcache\\Drivers\\Cassandra\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Cassandra/Item.php',
-        'Phpfastcache\\Drivers\\Cookie\\Config' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Cookie/Config.php',
-        'Phpfastcache\\Drivers\\Cookie\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Cookie/Driver.php',
-        'Phpfastcache\\Drivers\\Cookie\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Cookie/Item.php',
-        'Phpfastcache\\Drivers\\Couchbase\\Config' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Couchbase/Config.php',
-        'Phpfastcache\\Drivers\\Couchbase\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Couchbase/Driver.php',
-        'Phpfastcache\\Drivers\\Couchbase\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Couchbase/Item.php',
         'Phpfastcache\\Drivers\\Couchbasev3\\Config' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Couchbasev3/Config.php',
         'Phpfastcache\\Drivers\\Couchbasev3\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Couchbasev3/Driver.php',
         'Phpfastcache\\Drivers\\Couchbasev3\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Couchbasev3/Item.php',
-        'Phpfastcache\\Drivers\\Couchdb\\Config' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Couchdb/Config.php',
-        'Phpfastcache\\Drivers\\Couchdb\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Couchdb/Driver.php',
-        'Phpfastcache\\Drivers\\Couchdb\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Couchdb/Item.php',
-        'Phpfastcache\\Drivers\\Devfalse\\Config' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Devfalse/Config.php',
-        'Phpfastcache\\Drivers\\Devfalse\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Devfalse/Driver.php',
-        'Phpfastcache\\Drivers\\Devfalse\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Devfalse/Item.php',
         'Phpfastcache\\Drivers\\Devnull\\Config' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Devnull/Config.php',
         'Phpfastcache\\Drivers\\Devnull\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Devnull/Driver.php',
         'Phpfastcache\\Drivers\\Devnull\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Devnull/Item.php',
-        'Phpfastcache\\Drivers\\Devtrue\\Config' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Devtrue/Config.php',
-        'Phpfastcache\\Drivers\\Devtrue\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Devtrue/Driver.php',
-        'Phpfastcache\\Drivers\\Devtrue\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Devtrue/Item.php',
+        'Phpfastcache\\Drivers\\Devrandom\\Config' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Devrandom/Config.php',
+        'Phpfastcache\\Drivers\\Devrandom\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Devrandom/Driver.php',
+        'Phpfastcache\\Drivers\\Devrandom\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Devrandom/Item.php',
         'Phpfastcache\\Drivers\\Files\\Config' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Files/Config.php',
         'Phpfastcache\\Drivers\\Files\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Files/Driver.php',
         'Phpfastcache\\Drivers\\Files\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Files/Item.php',
@@ -1615,18 +1604,22 @@ class ComposerStaticInit3ae559e2dbc63b5d16fbfdfeb86b5b35
         'Phpfastcache\\Drivers\\Memcached\\Config' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Memcached/Config.php',
         'Phpfastcache\\Drivers\\Memcached\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Memcached/Driver.php',
         'Phpfastcache\\Drivers\\Memcached\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Memcached/Item.php',
+        'Phpfastcache\\Drivers\\Memory\\Config' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Memory/Config.php',
+        'Phpfastcache\\Drivers\\Memory\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Memory/Driver.php',
+        'Phpfastcache\\Drivers\\Memory\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Memory/Item.php',
         'Phpfastcache\\Drivers\\Memstatic\\Config' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Memstatic/Config.php',
         'Phpfastcache\\Drivers\\Memstatic\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Memstatic/Driver.php',
         'Phpfastcache\\Drivers\\Memstatic\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Memstatic/Item.php',
-        'Phpfastcache\\Drivers\\Mongodb\\Config' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Mongodb/Config.php',
-        'Phpfastcache\\Drivers\\Mongodb\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Mongodb/Driver.php',
-        'Phpfastcache\\Drivers\\Mongodb\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Mongodb/Item.php',
         'Phpfastcache\\Drivers\\Predis\\Config' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Predis/Config.php',
         'Phpfastcache\\Drivers\\Predis\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Predis/Driver.php',
         'Phpfastcache\\Drivers\\Predis\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Predis/Item.php',
         'Phpfastcache\\Drivers\\Redis\\Config' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Redis/Config.php',
         'Phpfastcache\\Drivers\\Redis\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Redis/Driver.php',
         'Phpfastcache\\Drivers\\Redis\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Redis/Item.php',
+        'Phpfastcache\\Drivers\\Redis\\RedisDriverTrait' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Redis/RedisDriverTrait.php',
+        'Phpfastcache\\Drivers\\Rediscluster\\Config' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Rediscluster/Config.php',
+        'Phpfastcache\\Drivers\\Rediscluster\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Rediscluster/Driver.php',
+        'Phpfastcache\\Drivers\\Rediscluster\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Rediscluster/Item.php',
         'Phpfastcache\\Drivers\\Sqlite\\Config' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Sqlite/Config.php',
         'Phpfastcache\\Drivers\\Sqlite\\Driver' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Sqlite/Driver.php',
         'Phpfastcache\\Drivers\\Sqlite\\Item' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Drivers/Sqlite/Item.php',
@@ -1646,34 +1639,47 @@ class ComposerStaticInit3ae559e2dbc63b5d16fbfdfeb86b5b35
         'Phpfastcache\\Entities\\DriverStatistic' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Entities/DriverStatistic.php',
         'Phpfastcache\\Entities\\ItemBatch' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Entities/ItemBatch.php',
         'Phpfastcache\\EventManager' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/EventManager.php',
+        'Phpfastcache\\Event\\Event' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Event/Event.php',
+        'Phpfastcache\\Event\\EventInterface' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Event/EventInterface.php',
         'Phpfastcache\\Event\\EventManagerDispatcherInterface' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Event/EventManagerDispatcherInterface.php',
         'Phpfastcache\\Event\\EventManagerDispatcherTrait' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Event/EventManagerDispatcherTrait.php',
         'Phpfastcache\\Event\\EventManagerInterface' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Event/EventManagerInterface.php',
+        'Phpfastcache\\Event\\EventReferenceParameter' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Event/EventReferenceParameter.php',
         'Phpfastcache\\Exceptions\\PhpfastcacheCoreException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheCoreException.php',
+        'Phpfastcache\\Exceptions\\PhpfastcacheCorruptedDataException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheCorruptedDataException.php',
         'Phpfastcache\\Exceptions\\PhpfastcacheDeprecatedException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheDeprecatedException.php',
         'Phpfastcache\\Exceptions\\PhpfastcacheDriverCheckException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheDriverCheckException.php',
         'Phpfastcache\\Exceptions\\PhpfastcacheDriverConnectException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheDriverConnectException.php',
         'Phpfastcache\\Exceptions\\PhpfastcacheDriverException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheDriverException.php',
         'Phpfastcache\\Exceptions\\PhpfastcacheDriverNotFoundException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheDriverNotFoundException.php',
+        'Phpfastcache\\Exceptions\\PhpfastcacheEventManagerException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheEventManagerException.php',
         'Phpfastcache\\Exceptions\\PhpfastcacheExceptionInterface' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheExceptionInterface.php',
+        'Phpfastcache\\Exceptions\\PhpfastcacheExtensionNotFoundException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheExtensionNotFoundException.php',
+        'Phpfastcache\\Exceptions\\PhpfastcacheExtensionNotInstalledException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheExtensionNotInstalledException.php',
         'Phpfastcache\\Exceptions\\PhpfastcacheIOException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheIOException.php',
         'Phpfastcache\\Exceptions\\PhpfastcacheInstanceNotFoundException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheInstanceNotFoundException.php',
         'Phpfastcache\\Exceptions\\PhpfastcacheInvalidArgumentException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheInvalidArgumentException.php',
-        'Phpfastcache\\Exceptions\\PhpfastcacheInvalidArgumentTypeException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheInvalidArgumentTypeException.php',
         'Phpfastcache\\Exceptions\\PhpfastcacheInvalidConfigurationException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheInvalidConfigurationException.php',
+        'Phpfastcache\\Exceptions\\PhpfastcacheInvalidTypeException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheInvalidTypeException.php',
         'Phpfastcache\\Exceptions\\PhpfastcacheLogicException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheLogicException.php',
         'Phpfastcache\\Exceptions\\PhpfastcacheReplicationException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheReplicationException.php',
         'Phpfastcache\\Exceptions\\PhpfastcacheRootException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheRootException.php',
         'Phpfastcache\\Exceptions\\PhpfastcacheSimpleCacheException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheSimpleCacheException.php',
+        'Phpfastcache\\Exceptions\\PhpfastcacheUnsupportedException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheUnsupportedException.php',
+        'Phpfastcache\\Exceptions\\PhpfastcacheUnsupportedMethodException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheUnsupportedMethodException.php',
         'Phpfastcache\\Exceptions\\PhpfastcacheUnsupportedOperationException' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Exceptions/PhpfastcacheUnsupportedOperationException.php',
+        'Phpfastcache\\ExtensionManager' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/ExtensionManager.php',
         'Phpfastcache\\Helper\\CacheConditionalHelper' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Helper/CacheConditionalHelper.php',
         'Phpfastcache\\Helper\\Psr16Adapter' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Helper/Psr16Adapter.php',
+        'Phpfastcache\\Helper\\UninstanciableObjectTrait' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Helper/UninstanciableObjectTrait.php',
         'Phpfastcache\\Proxy\\PhpfastcacheAbstractProxy' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Proxy/PhpfastcacheAbstractProxy.php',
-        'Phpfastcache\\Util\\ArrayObject' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Util/ArrayObject.php',
+        'Phpfastcache\\Proxy\\PhpfastcacheAbstractProxyInterface' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Proxy/PhpfastcacheAbstractProxyInterface.php',
         'Phpfastcache\\Util\\ClassNamespaceResolverInterface' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Util/ClassNamespaceResolverInterface.php',
         'Phpfastcache\\Util\\ClassNamespaceResolverTrait' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Util/ClassNamespaceResolverTrait.php',
         'Phpfastcache\\Util\\Directory' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Util/Directory.php',
         'Phpfastcache\\Util\\MemcacheDriverCollisionDetectorTrait' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Util/MemcacheDriverCollisionDetectorTrait.php',
+        'Phpfastcache\\Util\\SapiDetector' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Util/SapiDetector.php',
+        'Phpfastcache\\Wiki' => __DIR__ . '/..' . '/phpfastcache/phpfastcache/lib/Phpfastcache/Wiki.php',
         'Psr\\Cache\\CacheException' => __DIR__ . '/..' . '/psr/cache/src/CacheException.php',
         'Psr\\Cache\\CacheItemInterface' => __DIR__ . '/..' . '/psr/cache/src/CacheItemInterface.php',
         'Psr\\Cache\\CacheItemPoolInterface' => __DIR__ . '/..' . '/psr/cache/src/CacheItemPoolInterface.php',

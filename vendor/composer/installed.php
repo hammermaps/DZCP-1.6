@@ -3,7 +3,7 @@
         'name' => 'dzcp/core',
         'pretty_version' => 'dev-development',
         'version' => 'dev-development',
-        'reference' => '850a4fefb6123b55ad9544f5d24685035c0dd08e',
+        'reference' => 'ad2e698a70a721a8660fba249fa549ae638d546b',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'dzcp/core' => array(
             'pretty_version' => 'dev-development',
             'version' => 'dev-development',
-            'reference' => '850a4fefb6123b55ad9544f5d24685035c0dd08e',
+            'reference' => 'ad2e698a70a721a8660fba249fa549ae638d546b',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -31,7 +31,7 @@
         'monolog/monolog' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '6db20ca029219dd8de378cea8e32ee149399ef1b',
+            'reference' => '57eb1028342134e701e77c617565d51b6e5a2a53',
             'type' => 'library',
             'install_path' => __DIR__ . '/../monolog/monolog',
             'aliases' => array(
@@ -80,9 +80,9 @@
             'dev_requirement' => true,
         ),
         'phpfastcache/phpfastcache' => array(
-            'pretty_version' => '8.0.8',
-            'version' => '8.0.8.0',
-            'reference' => 'c413ffd8185564db3d670e20f9135497be9ebe85',
+            'pretty_version' => '9.2.4',
+            'version' => '9.2.4.0',
+            'reference' => '7c24491baf23ffb637b18e485f517144cd9af203',
             'type' => 'library',
             'install_path' => __DIR__ . '/../phpfastcache/phpfastcache',
             'aliases' => array(),
@@ -152,13 +152,19 @@
             'dev_requirement' => true,
         ),
         'psr/cache' => array(
-            'pretty_version' => '1.0.1',
-            'version' => '1.0.1.0',
-            'reference' => 'd11b50ad223250cf17b86e38383413f5a6764bf8',
+            'pretty_version' => '3.0.0',
+            'version' => '3.0.0.0',
+            'reference' => 'aa5030cfa5405eccfdcb1083ce040c2cb8d253bf',
             'type' => 'library',
             'install_path' => __DIR__ . '/../psr/cache',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'psr/cache-implementation' => array(
+            'dev_requirement' => false,
+            'provided' => array(
+                0 => '2.0|3.0',
+            ),
         ),
         'psr/log' => array(
             'pretty_version' => 'dev-master',
@@ -178,13 +184,19 @@
             ),
         ),
         'psr/simple-cache' => array(
-            'pretty_version' => '1.0.1',
-            'version' => '1.0.1.0',
-            'reference' => '408d5eafb83c57f6365a3ca330ff23aa4a5fa39b',
+            'pretty_version' => '3.0.0',
+            'version' => '3.0.0.0',
+            'reference' => '764e0b3939f5ca87cb904f570ef9be2d78a07865',
             'type' => 'library',
             'install_path' => __DIR__ . '/../psr/simple-cache',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'psr/simple-cache-implementation' => array(
+            'dev_requirement' => false,
+            'provided' => array(
+                0 => '2.0|3.0',
+            ),
         ),
         'sebastian/cli-parser' => array(
             'pretty_version' => '3.0.2',

@@ -145,7 +145,7 @@ DzcpErrorHandler::configure($config_logging, view_error_reporting);
  * Cache Configuration
  */
 
-use Phpfastcache\Config\Config;
+use Phpfastcache\Config\ConfigurationOption;
 use Phpfastcache\Exceptions\PhpfastcacheInvalidConfigurationException;
 
 try {
@@ -153,11 +153,9 @@ try {
         //auto ,apc, apcu, cassandra, cookie, couchbase, couchdb, files, leveldb, memcache, memcached, memstatic, mongodb, predis
         //redis, riak, sqlite, ssdb, wincache, xcache, zenddisk, zendshm
         "storage" => "files",
-        "config" => new Config([
+        "config" => new ConfigurationOption([
             "autoTmpFallback" => true,
             "defaultTtl" => 10,
-            "defaultChmod" => 0775,
-            "compressData" => true,
             "path" => basePath . "/inc/_cache_/"
         ]),
         "dbc" => true,  //use database query caching * only use with memory cache
