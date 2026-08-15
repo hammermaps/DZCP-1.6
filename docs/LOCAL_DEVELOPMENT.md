@@ -10,13 +10,13 @@ composer install --prefer-dist --no-progress
 
 Lege anschließend eine lokale, nicht versionierte `inc/mysql.php` mit den Zugangsdaten an oder durchlaufe den Installer unter `/_installer/`. Die Datei ist absichtlich in `.gitignore` enthalten. Das Schema befindet sich in `_installer/full_dzcp.sql`; der Installer erzeugt außerdem die erforderlichen Anfangsdaten. Niemals echte Zugangsdaten oder Datenbankexporte mit Produktionsdaten einchecken.
 
-Für einen einfachen lokalen Server im Repository-Root genügt:
+Starte den PHP-Testserver im Repository-Root mit:
 
 ```bash
-php -S 127.0.0.1:8011
+./tools/start-test-server.sh
 ```
 
-Rufe danach `http://127.0.0.1:8011/` auf. Ohne Datenbankkonfiguration ist die Weiterleitung zum Installer erwartetes Verhalten.
+Standardmäßig läuft er unter `http://127.0.0.1:8011/`. Host, Port und Document Root können als Argumente überschrieben werden, zum Beispiel `./tools/start-test-server.sh 0.0.0.0 8080`. Ohne Datenbankkonfiguration ist die Weiterleitung zum Installer erwartetes Verhalten.
 
 ## Prüfen und Debuggen
 
