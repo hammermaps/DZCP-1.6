@@ -139,9 +139,11 @@ switch ($action):
                 $get = _fetch($qry);
 
                 $files = get_files("../inc/images/uploads/taktiken/", false, true, $picformat, false, array(), 'minimize');
-                for ($i = 0; $i < count($files); $i++) {
-                    $screen .= show(_member_admin_select_icons, array("iconimg" => $files[$i]));
-                    $icons = $files[$i];
+                $screen = '';
+                $icons = '';
+                foreach (is_array($files) ? $files : array() as $file) {
+                    $screen .= show(_member_admin_select_icons, array("iconimg" => $file));
+                    $icons = $file;
                 }
 
                 $index = show($dir . "/new", array("date" => date("d.m.Y"),
@@ -185,9 +187,11 @@ switch ($action):
                 $get = _fetch($qry);
 
                 $files = get_files("../inc/images/uploads/taktiken/", false, true, $picformat, false, array(), 'minimize');
-                for ($i = 0; $i < count($files); $i++) {
-                    $screen .= show(_member_admin_select_icons, array("iconimg" => $files[$i]));
-                    $icons = $files[$i];
+                $screen = '';
+                $icons = '';
+                foreach (is_array($files) ? $files : array() as $file) {
+                    $screen .= show(_member_admin_select_icons, array("iconimg" => $file));
+                    $icons = $file;
                 }
 
                 $index = show($dir . "/edit", array("id" => $_GET['id'],
